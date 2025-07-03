@@ -1,0 +1,73 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 800px;
+    width: 90%;
+    background-color: #1e1e1e;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.logo {
+    max-width: 250px;
+    margin-bottom: 20px;
+    /* Filtre pour adapter le logo au thème sombre si nécessaire */
+    filter: brightness(0.9) contrast(1.1);
+}
+
+h1 {
+    color: #d91313;
+    margin-bottom: 15px;
+}
+
+p {
+    color: #b0b0b0;
+    margin-bottom: 25px;
+}
+
+.language-selector {
+    margin: 20px 0;
+}
+
+.language-selector select {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.login-button {
+    background-color: #039dda;
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    background-color: #96d0f6;
+    transform: translateY(-2px);
+}

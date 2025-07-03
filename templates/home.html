@@ -1,0 +1,30 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'fr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comité des fêtes de Genay</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>{% trans "Bienvenue au Comité des fêtes de Genay" %}</h1>
+        <img src="{% static 'images/cdf.png' %}" alt="Logo du Comité des fêtes de Genay" class="logo">
+        <p>{% trans "Application de gestion du matériel" %}</p>
+
+        <form class="language-selector" action="{% url 'set_language' %}" method="post">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="{{ request.path }}">
+            <select name="language" onchange="this.form.submit()">
+                {% get_current_language as CURRENT_LANGUAGE %}
+                <option value="fr" {% if CURRENT_LANGUAGE == 'fr' %}selected{% endif %}>Français</option>
+                <option value="en" {% if CURRENT_LANGUAGE == 'en' %}selected{% endif %}>English</option>
+            </select>
+        </form>
+
+        <button class="login-button">{% trans "Connexion" %}</button>
+    </div>
+</body>
+</html>
