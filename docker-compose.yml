@@ -3,8 +3,7 @@ services:
   web:
     build: .
     volumes:
-      - ./data/ui:/data
-      - ./data/migration_data:/app/migrations_data
+      - ./data:/app/data
     ports:
       - 8888:8000
     env_file:
@@ -19,7 +18,9 @@ services:
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
-      - DJANGO_SUPERUSER_PASSWORD=${ADMIN_PASSWD:-admin}
+      - SUPERUSER_LOGIN=${ADMIN_LOGIN:-admin}
+      - SUPERUSER_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - SUPERUSER_PASSWORD=${ADMIN_PASSWD:-admin}
       - DJANGO_DEBUG=${DJANGO_DEBUG:-False}
       - DJANGO_SECRET=${DJANGO_SECRET:-your_secret_key}
       # Environment variables for database connection

@@ -12,11 +12,11 @@ run_cmd() {
 }
 
 # Créer les répertoires nécessaires s'ils n'existent pas
-for dir in /app/data/migrations_data /app/nginx /app/staticfiles; do
+for dir in /app/data/migrations_data /app/staticfiles; do
     [[ -d $dir ]] || mkdir -p $dir
 done
-touch /app/migrations_data/__init__.py
-for module in admin auth contenttypes sessions ui; do
+touch /app/data/migrations_data/__init__.py
+for module in admin auth contenttypes sessions ui accounts; do
     [[ -d /app/data/migrations_data/$module ]] || mkdir -p /app/data/migrations_data/$module
     touch /app/data/migrations_data/$module/__init__.py
 done
@@ -73,7 +73,7 @@ run_cmd python manage.py shell -c "
 from django.contrib.auth import get_user_model;
 User = get_user_model();
 if not User.objects.filter(is_superuser=True).exists():
-    User.objects.create_superuser('admin', 'admin@example.com', '${DJANGO_SUPERUSER_PASSWORD}');
+    User.objects.create_superuser('${SUPERUSER_LOGIN}', '${SUPERUSER_EMAIL}', '${SUPERUSER_PASSWORD}');
     print('Superuser created');
 else:
     print('Superuser already exist');

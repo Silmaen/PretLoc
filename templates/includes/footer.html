@@ -1,0 +1,22 @@
+{% load i18n %}
+<footer>
+    <div class="footer-container">
+        <div class="copyright">
+            © {% now "Y" %} Damien - {% trans "Tous droits réservés" %}
+        </div>
+
+        <div class="github-link">
+            <a href="https://github.com/damien-tdg/reservation-cdf" target="_blank">
+                <i class="fab fa-github github-icon"></i> <span>{% trans "Code source" %}</span>
+            </a>
+        </div>
+
+        {% if user.is_authenticated and user.profile.user_type == 'admin' %}
+        <div class="admin-link">
+            <a href="{% url 'admin:index' %}">
+                <i class="fas fa-cog"></i> <span>{% trans "Administration Django" %}</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</footer>

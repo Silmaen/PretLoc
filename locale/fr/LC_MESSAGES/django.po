@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-04 00:08+0200\n"
+"POT-Creation-Date: 2025-07-04 13:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,14 +18,328 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: templates/home.html:13
+#: accounts/decorators.py:24
+msgid "Vous devez être connecté pour accéder à cette page."
+msgstr "Vous devez être connecté pour accéder à cette page."
+
+#: accounts/decorators.py:42
+msgid "Accès refusé. Votre compte ne dispose pas des permissions suffisantes."
+msgstr "Accès refusé. Votre compte ne dispose pas des permissions suffisantes."
+
+#: accounts/forms.py:13
+msgid "Obligatoire. Entrez une adresse email valide."
+msgstr "Obligatoire. Entrez une adresse email valide."
+
+#: accounts/forms.py:28 templates/accounts/create_user.html:18
+#: templates/accounts/edit_user.html:18 templates/accounts/login.html:18
+#: templates/accounts/manage_users.html:18 templates/accounts/profile.html:18
+#: templates/accounts/signup.html:18
+msgid "Nom d'utilisateur"
+msgstr "Nom d'utilisateur"
+
+#: accounts/forms.py:29
+msgid "Adresse e-mail"
+msgstr "Adresse e-mail"
+
+#: accounts/forms.py:30 templates/accounts/create_user.html:34
+#: templates/accounts/edit_user.html:36 templates/accounts/profile.html:36
+msgid "Prénom"
+msgstr "Prénom"
+
+#: accounts/forms.py:31
+msgid "Nom de famille"
+msgstr "Nom de famille"
+
+#: accounts/forms.py:40 templates/accounts/create_user.html:58
+#: templates/accounts/edit_user.html:54 templates/accounts/manage_users.html:20
+#: templates/accounts/profile.html:54
+msgid "Type d'utilisateur"
+msgstr "Type d'utilisateur"
+
+#: accounts/forms.py:49
+msgid "Le statut superutilisateur impose le type Administrateur"
+msgstr "Le statut superutilisateur impose le type Administrateur"
+
+#: accounts/models.py:10
+msgid "Administrateur"
+msgstr "Administrateur"
+
+#: accounts/models.py:11
+msgid "Gestionnaire"
+msgstr "Gestionnaire"
+
+#: accounts/models.py:12
+msgid "Membre"
+msgstr "Membre"
+
+#: accounts/models.py:13
+msgid "Client"
+msgstr "Client"
+
+#: accounts/models.py:14
+msgid "Nouveau"
+msgstr "Nouveau"
+
+#: accounts/views.py:56
+msgid "Votre profil a été mis à jour avec succès."
+msgstr "Votre profil a été mis à jour avec succès."
+
+#: accounts/views.py:107
+msgid "Les informations de l'utilisateur ont été mises à jour."
+msgstr "Les informations de l'utilisateur ont été mises à jour."
+
+#: accounts/views.py:127
+msgid ""
+"Vous ne pouvez pas réinitialiser votre propre mot de passe par cette "
+"méthode. Utilisez la page de profil."
+msgstr ""
+
+#: accounts/views.py:146
+#, python-brace-format
+msgid "Le mot de passe de {username} a été réinitialisé à: {password}"
+msgstr "Le mot de passe de {username} a été réinitialisé à: {password}"
+
+#: accounts/views.py:178
+msgid "L'utilisateur a été créé avec succès."
+msgstr "L'utilisateur a été créé avec succès."
+
+#: accounts/views.py:193
+msgid "Vous ne pouvez pas supprimer votre propre compte."
+msgstr "Vous ne pouvez pas supprimer votre propre compte."
+
+#: accounts/views.py:201
+msgid "L'utilisateur {} a été supprimé avec succès."
+msgstr "L'utilisateur {} a été supprimé avec succès."
+
+#: templates/accounts/create_user.html:9
+#: templates/accounts/manage_users.html:10
+msgid "Créer un nouvel utilisateur"
+msgstr "Créer un nouvel utilisateur"
+
+#: templates/accounts/create_user.html:26 templates/accounts/edit_user.html:27
+#: templates/accounts/manage_users.html:19 templates/accounts/profile.html:27
+#: templates/accounts/signup.html:26
+msgid "Email"
+msgstr "Email"
+
+#: templates/accounts/create_user.html:42 templates/accounts/edit_user.html:45
+#: templates/accounts/profile.html:45
+msgid "Nom"
+msgstr "Nom"
+
+#: templates/accounts/create_user.html:50 templates/accounts/login.html:26
+#: templates/accounts/signup.html:34
+msgid "Mot de passe"
+msgstr "Mot de passe"
+
+#: templates/accounts/create_user.html:69
+msgid "Créer l'utilisateur"
+msgstr "Créer l'utilisateur"
+
+#: templates/accounts/create_user.html:75 templates/accounts/edit_user.html:90
+msgid "Retour à la liste"
+msgstr "Retour à la liste"
+
+#: templates/accounts/edit_user.html:9
+msgid "Modifier l'utilisateur"
+msgstr "Modifier l'utilisateur"
+
+#: templates/accounts/edit_user.html:64
+msgid ""
+"Le type d'utilisateur est fixé comme Administrateur pour les "
+"superutilisateurs"
+msgstr ""
+"Le type d'utilisateur est fixé comme Administrateur pour les "
+"superutilisateurs"
+
+#: templates/accounts/edit_user.html:72
+msgid ""
+"Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur?"
+msgstr ""
+"Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur?"
+
+#: templates/accounts/edit_user.html:73
+msgid "Réinitialiser le mot de passe"
+msgstr "Réinitialiser le mot de passe"
+
+#: templates/accounts/edit_user.html:78
+msgid ""
+"Pour modifier votre propre mot de passe, utilisez la fonctionnalité dédiée "
+"dans votre profil."
+msgstr ""
+"Pour modifier votre propre mot de passe, utilisez la fonctionnalité dédiée "
+"dans votre profil."
+
+#: templates/accounts/edit_user.html:84 templates/accounts/profile.html:71
+msgid "Enregistrer les modifications"
+msgstr "Enregistrer les modifications"
+
+#: templates/accounts/login.html:9 templates/accounts/login.html:33
+#: templates/includes/header.html:20 templates/ui/home.html:37
+msgid "Connexion"
+msgstr "Connexion"
+
+#: templates/accounts/login.html:40
+msgid "Pas encore inscrit?"
+msgstr "Pas encore inscrit?"
+
+#: templates/accounts/login.html:41 templates/accounts/signup.html:49
+msgid "S'inscrire"
+msgstr "S'inscrire"
+
+#: templates/accounts/login.html:45
+msgid ""
+"Veuillez passer au local du comité pour réinitialiser votre mot de passe."
+msgstr ""
+"Veuillez passer au local du comité pour réinitialiser votre mot de passe."
+
+#: templates/accounts/login.html:46
+msgid "Mot de passe oublié?"
+msgstr "Mot de passe oublié?"
+
+#: templates/accounts/manage_users.html:6
+msgid "Gestion des utilisateurs"
+msgstr "Gestion des utilisateurs"
+
+#: templates/accounts/manage_users.html:21
+msgid "Actions"
+msgstr "Actions"
+
+#: templates/accounts/manage_users.html:36
+msgid "Êtes-vous sûr de vouloir supprimer cet utilisateur?"
+msgstr "Êtes-vous sûr de vouloir supprimer cet utilisateur?"
+
+#: templates/accounts/password_change.html:9
+#: templates/accounts/password_change.html:65
+#: templates/accounts/profile.html:77
+msgid "Modifier mon mot de passe"
+msgstr "Modifier mon mot de passe"
+
+#: templates/accounts/password_change.html:18
+msgid "Ancien mot de passe"
+msgstr "Ancien mot de passe"
+
+#: templates/accounts/password_change.html:33
+msgid "Nouveau mot de passe"
+msgstr "Nouveau mot de passe"
+
+#: templates/accounts/password_change.html:51
+msgid "Confirmation du nouveau mot de passe"
+msgstr "Confirmation du nouveau mot de passe"
+
+#: templates/accounts/password_change.html:72
+#: templates/accounts/password_change_done.html:19
+msgid "Retour au profil"
+msgstr "Retour au profil"
+
+#: templates/accounts/password_change_done.html:9
+msgid "Mot de passe modifié"
+msgstr "Mot de passe modifié"
+
+#: templates/accounts/password_change_done.html:13
+msgid "Votre mot de passe a été modifié avec succès."
+msgstr "Votre mot de passe a été mis à jour avec succès."
+
+#: templates/accounts/profile.html:9
+msgid "Mon profil"
+msgstr "Mon profil"
+
+#: templates/accounts/profile.html:59
+msgid "En tant que superuser, votre type est fixé comme Administrateur"
+msgstr "En tant que superuser, votre type est fixé comme Administrateur"
+
+#: templates/accounts/profile.html:63
+msgid "Seuls les administrateurs peuvent modifier ce champ"
+msgstr "Seuls les administrateurs peuvent modifier ce champ"
+
+#: templates/accounts/signup.html:9 templates/includes/header.html:23
+msgid "Inscription"
+msgstr "Inscription"
+
+#: templates/accounts/signup.html:42
+msgid "Confirmer le mot de passe"
+msgstr "Confirmer le mot de passe"
+
+#: templates/accounts/signup.html:56
+msgid "Déjà inscrit?"
+msgstr "Déjà inscrit?"
+
+#: templates/accounts/signup.html:57
+msgid "Se connecter"
+msgstr "Se connecter"
+
+#: templates/base.html:9
+msgid "Réservation CDF"
+msgstr "Réservation CDF"
+
+#: templates/includes/footer.html:5
+msgid "Tous droits réservés"
+msgstr "Tous droits réservés"
+
+#: templates/includes/footer.html:10
+msgid "Code source"
+msgstr "Code source"
+
+#: templates/includes/footer.html:17
+msgid "Administration Django"
+msgstr "Administration Django"
+
+#: templates/includes/header.html:7
+msgid "Réservation"
+msgstr "Réservation"
+
+#: templates/includes/header.html:16
+msgid "Déconnexion"
+msgstr "Déconnexion"
+
+#: templates/includes/header.html:46
+msgid "Gestion utilisateurs"
+msgstr "Gestion utilisateurs"
+
+#: templates/includes/header.html:51
+msgid "Gestion réservations"
+msgstr "Gestion réservations"
+
+#: templates/includes/header.html:56
+msgid "Gestion stock"
+msgstr "Gestion stock"
+
+#: templates/ui/home.html:12
+msgid "Compte en attente de validation"
+msgstr "Compte en attente de validation"
+
+#: templates/ui/home.html:15
+msgid ""
+" Votre compte est actuellement en attente de validation par un "
+"administrateur.\n"
+"            Vous pourrez accéder à toutes les fonctionnalités une fois votre "
+"compte validé."
+msgstr ""
+" Votre compte est actuellement en attente de validation par un "
+"administrateur.\n"
+"            Vous pourrez accéder à toutes les fonctionnalités une fois votre "
+"compte validé."
+
+#: templates/ui/home.html:23
+msgid "Site en construction"
+msgstr "Site en construction"
+
+#: templates/ui/home.html:26
+msgid ""
+" Notre site est actuellement en cours de développement. Certaines "
+"fonctionnalités peuvent ne\n"
+"            pas être disponibles ou fonctionner correctement. Merci de votre "
+"patience. "
+msgstr ""
+" Notre site est actuellement en cours de développement. Certaines "
+"fonctionnalités peuvent ne\n"
+"            pas être disponibles ou fonctionner correctement. Merci de votre "
+"patience. "
+
+#: templates/ui/home.html:32
 msgid "Bienvenue au Comité des fêtes de Genay"
 msgstr "Bienvenue au Comité des fêtes de Genay"
 
-#: templates/home.html:15
+#: templates/ui/home.html:34
 msgid "Application de gestion du matériel"
 msgstr "Application de gestion du matériel"
-
-#: templates/home.html:27
-msgid "Connexion"
-msgstr "Connexion"

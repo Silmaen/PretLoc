@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-sign-in-alt auth-icon"></i>
+            <h2>{% trans "Connexion" %}</h2>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">
+                    <i class="fas fa-user"></i>
+                    {% trans "Nom d'utilisateur" %}
+                </label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">
+                    <i class="fas fa-lock"></i>
+                    {% trans "Mot de passe" %}
+                </label>
+                {{ form.password }}
+            </div>
+
+            <button type="submit" class="auth-button">
+                <i class="fas fa-sign-in-alt"></i>
+                {% trans "Connexion" %}
+            </button>
+        </form>
+
+        <div class="auth-links">
+            <p>
+                <i class="fas fa-user-plus"></i>
+                {% trans "Pas encore inscrit?" %}
+                <a href="{% url 'accounts:signup' %}">{% trans "S'inscrire" %}</a>
+            </p>
+            <p>
+                <i class="fas fa-key"></i>
+                <a href="javascript:void(0);" onclick="alert('{% trans "Veuillez passer au local du comité pour réinitialiser votre mot de passe." %}')">
+                    {% trans "Mot de passe oublié?" %}
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

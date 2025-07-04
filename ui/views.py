@@ -13,4 +13,4 @@ def health_check(request):
 
 
 def home(request):
-    return render(request, "home.html")
+    return render(request, "ui/home.html")

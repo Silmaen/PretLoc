@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    {% if user.is_authenticated %}
+    {% if user.profile.user_type == "new" %}
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-user-clock auth-icon"></i>
+            <h2>{% trans "Compte en attente de validation" %}</h2>
+        </div>
+        <p>
+            {% blocktrans %} Votre compte est actuellement en attente de validation par un administrateur.
+            Vous pourrez accéder à toutes les fonctionnalités une fois votre compte validé.{% endblocktrans %}
+        </p>
+    </div>
+    {% else %}
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-tools auth-icon"></i>
+            <h2>{% trans "Site en construction" %}</h2>
+        </div>
+        <p>
+            {% blocktrans %} Notre site est actuellement en cours de développement. Certaines fonctionnalités peuvent ne
+            pas être disponibles ou fonctionner correctement. Merci de votre patience. {% endblocktrans %}
+        </p>
+    </div>
+    {% endif %}
+    {% else %}
+    <h1>{% trans "Bienvenue au Comité des fêtes de Genay" %}</h1>
+    <img src="{% static 'images/cdf.png' %}" alt="Logo du Comité des fêtes de Genay" class="logo">
+    <p>{% trans "Application de gestion du matériel" %}</p>
+
+    <a href="{% url 'accounts:login' %}" class="login-button">
+        <i class="fas fa-sign-in-alt"></i> {% trans "Connexion" %}
+    </a>
+    {% endif %}
+</div>
+{% endblock %}

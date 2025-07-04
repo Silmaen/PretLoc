@@ -1,0 +1,62 @@
+{% load i18n %}
+{% load static %}
+<header>
+    <div class="header-container">
+        <div class="header-left">
+            <img src="{% static 'images/cdf.png' %}" alt="Logo CDF" class="small-logo">
+            <h1>{% trans "Réservation" %}</h1>
+        </div>
+
+        <div class="header-center">
+            {% if user.is_authenticated %}
+            <a href="{% url 'accounts:user_profile' %}" class="user-profile-link">
+                <i class="fas fa-user"></i> <span>{{ user.username }}</span>
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="logout-button">
+                <i class="fas fa-sign-out-alt"></i> <span>{% trans "Déconnexion" %}</span>
+            </a>
+            {% else %}
+            <a href="{% url 'accounts:login' %}" class="login-button">
+                <i class="fas fa-sign-in-alt"></i> <span>{% trans "Connexion" %}</span>
+            </a>
+            <a href="{% url 'accounts:signup' %}" class="signup-button">
+                <i class="fas fa-user-plus"></i> <span>{% trans "Inscription" %}</span>
+            </a>
+            {% endif %}
+
+            <form class="language-selector" action="{% url 'set_language' %}" method="post">
+                {% csrf_token %}
+                <input name="next" type="hidden" value="{{ request.path }}">
+                {% get_current_language as CURRENT_LANGUAGE %}
+                <select name="language" onchange="this.form.submit()">
+                    <option value="fr" {% if CURRENT_LANGUAGE == 'fr' %}selected{% endif %}>
+                        <i class="flag-icon flag-icon-fr"></i>Fr
+                    </option>
+                    <option value="en" {% if CURRENT_LANGUAGE == 'en' %}selected{% endif %}>
+                        <i class="flag-icon flag-icon-en"></i>En
+                    </option>
+                </select>
+            </form>
+        </div>
+
+        <div class="header-right">
+            {% if user.is_authenticated %}
+                {% if user.profile.user_type == 'admin' %}
+                <a href="{% url 'accounts:manage_users' %}">
+                    <i class="fas fa-users"></i><span>{% trans "Gestion utilisateurs" %}</span>
+                </a>
+                {% endif %}
+                {% if user.profile.user_type == 'admin' or user.profile.user_type == 'manager' %}
+                <a href="{% url 'ui:reservations' %}">
+                    <i class="fas fa-calendar-check"></i><span>{% trans "Gestion réservations" %}</span>
+                </a>
+                {% endif %}
+                {% if user.profile.user_type == 'admin' or user.profile.user_type == 'manager' %}
+                <a href="{% url 'ui:stock' %}">
+                    <i class="fas fa-boxes"></i><span>{% trans "Gestion stock" %}</span>
+                </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</header>

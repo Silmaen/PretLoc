@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "ui",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -148,9 +149,13 @@ MIGRATION_MODULES = {
     "contenttypes": "data.migrations_data.contenttypes",
     "sessions": "data.migrations_data.sessions",
     "ui": "data.migrations_data.ui",
+    "accounts": "data.migrations_data.accounts",
 }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
