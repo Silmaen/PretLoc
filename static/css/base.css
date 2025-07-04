@@ -207,8 +207,6 @@ footer {
     border-radius: 5px;
     cursor: pointer;
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s;
 }

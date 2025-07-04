@@ -28,34 +28,36 @@
                 {% csrf_token %}
                 <input name="next" type="hidden" value="{{ request.path }}">
                 {% get_current_language as CURRENT_LANGUAGE %}
+                {% get_available_languages as LANGUAGES %}
+                <!-- @formatter:off -->
                 <select name="language" onchange="this.form.submit()">
-                    <option value="fr" {% if CURRENT_LANGUAGE == 'fr' %}selected{% endif %}>
-                        <i class="flag-icon flag-icon-fr"></i>Fr
+                    {% for code,lang in LANGUAGES %}
+                    <option value="{{ code }}" {% if CURRENT_LANGUAGE == code %}selected{% endif %}>
+                        {{ code|title }}
                     </option>
-                    <option value="en" {% if CURRENT_LANGUAGE == 'en' %}selected{% endif %}>
-                        <i class="flag-icon flag-icon-en"></i>En
-                    </option>
+                    {% endfor %}
                 </select>
+                <!-- @formatter:on -->
             </form>
         </div>
 
         <div class="header-right">
             {% if user.is_authenticated %}
-                {% if user.profile.user_type == 'admin' %}
-                <a href="{% url 'accounts:manage_users' %}">
-                    <i class="fas fa-users"></i><span>{% trans "Gestion utilisateurs" %}</span>
-                </a>
-                {% endif %}
-                {% if user.profile.user_type == 'admin' or user.profile.user_type == 'manager' %}
-                <a href="{% url 'ui:reservations' %}">
-                    <i class="fas fa-calendar-check"></i><span>{% trans "Gestion réservations" %}</span>
-                </a>
-                {% endif %}
-                {% if user.profile.user_type == 'admin' or user.profile.user_type == 'manager' %}
-                <a href="{% url 'ui:stock' %}">
-                    <i class="fas fa-boxes"></i><span>{% trans "Gestion stock" %}</span>
-                </a>
-                {% endif %}
+            {% if user.profile.user_type == 'admin' %}
+            <a href="{% url 'accounts:manage_users' %}">
+                <i class="fas fa-users"></i><span>{% trans "Gestion utilisateurs" %}</span>
+            </a>
+            {% endif %}
+            {% if user.profile.user_type == 'admin' or user.profile.user_type == 'manager' %}
+            <a href="{% url 'ui:reservations' %}">
+                <i class="fas fa-calendar-check"></i><span>{% trans "Gestion réservations" %}</span>
+            </a>
+            {% endif %}
+            {% if user.profile.user_type == 'admin' or user.profile.user_type == 'manager' %}
+            <a href="{% url 'ui:stock' %}">
+                <i class="fas fa-boxes"></i><span>{% trans "Gestion stock" %}</span>
+            </a>
+            {% endif %}
             {% endif %}
         </div>
     </div>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-04 13:05+0000\n"
+"POT-Creation-Date: 2025-07-04 13:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,26 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/admin.py:13
+msgid "Profil"
+msgstr "Profile"
+
+#: accounts/admin.py:40 accounts/forms.py:40
+#: templates/accounts/create_user.html:58 templates/accounts/edit_user.html:54
+#: templates/accounts/manage_users.html:20 templates/accounts/profile.html:54
+msgid "Type d'utilisateur"
+msgstr "User type"
+
+#: accounts/admin.py:59 templates/accounts/create_user.html:26
+#: templates/accounts/edit_user.html:27 templates/accounts/manage_users.html:19
+#: templates/accounts/profile.html:27 templates/accounts/signup.html:26
+msgid "Email"
+msgstr "Email"
+
+#: accounts/admin.py:65
+msgid "Superutilisateur"
+msgstr "Superuser"
 
 #: accounts/decorators.py:24
 msgid "Vous devez être connecté pour accéder à cette page."
@@ -49,12 +69,6 @@ msgstr "First name"
 #: accounts/forms.py:31
 msgid "Nom de famille"
 msgstr "Last name"
-
-#: accounts/forms.py:40 templates/accounts/create_user.html:58
-#: templates/accounts/edit_user.html:54 templates/accounts/manage_users.html:20
-#: templates/accounts/profile.html:54
-msgid "Type d'utilisateur"
-msgstr "User type"
 
 #: accounts/forms.py:49
 msgid "Le statut superutilisateur impose le type Administrateur"
@@ -116,12 +130,6 @@ msgstr "User {} has been successfully deleted."
 #: templates/accounts/manage_users.html:10
 msgid "Créer un nouvel utilisateur"
 msgstr "Create a new user"
-
-#: templates/accounts/create_user.html:26 templates/accounts/edit_user.html:27
-#: templates/accounts/manage_users.html:19 templates/accounts/profile.html:27
-#: templates/accounts/signup.html:26
-msgid "Email"
-msgstr "Email"
 
 #: templates/accounts/create_user.html:42 templates/accounts/edit_user.html:45
 #: templates/accounts/profile.html:45
@@ -310,7 +318,8 @@ msgid ""
 "administrateur.\n"
 "            Vous pourrez accéder à toutes les fonctionnalités une fois votre "
 "compte validé."
-msgstr "Your account is currently pending validation by an administrator.\n"
+msgstr ""
+"Your account is currently pending validation by an administrator.\n"
 "            You will be able to access all features once your account is "
 "validated."
 
