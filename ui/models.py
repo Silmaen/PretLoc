@@ -31,7 +31,7 @@ class Asset(models.Model):
         max_digits=10, decimal_places=2, verbose_name=_("Valeur de remplacement")
     )
     rental_value = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name=_("Valeur de location")
+        max_digits=10, decimal_places=2, verbose_name=_("Don minimum exigé")
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

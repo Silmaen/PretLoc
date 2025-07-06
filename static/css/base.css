@@ -430,19 +430,42 @@ tr:hover {
     background-color: rgba(3, 157, 218, 0.1);
 }
 
+.actions-buttons {
+    display: flex;
+    gap: 10px;
+    white-space: nowrap;
+}
+
 .action-button {
     display: inline-flex;
+    justify-content: center;
     align-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0 2px;
     background-color: var(--bg-container);
     color: var(--accent-blue);
-    padding: 6px 10px;
     border-radius: 4px;
     text-decoration: none;
     transition: all 0.3s;
 }
 
+.action-button i {
+    margin: 0;
+}
+
 .action-button:hover {
     background-color: var(--accent-blue);
+    color: white;
+}
+
+.action-button.danger {
+    color: var(--accent-red);
+}
+
+.action-button.danger:hover {
+    background-color: var(--accent-red);
     color: white;
 }
 
@@ -699,8 +722,7 @@ h6.mb-0 {
 /* Styles pour la barre de recherche */
 .search-container {
     display: flex;
-    flex-grow: 1;
-    margin-right: 15px;
+    width: 100%;
 }
 
 .search-input-group {
@@ -710,14 +732,12 @@ h6.mb-0 {
 }
 
 .search-input {
-    width: 100%;
-    padding: 12px 15px;
+    flex-grow: 1;
+    padding: 8px 12px;
     background-color: var(--bg-element);
     border: 1px solid var(--border-color);
     border-radius: 5px 0 0 5px;
     color: var(--text-primary);
-    font-size: 16px;
-    border-right: none;
 }
 
 .search-button {
@@ -730,11 +750,50 @@ h6.mb-0 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 /* Style pour les boutons de filtre */
+.filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+    background-color: var(--bg-element);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.filter-label i {
+    margin-right: 8px;
+    color: var(--accent-blue);
+}
+
+.filter-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
 .filter-button {
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
     background-color: var(--bg-element);
     color: var(--text-primary);
     transition: all 0.3s;
@@ -748,4 +807,89 @@ h6.mb-0 {
 .filter-button.active {
     background-color: var(--accent-blue);
     color: white;
+}
+
+/* Style pour les lignes de tableau condensées */
+.users-table td {
+    padding: 8px 10px;
+    vertical-align: middle;
+}
+
+/* Réduire l'espace entre les lignes */
+.users-table tr {
+    height: auto;
+}
+
+/* Amélioration de l'affichage des contacts */
+.users-table .contact-info {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Style pour les valeurs des articles */
+.values-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.value-item {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Style pour les informations client/article */
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.item-title {
+    font-weight: bold;
+}
+
+.item-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.item-description {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.search-action-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.search-action-bar .search-container {
+    flex: 1;
+    margin: 0;
+}
+
+.search-action-bar .actions-buttons {
+    white-space: nowrap;
+}
+
+/* Pour les écrans mobiles */
+@media (max-width: 576px) {
+    .search-action-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-action-bar .actions-buttons {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
 }

@@ -32,6 +32,7 @@ def stock_view(request):
     category_id = request.GET.get("category")
     sort = request.GET.get("sort", "name")  # Par défaut, tri par nom
     direction = request.GET.get("direction", "asc")  # Par défaut, ordre ascendant
+    search_query = request.GET.get("search", "")  # Récupération de la recherche
 
     # Déterminer le champ de tri
     if sort == "category":
@@ -43,13 +44,26 @@ def stock_view(request):
     if direction == "desc":
         order_by = f"-{order_by}"
 
+    # Initialiser les filtres de base
+    filters = {}
+
     # Filtrer par catégorie si spécifiée
     if category_id:
-        items = Asset.objects.filter(category_id=category_id).order_by(order_by)
+        filters["category_id"] = category_id
         current_category = get_object_or_404(Category, id=category_id)
     else:
-        items = Asset.objects.all().order_by(order_by)
         current_category = None
+
+    # Filtrer par recherche si spécifiée
+    if search_query:
+        items = Asset.objects.filter(
+            Q(name__icontains=search_query)
+            | Q(description__icontains=search_query)
+            | Q(category__name__icontains=search_query),
+            **filters,
+        ).order_by(order_by)
+    else:
+        items = Asset.objects.filter(**filters).order_by(order_by)
 
     context = {
         "items": items,
@@ -58,6 +72,7 @@ def stock_view(request):
         "category_id": category_id,
         "sort": sort,
         "direction": direction,
+        "search_query": search_query,  # Ajouter la recherche au contexte
         "capability": get_capability(request.user),
     }
     return render(request, "ui/stock/list.html", context)

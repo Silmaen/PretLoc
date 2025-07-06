@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from .models import Category, Asset, Customer
 
@@ -45,6 +46,12 @@ class CustomerForm(forms.ModelForm):
         widgets = {
             "customer_type": forms.RadioSelect(),
             "address": forms.Textarea(attrs={"rows": 3}),
+        }
+        help_texts = {
+            "rental_value": _("Don minimum demandé pour l'emprunt de cet article."),
+            "replacement_value": _(
+                "Valeur exigée si l'article n'est pas rendu ou est rendu dans un état irréparable."
+            ),
         }
 
     def clean(self):

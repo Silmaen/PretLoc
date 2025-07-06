@@ -21,7 +21,7 @@
             {% for field in form %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">
-                    <i class="fas fa-{% if field.name == 'name' %}box{% elif field.name == 'description' %}align-left{% elif field.name == 'stock_quantity' %}cubes{% elif field.name == 'category' %}tag{% elif field.name == 'replacement_value' %}euro-sign{% else %}money-bill-wave{% endif %}"></i>
+                    <i class="fas fa-{% if field.name == 'name' %}box{% elif field.name == 'description' %}align-left{% elif field.name == 'stock_quantity' %}cubes{% elif field.name == 'category' %}tag{% elif field.name == 'replacement_value' %}exclamation-triangle{% else %}hand-holding-heart{% endif %}"></i>
                     {{ field.label }}
                 </label>
                 {{ field }}

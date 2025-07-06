@@ -9,52 +9,51 @@
             <h2>{% trans "Gestion des Clients" %}</h2>
         </div>
 
-        <div class="actions-bar">
-            <!-- Barre de recherche et filtres -->
-            <div style="display: flex; align-items: center; flex-grow: 1; gap: 15px;">
-                <!-- Barre de recherche -->
-                <form method="get" class="search-container">
-                    <div class="search-input-group">
-                        <input type="text" name="search" value="{{ search_query }}"
-                               placeholder="{% trans 'Rechercher un client...' %}"
-                               class="search-input">
-                        <button type="submit" class="auth-button search-button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
+        <!-- Barre de recherche et boutons d'action sur la même ligne -->
+        <div class="search-action-bar">
+            <form method="get" class="search-container">
+                <div class="search-input-group">
+                    <input type="text" name="search" value="{{ search_query }}"
+                           placeholder="{% trans 'Rechercher un client...' %}" class="search-input">
+                    <button type="submit" class="auth-button search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <input type="hidden" name="type" value="{{ customer_type }}">
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <input type="hidden" name="direction" value="{{ direction }}">
+            </form>
 
-                    <!-- Filtre par type caché dans le formulaire de recherche -->
-                    <input type="hidden" name="type" value="{{ customer_type }}">
-                    <input type="hidden" name="sort" value="{{ sort }}">
-                    <input type="hidden" name="direction" value="{{ direction }}">
-                </form>
+            <div class="actions-buttons">
+                {% if capability.can_add_customers %}
+                <a href="{% url 'ui:customer_create' %}" class="auth-button">
+                    <i class="fas fa-plus"></i> {% trans "Ajouter un client" %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
 
-                <!-- Filtrer par type -->
-                <div class="type-filter" style="display: flex; gap: 10px; align-items: center; white-space: nowrap;">
-                    <span><i class="fas fa-filter"></i> {% trans "Type:" %}</span>
+        <!-- Ligne de filtres -->
+        <div class="filters-row">
+            <div class="filter-group">
+                <div class="filter-label">
+                    <i class="fas fa-filter"></i> {% trans "Type:" %}
+                </div>
+                <div class="filter-buttons-container">
                     <a href="?{% if search_query %}search={{ search_query }}&{% endif %}sort={{ sort }}&direction={{ direction }}"
-                       class="filter-button {% if not customer_type %}active{% endif %}"
-                       style="padding: 5px 10px; border-radius: 4px; text-decoration: none; border: 1px solid var(--border-color);">
+                       class="filter-button {% if not customer_type %}active{% endif %}">
                         {% trans "Tous" %}
                     </a>
                     <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=physical&sort={{ sort }}&direction={{ direction }}"
-                       class="filter-button {% if customer_type == 'physical' %}active{% endif %}"
-                       style="padding: 5px 10px; border-radius: 4px; text-decoration: none; border: 1px solid var(--border-color);">
+                       class="filter-button {% if customer_type == 'physical' %}active{% endif %}">
                         <i class="fas fa-user"></i> {% trans "Pers. physique" %}
                     </a>
                     <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=legal&sort={{ sort }}&direction={{ direction }}"
-                       class="filter-button {% if customer_type == 'legal' %}active{% endif %}"
-                       style="padding: 5px 10px; border-radius: 4px; text-decoration: none; border: 1px solid var(--border-color);">
+                       class="filter-button {% if customer_type == 'legal' %}active{% endif %}">
                         <i class="fas fa-building"></i> {% trans "Pers. morale" %}
                     </a>
                 </div>
             </div>
-
-            {% if capability.can_add_customers %}
-            <a href="{% url 'ui:customer_create' %}" class="auth-button" style="width: auto; white-space: nowrap;">
-                <i class="fas fa-plus"></i> {% trans "Ajouter un client" %}
-            </a>
-            {% endif %}
         </div>
 
         <!-- Liste des clients -->
@@ -95,48 +94,46 @@
                 <tbody>
                 {% for customer in customers %}
                 <tr>
-                    <td>
+                    <td style="width: 40px; text-align: center;">
                         {% if customer.customer_type == "physical" %}
-                        <span title="{% trans 'Personne physique' %}"><i class="fas fa-user"></i></span>
+                        <i class="fas fa-user" title="{% trans 'Personne physique' %}"></i>
                         {% else %}
-                        <span title="{% trans 'Personne morale' %}"><i class="fas fa-building"></i></span>
+                        <i class="fas fa-building" title="{% trans 'Personne morale' %}"></i>
                         {% endif %}
                     </td>
                     <td>
-                        <h6 class="mb-0" style="font-size: 1.1rem; font-weight: bold;">
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
                             {% if customer.customer_type == "physical" %}
-                            {{ customer.last_name }} {{ customer.first_name }}
+                            <span style="font-weight: bold;">{{ customer.last_name }} {{ customer.first_name }}</span>
                             {% else %}
-                            {{ customer.company_name }}
-                            <div style="font-size: 0.8rem; color: var(--text-secondary);">
-                                <i class="fas fa-user-tie"></i>
-                                {{ customer.legal_rep_last_name }} {{ customer.legal_rep_first_name }}
-                            </div>
+                            <span style="font-weight: bold;">{{ customer.company_name }}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                                <i class="fas fa-user-tie"></i> {{ customer.legal_rep_last_name }} {{ customer.legal_rep_first_name }}
+                            </span>
                             {% endif %}
-                        </h6>
-                        <p class="text-secondary mb-0" style="font-size: 0.8rem;">
-                            {{ customer.address|truncatewords:10 }}
-                        </p>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic;">
+                                {{ customer.address|truncatewords:6 }}
+                            </span>
+                        </div>
                     </td>
-                    <td>
-                        <div>
+                    <td style="white-space: nowrap;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             {% if customer.email %}
-                            <p class="mb-0"><i class="fas fa-envelope"></i> {{ customer.email }}</p>
+                            <span style="font-size: 0.9rem;"><i class="fas fa-envelope"></i> {{ customer.email }}</span>
                             {% endif %}
                             {% if customer.phone %}
-                            <p class="mb-0"><i class="fas fa-phone"></i> {{ customer.phone }}</p>
+                            <span style="font-size: 0.9rem;"><i class="fas fa-phone"></i> {{ customer.phone }}</span>
                             {% endif %}
                         </div>
                     </td>
-                    <td>
+                    <td style="width: 80px; white-space: nowrap; text-align: right;">
                         {% if capability.can_edit_customers %}
                         <a href="{% url 'ui:customer_update' customer.id %}" class="action-button">
                             <i class="fas fa-edit"></i>
                         </a>
                         {% endif %}
                         {% if capability.can_delete_customers %}
-                        <a href="{% url 'ui:customer_delete' customer.id %}" class="action-button"
-                           style="color: var(--accent-red);">
+                        <a href="{% url 'ui:customer_delete' customer.id %}" class="action-button danger">
                             <i class="fas fa-trash"></i>
                         </a>
                         {% endif %}
@@ -145,7 +142,7 @@
                 {% empty %}
                 <tr>
                     <td colspan="4" class="text-center py-3">
-                        [...]
+                        {% trans "Aucun client trouvé" %}
                     </td>
                 </tr>
                 {% endfor %}
