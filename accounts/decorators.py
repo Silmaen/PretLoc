@@ -68,19 +68,24 @@ def get_capability(user):
             "can_view_reservations": False,
         }
     return {
+        # articles
         "can_add_articles": user.profile.user_type in ["admin"],
         "can_edit_articles": user.profile.user_type in ["admin", "manager"],
         "can_delete_articles": user.profile.user_type == "admin",
         "can_view_articles": user.profile.user_type in ["admin", "manager", "member"],
-        "can_view_customers": user.profile.user_type in ["admin", "manager", "member"],
+        # customers
+        "can_view_customers": user.profile.user_type in ["admin", "manager"],
         "can_add_customers": user.profile.user_type in ["admin", "manager"],
         "can_edit_customers": user.profile.user_type in ["admin", "manager"],
-        "can_delete_customers": user.profile.user_type in ["admin", "manager"],
+        "can_delete_customers": user.profile.user_type in ["admin"],
+        # categories
         "can_add_categories": user.profile.user_type == "admin",
         "can_edit_categories": user.profile.user_type == "admin",
         "can_delete_categories": user.profile.user_type == "admin",
         "can_view_categories": user.profile.user_type in ["admin", "manager", "member"],
+        # reservations
         "can_create_reservations": user.profile.user_type in ["admin", "manager"],
+        "can_edit_reservations": user.profile.user_type in ["admin", "manager"],
         "can_view_reservations": user.profile.user_type
                                  in ["admin", "manager", "member"],
     }

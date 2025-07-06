@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .models import Category, Asset
+from .models import Category, Asset, Customer
 
 
 @admin.register(Category)
@@ -48,4 +48,16 @@ class AssetAdmin(admin.ModelAdmin):
 
     reset_stock_to_zero.short_description = _(
         "Remettre le stock à zéro pour les articles sélectionnés"
+    )
+
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ("last_name", "email", "phone")
+    search_fields = ("last_name", "email", "phone", "address", "notes")
+    ordering = ("last_name",)
+
+    fieldsets = (
+        (_("Informations générales"), {"fields": ("last_name", "email", "phone")}),
+        (_("Détails"), {"fields": ("address", "notes")}),
     )

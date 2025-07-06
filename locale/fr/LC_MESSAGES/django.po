@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-06 12:34+0000\n"
+"POT-Creation-Date: 2025-07-06 16:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,7 @@ msgstr "Type d'utilisateur"
 #: accounts/admin.py:59 templates/accounts/create_user.html:26
 #: templates/accounts/edit_user.html:27 templates/accounts/manage_users.html:19
 #: templates/accounts/profile.html:27 templates/accounts/signup.html:26
+#: ui/models.py:75
 msgid "Email"
 msgstr "Email"
 
@@ -63,10 +64,13 @@ msgstr "Adresse e-mail"
 
 #: accounts/forms.py:30 templates/accounts/create_user.html:34
 #: templates/accounts/edit_user.html:36 templates/accounts/profile.html:36
+#: ui/models.py:60
 msgid "Prénom"
 msgstr "Prénom"
 
-#: accounts/forms.py:31
+#: accounts/forms.py:31 templates/accounts/create_user.html:42
+#: templates/accounts/edit_user.html:45 templates/accounts/profile.html:45
+#: ui/models.py:62
 msgid "Nom de famille"
 msgstr "Nom de famille"
 
@@ -86,7 +90,7 @@ msgstr "Gestionnaire"
 msgid "Membre"
 msgstr "Membre"
 
-#: accounts/models.py:13
+#: accounts/models.py:13 ui/models.py:80
 msgid "Client"
 msgstr "Client"
 
@@ -107,6 +111,8 @@ msgid ""
 "Vous ne pouvez pas réinitialiser votre propre mot de passe par cette "
 "méthode. Utilisez la page de profil."
 msgstr ""
+"Vous ne pouvez pas réinitialiser votre propre mot de passe par cette "
+"méthode. Utilisez la page de profil."
 
 #: accounts/views.py:166
 #, python-brace-format
@@ -129,12 +135,6 @@ msgstr "L'utilisateur {} a été supprimé avec succès."
 #: templates/accounts/manage_users.html:10
 msgid "Créer un nouvel utilisateur"
 msgstr "Créer un nouvel utilisateur"
-
-#: templates/accounts/create_user.html:42 templates/accounts/edit_user.html:45
-#: templates/accounts/profile.html:45 templates/ui/stock/category_list.html:22
-#: ui/models.py:6 ui/models.py:19
-msgid "Nom"
-msgstr "Nom"
 
 #: templates/accounts/create_user.html:50 templates/accounts/login.html:26
 #: templates/accounts/signup.html:34
@@ -212,7 +212,7 @@ msgstr "Mot de passe oublié?"
 msgid "Gestion des utilisateurs"
 msgstr "Gestion des utilisateurs"
 
-#: templates/accounts/manage_users.html:21
+#: templates/accounts/manage_users.html:21 templates/ui/customers/list.html:92
 #: templates/ui/stock/category_list.html:24 templates/ui/stock/list.html:81
 msgid "Actions"
 msgstr "Actions"
@@ -314,9 +314,94 @@ msgstr "Réservations"
 msgid "Stock"
 msgstr "Stock"
 
-#: templates/includes/header.html:64
+#: templates/includes/header.html:64 ui/models.py:81
 msgid "Clients"
 msgstr "Clients"
+
+#: templates/ui/customers/customer_confirm_delete.html:9
+msgid "Supprimer un client"
+msgstr "Supprimer un client"
+
+#: templates/ui/customers/customer_confirm_delete.html:12
+msgid "Êtes-vous sûr de vouloir supprimer ce client ?"
+msgstr "Êtes-vous sûr de vouloir supprimer ce client?"
+
+#: templates/ui/customers/customer_confirm_delete.html:30
+#: templates/ui/customers/customer_form.html:180
+#: templates/ui/stock/category_confirm_delete.html:34
+#: templates/ui/stock/item_confirm_delete.html:33
+msgid "Annuler"
+msgstr "Annuler"
+
+#: templates/ui/customers/customer_confirm_delete.html:33
+msgid "Confirmer"
+msgstr "Confirmer"
+
+#: templates/ui/customers/customer_form.html:11
+msgid "Modifier le client"
+msgstr "Modifier le client"
+
+#: templates/ui/customers/customer_form.html:13
+#: templates/ui/customers/list.html:55
+msgid "Ajouter un client"
+msgstr "Ajouter un client"
+
+#: templates/ui/customers/customer_form.html:24 ui/models.py:57
+msgid "Type de client"
+msgstr "TYpe de client"
+
+#: templates/ui/customers/customer_form.html:153
+msgid "Optionnel"
+msgstr "Optionel"
+
+#: templates/ui/customers/customer_form.html:175
+msgid "Enregistrer"
+msgstr "Enregistrer"
+
+#: templates/ui/customers/list.html:9
+msgid "Gestion des Clients"
+msgstr "Gestion des Clients"
+
+#: templates/ui/customers/list.html:19
+msgid "Rechercher un client..."
+msgstr "Rechercher un client..."
+
+#: templates/ui/customers/list.html:34
+msgid "Type:"
+msgstr "Type:"
+
+#: templates/ui/customers/list.html:38 templates/ui/stock/list.html:39
+msgid "Tous"
+msgstr "Tous"
+
+#: templates/ui/customers/list.html:43
+msgid "Pers. physique"
+msgstr "Pers. Physique"
+
+#: templates/ui/customers/list.html:48
+msgid "Pers. morale"
+msgstr "Pers. morale"
+
+#: templates/ui/customers/list.html:66
+msgid "Type"
+msgstr "Type"
+
+#: templates/ui/customers/list.html:79 templates/ui/stock/category_list.html:22
+#: ui/models.py:6 ui/models.py:19
+msgid "Nom"
+msgstr "Nom"
+
+#: templates/ui/customers/list.html:91
+msgid "Contact"
+msgstr "Contact"
+
+#: templates/ui/customers/list.html:100 ui/models.py:49
+msgid "Personne physique"
+msgstr "Personne physique"
+
+#: templates/ui/customers/list.html:102 ui/models.py:50
+msgid "Personne morale"
+msgstr "Personne morale"
 
 #: templates/ui/home.html:12
 msgid "Compte en attente de validation"
@@ -376,11 +461,6 @@ msgstr ""
 #: templates/ui/stock/item_confirm_delete.html:30
 msgid "Oui, supprimer"
 msgstr "Oui, supprimer"
-
-#: templates/ui/stock/category_confirm_delete.html:34
-#: templates/ui/stock/item_confirm_delete.html:33
-msgid "Annuler"
-msgstr "Annuler"
 
 #: templates/ui/stock/category_form.html:11
 msgid "Modifier la catégorie"
@@ -461,10 +541,6 @@ msgstr "Gérer les catégories"
 msgid "Catégories"
 msgstr "Catégories"
 
-#: templates/ui/stock/list.html:39
-msgid "Tous"
-msgstr "Tous"
-
 #: templates/ui/stock/list.html:50 ui/models.py:40
 msgid "Article"
 msgstr "Article"
@@ -493,7 +569,7 @@ msgstr "Valeur de location"
 msgid "Aucun article disponible dans cette catégorie."
 msgstr "Aucun article disponible dans cette catégorie."
 
-#: ui/admin.py:38
+#: ui/admin.py:38 ui/admin.py:61
 msgid "Informations générales"
 msgstr "Informations générales"
 
@@ -514,6 +590,22 @@ msgstr "{updated} articles ont été remis à zéro."
 msgid "Remettre le stock à zéro pour les articles sélectionnés"
 msgstr "Remettre le stock à zéro pour les articles sélectionnés"
 
+#: ui/admin.py:62
+msgid "Détails"
+msgstr "Détails"
+
+#: ui/forms.py:58
+msgid "Ce champ est obligatoire pour une personne physique"
+msgstr "Ce champ est obligatoire pour une personne physique"
+
+#: ui/forms.py:64
+msgid "Ce champ est obligatoire pour une personne morale"
+msgstr "Ce champ est obligatoire pour une personne morale"
+
+#: ui/forms.py:69
+msgid "Le nom du représentant légal est obligatoire"
+msgstr "Le nom du représentant légal est obligatoire"
+
 #: ui/models.py:22
 msgid "Quantité en stock"
 msgstr "Quantité en stock"
@@ -530,26 +622,58 @@ msgstr "Valeur de remplacement"
 msgid "Articles"
 msgstr "Articles"
 
-#: ui/views.py:84
+#: ui/models.py:66
+msgid "Raison sociale"
+msgstr "Raison sociale"
+
+#: ui/models.py:69
+msgid "Prénom du représentant"
+msgstr "Prénom du représentant"
+
+#: ui/models.py:72
+msgid "Nom du représentant"
+msgstr "Nom du représentant"
+
+#: ui/models.py:76
+msgid "Téléphone"
+msgstr "Téléphone"
+
+#: ui/models.py:77
+msgid "Adresse"
+msgstr "Adresse"
+
+#: ui/views.py:85
 msgid "Catégorie créée avec succès"
 msgstr "Catégorie créée avec succès"
 
-#: ui/views.py:106
+#: ui/views.py:107
 msgid "Catégorie modifiée avec succès"
 msgstr "Catégorie modifiée avec succès"
 
-#: ui/views.py:127
+#: ui/views.py:128
 msgid "Catégorie supprimée avec succès"
 msgstr "Catégorie supprimée avec succès"
 
-#: ui/views.py:146
+#: ui/views.py:147
 msgid "Article créé avec succès"
 msgstr "Article créé avec succès"
 
-#: ui/views.py:168
+#: ui/views.py:169
 msgid "Article modifié avec succès"
 msgstr "Article modifié avec succès"
 
-#: ui/views.py:189
+#: ui/views.py:190
 msgid "Article supprimé avec succès"
 msgstr "Article supprimé avec succès"
+
+#: ui/views.py:256
+msgid "Client créé avec succès"
+msgstr "Client créé avec succès"
+
+#: ui/views.py:278
+msgid "Client modifié avec succès"
+msgstr "Client modifié avec succès"
+
+#: ui/views.py:299
+msgid "Client supprimé avec succès"
+msgstr "Client supprimé avec succès"

@@ -42,3 +42,46 @@ class Asset(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Customer(models.Model):
+    TYPE_CHOICES = (
+        ("physical", _("Personne physique")),
+        ("legal", _("Personne morale")),
+    )
+
+    customer_type = models.CharField(
+        max_length=10,
+        choices=TYPE_CHOICES,
+        default="physical",
+        verbose_name=_("Type de client"),
+    )
+    # Personne physique
+    first_name = models.CharField(max_length=100, verbose_name=_("Prénom"), blank=True)
+    last_name = models.CharField(
+        max_length=100, verbose_name=_("Nom de famille"), blank=True
+    )
+    # Personne morale
+    company_name = models.CharField(
+        max_length=200, verbose_name=_("Raison sociale"), blank=True
+    )
+    legal_rep_first_name = models.CharField(
+        max_length=100, verbose_name=_("Prénom du représentant"), blank=True
+    )
+    legal_rep_last_name = models.CharField(
+        max_length=100, verbose_name=_("Nom du représentant"), blank=True
+    )
+    # Commun
+    email = models.EmailField(verbose_name=_("Email"))
+    phone = models.CharField(max_length=20, verbose_name=_("Téléphone"), blank=True)
+    address = models.TextField(verbose_name=_("Adresse"))
+
+    class Meta:
+        verbose_name = _("Client")
+        verbose_name_plural = _("Clients")
+        ordering = ["last_name", "company_name"]
+
+    def __str__(self):
+        if self.customer_type == "legal":
+            return self.company_name
+        return f"{self.last_name} {self.first_name}"

@@ -14,7 +14,11 @@ urlpatterns = [
     path(
         "reservations/", views.home, name="reservations"
     ),  # Dummy path for reservations
-    path("customers/", views.home, name="customers"),  # Dummy path for reservations
+    # Gestion des clients
+    path("customers/", views.customers_view, name="customers"),
+    path("customers/add/", views.customer_create, name="customer_create"),
+    path("customers/<int:pk>/edit/", views.customer_update, name="customer_update"),
+    path("customers/<int:pk>/delete/", views.customer_delete, name="customer_delete"),
     # Gestion du stock
     path("stock/", views.stock_view, name="stock"),
     # Gestion des catégories (admin uniquement)
