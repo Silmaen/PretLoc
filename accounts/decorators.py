@@ -47,3 +47,32 @@ def user_type_required(minimum_user_type):
         return wrapper
 
     return decorator
+
+
+def get_capability(user):
+    if not user.is_authenticated:
+        return {
+            "can_add_articles": False,
+            "can_edit_articles": False,
+            "can_delete_articles": False,
+            "can_view_articles": False,
+            "can_add_categories": False,
+            "can_edit_categories": False,
+            "can_delete_categories": False,
+            "can_view_categories": False,
+            "can_create_reservations": False,
+            "can_view_reservations": False,
+        }
+    return {
+        "can_add_articles": user.profile.user_type in ["admin"],
+        "can_edit_articles": user.profile.user_type in ["admin", "manager"],
+        "can_delete_articles": user.profile.user_type == "admin",
+        "can_view_articles": user.profile.user_type in ["admin", "manager", "member"],
+        "can_add_categories": user.profile.user_type == "admin",
+        "can_edit_categories": user.profile.user_type == "admin",
+        "can_delete_categories": user.profile.user_type == "admin",
+        "can_view_categories": user.profile.user_type in ["admin", "manager", "member"],
+        "can_create_reservations": user.profile.user_type in ["admin", "manager"],
+        "can_view_reservations": user.profile.user_type
+                                 in ["admin", "manager", "member"],
+    }

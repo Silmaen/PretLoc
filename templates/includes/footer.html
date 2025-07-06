@@ -11,7 +11,7 @@
             </a>
         </div>
 
-        {% if user.is_authenticated and user.profile.user_type == 'admin' %}
+        {% if user.is_authenticated and user.is_superuser %}
         <div class="admin-link">
             <a href="{% url 'admin:index' %}">
                 <i class="fas fa-cog"></i> <span>{% trans "Administration Django" %}</span>

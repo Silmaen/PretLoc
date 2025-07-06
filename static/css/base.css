@@ -249,7 +249,6 @@ footer {
 }
 
 .auth-card:hover {
-    transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
@@ -658,4 +657,41 @@ tr:hover {
 img, svg, video, canvas, object {
     max-width: 100%;
     height: auto;
+}
+
+/* Styles pour les boutons de tri */
+.sort-buttons {
+    display: inline-flex;
+    margin-left: 5px;
+}
+
+.sort-btn {
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 3px;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.sort-btn:hover, .sort-btn.active {
+    color: white;
+    transform: scale(1.2);
+}
+
+/* Style pour les en-têtes de colonne */
+th {
+    position: relative;
+    white-space: nowrap;
+}
+
+/* Style pour la taille du titre de l'article */
+h6.mb-0 {
+    font-size: 1.1rem !important;
+    font-weight: bold !important;
+}
+
+/* Style pour les boutons de catégories actifs */
+.auth-button.active {
+    background-color: var(--accent-blue-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext_lazy as _
 
-from .decorators import user_type_required
+from .decorators import user_type_required, get_capability
 from .forms import SignUpForm, UserUpdateForm, ProfileUpdateForm
 from .models import UserProfile
 
@@ -30,7 +30,14 @@ def signup(request):
             return redirect("ui:home")
     else:
         form = SignUpForm()
-    return render(request, "accounts/signup.html", {"form": form})
+    return render(
+        request,
+        "accounts/signup.html",
+        {
+            "form": form,
+            "capability": get_capability(request.user),
+        },
+    )
 
 
 @login_required
@@ -67,6 +74,7 @@ def user_profile(request):
         "profile_form": profile_form,
         "is_admin": admin,
         "is_superuser": is_superuser,
+        "capability": get_capability(request.user),
     }
     return render(request, "accounts/profile.html", context)
 
@@ -75,7 +83,14 @@ def user_profile(request):
 @user_type_required("admin")
 def manage_users(request):
     users = UserProfile.objects.all()
-    return render(request, "accounts/manage_users.html", {"users": users})
+    return render(
+        request,
+        "accounts/manage_users.html",
+        {
+            "users": users,
+            "capability": get_capability(request.user),
+        },
+    )
 
 
 @login_required
@@ -109,7 +124,12 @@ def edit_user(request, user_id):
         return redirect("accounts:manage_users")
 
     return render(
-        request, "accounts/edit_user.html", {"user_profile": user_profile_local}
+        request,
+        "accounts/edit_user.html",
+        {
+            "user_profile": user_profile_local,
+            "capability": get_capability(request.user),
+        },
     )
 
 
@@ -180,7 +200,14 @@ def create_user(request):
 
     # Passer les types d'utilisateur au template
     user_types = UserProfile.USER_TYPE_CHOICES
-    return render(request, "accounts/create_user.html", {"user_types": user_types})
+    return render(
+        request,
+        "accounts/create_user.html",
+        {
+            "user_types": user_types,
+            "capability": get_capability(request.user),
+        },
+    )
 
 
 @login_required

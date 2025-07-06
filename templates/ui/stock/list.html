@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 1000px;">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-boxes auth-icon"></i>
+            <h2>{% trans "Gestion du Stock" %}</h2>
+        </div>
+
+        <div class="d-flex justify-content-end mb-4">
+            {% if capability.can_view_categories %}
+            <a href="{% url 'ui:category_list' %}" class="auth-button" style="width: auto; margin-right: 10px;">
+                <i class="fas fa-tags"></i> {% trans "Gérer les catégories" %}
+            </a>
+            {% endif %}
+            {% if capability.can_add_articles %}
+            <a href="{% url 'ui:item_create' %}" class="auth-button" style="width: auto;">
+                <i class="fas fa-plus"></i> {% trans "Ajouter un article" %}
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Filtres par catégorie -->
+        <div class="mb-4">
+            <p>{% trans "Catégories" %}</p>
+            <div class="d-flex flex-wrap">
+                {% for cat in categories %}
+                <a href="{% url 'ui:stock' %}?category={{ cat.id }}"
+                   class="auth-button {% if current_category.id == cat.id %}active{% endif %}"
+                   style="width: auto; margin-right: 10px; margin-bottom: 10px; {% if current_category.id == cat.id %}background-color: var(--accent-blue-hover); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);{% endif %}">
+                    {{ cat.name }}
+                </a>
+                {% endfor %}
+                <a href="{% url 'ui:stock' %}"
+                   class="auth-button {% if not current_category %}active{% endif %}"
+                   style="width: auto; margin-bottom: 10px; {% if not current_category %}background-color: var(--accent-blue-hover); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);{% endif %}">
+                    {% trans "Tous" %}
+                </a>
+            </div>
+        </div>
+
+        <!-- Liste des articles -->
+        <div class="users-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>
+                        {% trans "Article" %}
+                        <div class="sort-buttons">
+                            <a href="?{% if category_id %}category={{ category_id }}&{% endif %}sort=name&direction=asc"
+                               title="{% trans 'Trier par nom (ascendant)' %}"
+                               class="sort-btn {% if sort == 'name' and direction == 'asc' %}active{% endif %}">
+                                <i class="fas fa-sort-alpha-down"></i>
+                            </a>
+                            <a href="?{% if category_id %}category={{ category_id }}&{% endif %}sort=name&direction=desc"
+                               title="{% trans 'Trier par nom (descendant)' %}"
+                               class="sort-btn {% if sort == 'name' and direction == 'desc' %}active{% endif %}">
+                                <i class="fas fa-sort-alpha-down-alt"></i>
+                            </a>
+                        </div>
+                    </th>
+                    <th>
+                        {% trans "Catégorie" %}
+                        <div class="sort-buttons">
+                            <a href="?{% if category_id %}category={{ category_id }}&{% endif %}sort=category&direction=asc"
+                               title="{% trans 'Trier par catégorie (ascendant)' %}"
+                               class="sort-btn {% if sort == 'category' and direction == 'asc' %}active{% endif %}">
+                                <i class="fas fa-sort-alpha-down"></i>
+                            </a>
+                            <a href="?{% if category_id %}category={{ category_id }}&{% endif %}sort=category&direction=desc"
+                               title="{% trans 'Trier par catégorie (descendant)' %}"
+                               class="sort-btn {% if sort == 'category' and direction == 'desc' %}active{% endif %}">
+                                <i class="fas fa-sort-alpha-down-alt"></i>
+                            </a>
+                        </div>
+                    </th>
+                    <th>{% trans "Stock" %}</th>
+                    <th>{% trans "Valeur location" %}</th>
+                    <th>{% trans "Actions" %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <div>
+                            <div>
+                                <h6 class="mb-0" style="font-size: 1.1rem; font-weight: bold;">{{ item.name }}</h6>
+                                <p class="text-secondary mb-0" style="font-size: 0.8rem;">
+                                    {{ item.description|truncatewords:10 }}
+                                </p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">{{ item.category.name }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary">{{ item.stock_quantity }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ item.rental_value }} €</span>
+                    </td>
+                    <td>
+                        {% if capability.can_edit_articles %}
+                        <a href="{% url 'ui:item_update' item.id %}" class="action-button">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% endif %}
+                        {% if capability.can_delete_articles %}
+                        <a href="{% url 'ui:item_delete' item.id %}" class="action-button"
+                           style="color: var(--accent-red);">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-3">
+                        <div class="alert alert-info mb-0">
+                            {% trans "Aucun article disponible dans cette catégorie." %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

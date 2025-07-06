@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-tag auth-icon"></i>
+            <h2>
+                {% if category %}
+                {% trans "Modifier la catégorie" %}
+                {% else %}
+                {% trans "Ajouter une catégorie" %}
+                {% endif %}
+            </h2>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    <i class="fas fa-{% if field.name == 'name' %}tag{% else %}align-left{% endif %}"></i>
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ field.help_text }}
+                </div>
+                {% endif %}
+                {% if field.errors %}
+                <ul class="errorlist">
+                    {% for error in field.errors %}
+                    <li><i class="fas fa-exclamation-triangle"></i> {{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="auth-button">
+                <i class="fas fa-save"></i>
+                {% if category %}
+                {% trans "Enregistrer les modifications" %}
+                {% else %}
+                {% trans "Créer la catégorie" %}
+                {% endif %}
+            </button>
+        </form>
+        <div style="margin-top: 20px;"></div>
+
+        <a href="{% url 'ui:category_list' %}" class="auth-button">
+            <i class="fas fa-arrow-left"></i>{% trans "Retour à la liste des catégories" %}
+        </a>
+
+    </div>
+</div>
+{% endblock %}

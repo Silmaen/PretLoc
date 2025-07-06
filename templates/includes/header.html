@@ -48,12 +48,12 @@
                 <i class="fas fa-users"></i><span>{% trans "Gestion utilisateurs" %}</span>
             </a>
             {% endif %}
-            {% if user.profile.user_type == 'admin' or user.profile.user_type == 'manager' %}
+            {% if capability.can_view_reservations %}
             <a href="{% url 'ui:reservations' %}">
                 <i class="fas fa-calendar-check"></i><span>{% trans "Gestion réservations" %}</span>
             </a>
             {% endif %}
-            {% if user.profile.user_type == 'admin' or user.profile.user_type == 'manager' %}
+            {% if capability.can_view_articles %}
             <a href="{% url 'ui:stock' %}">
                 <i class="fas fa-boxes"></i><span>{% trans "Gestion stock" %}</span>
             </a>

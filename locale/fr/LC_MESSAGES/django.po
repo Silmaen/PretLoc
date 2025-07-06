@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-04 13:18+0000\n"
+"POT-Creation-Date: 2025-07-06 12:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,34 +94,34 @@ msgstr "Client"
 msgid "Nouveau"
 msgstr "Nouveau"
 
-#: accounts/views.py:56
+#: accounts/views.py:63
 msgid "Votre profil a été mis à jour avec succès."
 msgstr "Votre profil a été mis à jour avec succès."
 
-#: accounts/views.py:107
+#: accounts/views.py:122
 msgid "Les informations de l'utilisateur ont été mises à jour."
 msgstr "Les informations de l'utilisateur ont été mises à jour."
 
-#: accounts/views.py:127
+#: accounts/views.py:147
 msgid ""
 "Vous ne pouvez pas réinitialiser votre propre mot de passe par cette "
 "méthode. Utilisez la page de profil."
 msgstr ""
 
-#: accounts/views.py:146
+#: accounts/views.py:166
 #, python-brace-format
 msgid "Le mot de passe de {username} a été réinitialisé à: {password}"
 msgstr "Le mot de passe de {username} a été réinitialisé à: {password}"
 
-#: accounts/views.py:178
+#: accounts/views.py:198
 msgid "L'utilisateur a été créé avec succès."
 msgstr "L'utilisateur a été créé avec succès."
 
-#: accounts/views.py:193
+#: accounts/views.py:220
 msgid "Vous ne pouvez pas supprimer votre propre compte."
 msgstr "Vous ne pouvez pas supprimer votre propre compte."
 
-#: accounts/views.py:201
+#: accounts/views.py:228
 msgid "L'utilisateur {} a été supprimé avec succès."
 msgstr "L'utilisateur {} a été supprimé avec succès."
 
@@ -131,7 +131,8 @@ msgid "Créer un nouvel utilisateur"
 msgstr "Créer un nouvel utilisateur"
 
 #: templates/accounts/create_user.html:42 templates/accounts/edit_user.html:45
-#: templates/accounts/profile.html:45
+#: templates/accounts/profile.html:45 templates/ui/stock/category_list.html:22
+#: ui/models.py:6 ui/models.py:19
 msgid "Nom"
 msgstr "Nom"
 
@@ -179,6 +180,8 @@ msgstr ""
 "dans votre profil."
 
 #: templates/accounts/edit_user.html:84 templates/accounts/profile.html:71
+#: templates/ui/stock/category_form.html:46
+#: templates/ui/stock/item_form.html:46
 msgid "Enregistrer les modifications"
 msgstr "Enregistrer les modifications"
 
@@ -210,6 +213,7 @@ msgid "Gestion des utilisateurs"
 msgstr "Gestion des utilisateurs"
 
 #: templates/accounts/manage_users.html:21
+#: templates/ui/stock/category_list.html:24 templates/ui/stock/list.html:81
 msgid "Actions"
 msgstr "Actions"
 
@@ -300,15 +304,15 @@ msgstr "Réservation"
 msgid "Déconnexion"
 msgstr "Déconnexion"
 
-#: templates/includes/header.html:46
+#: templates/includes/header.html:48
 msgid "Gestion utilisateurs"
 msgstr "Gestion utilisateurs"
 
-#: templates/includes/header.html:51
+#: templates/includes/header.html:53
 msgid "Gestion réservations"
 msgstr "Gestion réservations"
 
-#: templates/includes/header.html:56
+#: templates/includes/header.html:58
 msgid "Gestion stock"
 msgstr "Gestion stock"
 
@@ -351,3 +355,204 @@ msgstr "Bienvenue au Comité des fêtes de Genay"
 #: templates/ui/home.html:34
 msgid "Application de gestion du matériel"
 msgstr "Application de gestion du matériel"
+
+#: templates/ui/stock/category_confirm_delete.html:9
+msgid "Supprimer la catégorie"
+msgstr "Supprimer la catégories"
+
+#: templates/ui/stock/category_confirm_delete.html:13
+msgid "Êtes-vous sûr de vouloir supprimer cette catégorie?"
+msgstr "Êtes-vous sûr de vouloir supprimer cete catégorie?"
+
+#: templates/ui/stock/category_confirm_delete.html:22
+msgid ""
+"Attention: Tous les articles de cette catégorie seront également supprimés!"
+msgstr ""
+"Attention: Tous les articles de cette catégorie seront également supprimés!"
+
+#: templates/ui/stock/category_confirm_delete.html:31
+#: templates/ui/stock/item_confirm_delete.html:30
+msgid "Oui, supprimer"
+msgstr "Oui, supprimer"
+
+#: templates/ui/stock/category_confirm_delete.html:34
+#: templates/ui/stock/item_confirm_delete.html:33
+msgid "Annuler"
+msgstr "Annuler"
+
+#: templates/ui/stock/category_form.html:11
+msgid "Modifier la catégorie"
+msgstr "Modifier la catégories"
+
+#: templates/ui/stock/category_form.html:13
+#: templates/ui/stock/category_list.html:14
+msgid "Ajouter une catégorie"
+msgstr "Ajouter une catégorie"
+
+#: templates/ui/stock/category_form.html:48
+msgid "Créer la catégorie"
+msgstr "Créer la catégories"
+
+#: templates/ui/stock/category_form.html:55
+msgid "Retour à la liste des catégories"
+msgstr "Retour à la liste des catégories"
+
+#: templates/ui/stock/category_list.html:9
+msgid "Gestion des catégories"
+msgstr "Gestion des catégories"
+
+#: templates/ui/stock/category_list.html:23 ui/admin.py:19 ui/models.py:7
+#: ui/models.py:20
+msgid "Description"
+msgstr "Description"
+
+#: templates/ui/stock/category_list.html:50
+msgid "Aucune catégorie disponible."
+msgstr "Aucune catégorie disponible."
+
+#: templates/ui/stock/category_list.html:61
+msgid "Retour au stock"
+msgstr "Retour au stock"
+
+#: templates/ui/stock/item_confirm_delete.html:9
+msgid "Supprimer l'article"
+msgstr "Supprimer l'article"
+
+#: templates/ui/stock/item_confirm_delete.html:13
+msgid "Êtes-vous sûr de vouloir supprimer cet article?"
+msgstr "Êtes-vous sûr de vouloir supprimer cet article?"
+
+#: templates/ui/stock/item_confirm_delete.html:16
+#: templates/ui/stock/list.html:65 ui/models.py:11 ui/models.py:28
+msgid "Catégorie"
+msgstr "Catégorie"
+
+#: templates/ui/stock/item_confirm_delete.html:17
+#: templates/ui/stock/list.html:79
+msgid "Stock"
+msgstr "Stock"
+
+#: templates/ui/stock/item_confirm_delete.html:18 ui/models.py:34
+msgid "Valeur de location"
+msgstr "Valeur de location"
+
+#: templates/ui/stock/item_form.html:11
+msgid "Modifier l'article"
+msgstr "Modifier l'article"
+
+#: templates/ui/stock/item_form.html:13 templates/ui/stock/list.html:20
+msgid "Ajouter un article"
+msgstr "Ajouter un article"
+
+#: templates/ui/stock/item_form.html:48
+msgid "Créer l'article"
+msgstr "Créer l'article"
+
+#: templates/ui/stock/item_form.html:55
+msgid "Retour à la liste des articles"
+msgstr "Retour à la liste des articles"
+
+#: templates/ui/stock/list.html:9
+msgid "Gestion du Stock"
+msgstr "Gestion du stock"
+
+#: templates/ui/stock/list.html:15
+msgid "Gérer les catégories"
+msgstr "Gérer les catégories"
+
+#: templates/ui/stock/list.html:27 ui/models.py:12
+msgid "Catégories"
+msgstr "Catégories"
+
+#: templates/ui/stock/list.html:39
+msgid "Tous"
+msgstr "Tous"
+
+#: templates/ui/stock/list.html:50 ui/models.py:40
+msgid "Article"
+msgstr "Article"
+
+#: templates/ui/stock/list.html:53
+msgid "Trier par nom (ascendant)"
+msgstr "Trier par nom (ascendant)"
+
+#: templates/ui/stock/list.html:58
+msgid "Trier par nom (descendant)"
+msgstr "Trier par nom (descendant)"
+
+#: templates/ui/stock/list.html:68
+msgid "Trier par catégorie (ascendant)"
+msgstr "Trier par catégorie (ascendant)"
+
+#: templates/ui/stock/list.html:73
+msgid "Trier par catégorie (descendant)"
+msgstr "Trier par catégorie (descendant)"
+
+#: templates/ui/stock/list.html:80
+msgid "Valeur location"
+msgstr "Valeur de location"
+
+#: templates/ui/stock/list.html:124
+msgid "Aucun article disponible dans cette catégorie."
+msgstr "Aucun article disponible dans cette catégorie."
+
+#: ui/admin.py:38
+msgid "Informations générales"
+msgstr "Informations générales"
+
+#: ui/admin.py:39
+msgid "Gestion du stock"
+msgstr "Gestion du stock"
+
+#: ui/admin.py:40
+msgid "Valeurs"
+msgstr "Valeurs"
+
+#: ui/admin.py:47
+#, python-brace-format
+msgid "{updated} articles ont été remis à zéro."
+msgstr "{updated} articles ont été remis à zéro."
+
+#: ui/admin.py:50
+msgid "Remettre le stock à zéro pour les articles sélectionnés"
+msgstr "Remettre le stock à zéro pour les articles sélectionnés"
+
+#: ui/models.py:22
+msgid "Quantité en stock"
+msgstr "Quantité en stock"
+
+#: ui/models.py:27
+msgid "items"
+msgstr "items"
+
+#: ui/models.py:31
+msgid "Valeur de remplacement"
+msgstr "Valeur de remplacement"
+
+#: ui/models.py:41
+msgid "Articles"
+msgstr "Articles"
+
+#: ui/views.py:84
+msgid "Catégorie créée avec succès"
+msgstr "Catégorie créée avec succès"
+
+#: ui/views.py:106
+msgid "Catégorie modifiée avec succès"
+msgstr "Catégorie modifiée avec succès"
+
+#: ui/views.py:127
+msgid "Catégorie supprimée avec succès"
+msgstr "Catégorie supprimée avec succès"
+
+#: ui/views.py:146
+msgid "Article créé avec succès"
+msgstr "Article créé avec succès"
+
+#: ui/views.py:168
+msgid "Article modifié avec succès"
+msgstr "Article modifié avec succès"
+
+#: ui/views.py:189
+msgid "Article supprimé avec succès"
+msgstr "Article supprimé avec succès"
