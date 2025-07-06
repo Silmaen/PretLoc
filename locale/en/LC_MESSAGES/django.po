@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-06 12:02+0000\n"
+"POT-Creation-Date: 2025-07-06 12:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -183,7 +183,7 @@ msgid "Enregistrer les modifications"
 msgstr "Save changes"
 
 #: templates/accounts/login.html:9 templates/accounts/login.html:33
-#: templates/includes/header.html:20 templates/ui/home.html:37
+#: templates/includes/header.html:21 templates/ui/home.html:37
 msgid "Connexion"
 msgstr "Login"
 
@@ -260,7 +260,7 @@ msgstr "As a superuser, your type is set to Administrator"
 msgid "Seuls les administrateurs peuvent modifier ce champ"
 msgstr "Only administrators can modify this field"
 
-#: templates/accounts/signup.html:9 templates/includes/header.html:23
+#: templates/accounts/signup.html:9 templates/includes/header.html:24
 msgid "Inscription"
 msgstr "Sign up"
 
@@ -292,25 +292,27 @@ msgstr "Source code"
 msgid "Administration Django"
 msgstr "Django administration"
 
-#: templates/includes/header.html:7
-msgid "Réservation"
-msgstr "Reservation"
-
-#: templates/includes/header.html:16
+#: templates/includes/header.html:17
 msgid "Déconnexion"
 msgstr "Logout"
 
-#: templates/includes/header.html:48
-msgid "Gestion utilisateurs"
-msgstr "User management"
+#: templates/includes/header.html:49
+msgid "Utilisateurs"
+msgstr "Users"
 
-#: templates/includes/header.html:53
-msgid "Gestion réservations"
-msgstr "Reservation management"
+#: templates/includes/header.html:54
+msgid "Réservations"
+msgstr "Reservations"
 
-#: templates/includes/header.html:58
-msgid "Gestion stock"
-msgstr "Stock management"
+#: templates/includes/header.html:59
+#: templates/ui/stock/item_confirm_delete.html:17
+#: templates/ui/stock/list.html:79
+msgid "Stock"
+msgstr "Stock"
+
+#: templates/includes/header.html:64
+msgid "Clients"
+msgstr "Customers"
 
 #: templates/ui/home.html:12
 msgid "Compte en attente de validation"
@@ -418,11 +420,6 @@ msgstr "Are you sure you want to delete this asset?"
 #: templates/ui/stock/list.html:65 ui/models.py:11 ui/models.py:28
 msgid "Catégorie"
 msgstr "Category"
-
-#: templates/ui/stock/item_confirm_delete.html:17
-#: templates/ui/stock/list.html:79
-msgid "Stock"
-msgstr "Stock"
 
 #: templates/ui/stock/item_confirm_delete.html:18 ui/models.py:34
 msgid "Valeur de location"

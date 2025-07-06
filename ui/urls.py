@@ -14,6 +14,7 @@ urlpatterns = [
     path(
         "reservations/", views.home, name="reservations"
     ),  # Dummy path for reservations
+    path("customers/", views.home, name="customers"),  # Dummy path for reservations
     # Gestion du stock
     path("stock/", views.stock_view, name="stock"),
     # Gestion des catégories (admin uniquement)

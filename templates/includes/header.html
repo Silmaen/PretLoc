@@ -3,8 +3,9 @@
 <header>
     <div class="header-container">
         <div class="header-left">
-            <img src="{% static 'images/cdf.png' %}" alt="Logo CDF" class="small-logo">
-            <h1>{% trans "Réservation" %}</h1>
+            <a href="{% url 'ui:home' %}" style="text-decoration: none; display: flex; align-items: center;">
+                <img src="{% static 'images/cdf.png' %}" alt="Logo CDF" class="small-logo">
+            </a>
         </div>
 
         <div class="header-center">
@@ -45,17 +46,22 @@
             {% if user.is_authenticated %}
             {% if user.profile.user_type == 'admin' %}
             <a href="{% url 'accounts:manage_users' %}">
-                <i class="fas fa-users"></i><span>{% trans "Gestion utilisateurs" %}</span>
+                <i class="fas fa-users"></i><span>{% trans "Utilisateurs" %}</span>
             </a>
             {% endif %}
             {% if capability.can_view_reservations %}
             <a href="{% url 'ui:reservations' %}">
-                <i class="fas fa-calendar-check"></i><span>{% trans "Gestion réservations" %}</span>
+                <i class="fas fa-calendar-check"></i><span>{% trans "Réservations" %}</span>
             </a>
             {% endif %}
             {% if capability.can_view_articles %}
             <a href="{% url 'ui:stock' %}">
-                <i class="fas fa-boxes"></i><span>{% trans "Gestion stock" %}</span>
+                <i class="fas fa-boxes"></i><span>{% trans "Stock" %}</span>
+            </a>
+            {% endif %}
+            {% if capability.can_view_customers %}
+            <a href="{% url 'ui:customers' %}">
+                <i class="fas fa-users-cog"></i><span>{% trans "Clients" %}</span>
             </a>
             {% endif %}
             {% endif %}
