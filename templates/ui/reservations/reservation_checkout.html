@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 800px;">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-arrow-right auth-icon" style="color: var(--accent-blue);"></i>
+            <h2>{% trans "Sortie de matériel" %}</h2>
+        </div>
+
+        <!-- En-tête avec informations de la réservation -->
+        <div class="form-group">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <h3 style="margin: 0;">{{ reservation.customer }}</h3>
+                <div>
+                    <span style="font-weight: bold; font-size: 0.9rem;">
+                        <i class="fas fa-arrow-right"></i> {{ reservation.checkout_date }} | 
+                        <i class="fas fa-arrow-left"></i> {{ reservation.return_date }}
+                    </span>
+                </div>
+            </div>
+            <div style="font-size: 0.9rem;">
+                <i class="fas fa-envelope"></i> {{ reservation.customer.email }}
+                {% if reservation.customer.phone %}
+                | <i class="fas fa-phone"></i> {{ reservation.customer.phone }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="actual_checkout_date">
+                    <i class="fas fa-calendar-alt"></i> {% trans "Date de sortie réelle" %}
+                </label>
+                <input type="date" name="actual_checkout_date" id="actual_checkout_date"
+                       value="{% now 'Y-m-d' %}" class="form-control">
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Articles à sortir -->
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-top: 0;">{% trans "Articles à sortir" %}</h4>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>{% trans "Article" %}</th>
+                        <th style="width: 100px; text-align: center;">{% trans "Réservé" %}</th>
+                        <th style="width: 100px; text-align: center;">{% trans "À sortir" %}</th>
+                        <th style="width: 150px; text-align: right;">{% trans "Don minimum" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <div class="item-info">
+                                <span class="item-title">{{ item.asset.name }}</span>
+                                <span class="item-subtitle">{{ item.asset.category.name }}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">{{ item.quantity_reserved }}</td>
+                        <td style="text-align: center;">
+                            <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity_reserved }}"
+                                   min="0" max="{{ item.quantity_reserved }}"
+                                   style="width: 60px; text-align: center;"
+                                   onchange="updateTotal()">
+                        </td>
+                        <td style="text-align: right;">
+                                <span class="item-donation" data-value="{{ item.asset.rental_value }}">
+                                    {{ item.expected_donation }} €
+                                </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right; font-weight: bold;">
+                            {% trans "Don minimum total" %}:
+                        </td>
+                        <td style="text-align: right; font-weight: bold;">
+                            <span id="total-donation">{{ total_expected }} €</span>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Don minimum attendu (en lecture seule) -->
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-hand-holding-heart"></i> {% trans "Don minimum attendu" %}
+                </label>
+                <div style="background-color: var(--bg-element); padding: 12px 15px; border-radius: 5px; text-align: right; font-weight: bold;">
+                    <span id="total-donation">{{ total_expected }} €</span>
+                    <input type="hidden" name="donation_amount" value="{{ total_expected }}">
+                </div>
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i>
+                    {% trans "Le don minimum est calculé automatiquement selon les articles sortis" %}
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="form-group">
+                <label for="notes">
+                    <i class="fas fa-sticky-note"></i> {% trans "Notes" %}
+                </label>
+                <textarea id="notes" name="notes" rows="3">{{ reservation.notes }}</textarea>
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i>
+                    {% trans "Ajoutez des remarques ou informations complémentaires" %}
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                <a href="{% url 'ui:reservation_detail' reservation.pk %}" class="auth-button"
+                   style="background-color: var(--bg-element);">
+                    <i class="fas fa-times"></i> {% trans "Annuler" %}
+                </a>
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-arrow-right"></i> {% trans "Valider la sortie" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function updateTotal() {
+        const rows = document.querySelectorAll('tbody tr');
+        let total = 0;
+
+        rows.forEach(row => {
+            const quantityInput = row.querySelector('input[type="number"]');
+            const donationElem = row.querySelector('.item-donation');
+
+            if (quantityInput && donationElem) {
+                const quantity = parseInt(quantityInput.value) || 0;
+                const unitValue = parseFloat(donationElem.getAttribute('data-value')) || 0;
+                const itemDonation = quantity * unitValue;
+
+                // Mettre à jour l'affichage du don pour cet article
+                donationElem.textContent = itemDonation.toFixed(2) + ' €';
+
+                total += itemDonation;
+            }
+        });
+
+        // Mettre à jour le total et le champ de don
+        document.getElementById('total-donation').textContent = total.toFixed(2) + ' €';
+        document.getElementById('donation_amount').value = total.toFixed(2);
+    }
+</script>
+{% endblock %}

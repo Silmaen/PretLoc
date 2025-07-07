@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-check-circle auth-icon"></i>
+            <h2>{% trans "Confirmer la validation" %}</h2>
+        </div>
+
+        <p>{% trans "Êtes-vous sûr de vouloir valider cette réservation?" %}</p>
+
+        <p><strong>{% trans "Client" %}:</strong> {{ reservation.customer }}</p>
+        <p><strong>{% trans "Date de sortie" %}:</strong> {{ reservation.checkout_date }}</p>
+        <p><strong>{% trans "Date de retour" %}:</strong> {{ reservation.return_date }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <a href="{% url 'ui:reservation_detail' reservation.pk %}" class="auth-button"
+                   style="background-color: var(--bg-element); color: var(--text-primary);">
+                    <i class="fas fa-arrow-left"></i> {% trans "Annuler" %}
+                </a>
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-check"></i> {% trans "Valider la réservation" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

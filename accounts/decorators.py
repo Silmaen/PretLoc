@@ -64,7 +64,7 @@ def get_capability(user):
             "can_edit_customers": False,
             "can_delete_customers": False,
             "can_view_categories": False,
-            "can_create_reservations": False,
+            "can_add_reservations": False,
             "can_view_reservations": False,
         }
     return {
@@ -84,8 +84,9 @@ def get_capability(user):
         "can_delete_categories": user.profile.user_type == "admin",
         "can_view_categories": user.profile.user_type in ["admin", "manager", "member"],
         # reservations
-        "can_create_reservations": user.profile.user_type in ["admin", "manager"],
+        "can_add_reservations": user.profile.user_type in ["admin", "manager"],
         "can_edit_reservations": user.profile.user_type in ["admin", "manager"],
         "can_view_reservations": user.profile.user_type
-                                 in ["admin", "manager", "member"],
+        in ["admin", "manager", "member"],
+        "can_delete_reservations": user.profile.user_type in ["admin", "manager"],
     }

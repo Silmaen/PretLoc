@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import Category, Asset, Customer
+from .models import Category, Asset, Customer, Reservation, ReservationItem
 
 
 class CategoryForm(forms.ModelForm):
@@ -77,3 +77,25 @@ class CustomerForm(forms.ModelForm):
                 )
 
         return cleaned_data
+
+
+class ReservationForm(forms.ModelForm):
+    class Meta:
+        model = Reservation
+        fields = ["customer", "checkout_date", "return_date", "notes"]
+        widgets = {
+            "checkout_date": forms.DateInput(attrs={"type": "date"}),
+            "return_date": forms.DateInput(attrs={"type": "date"}),
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+
+
+class ReservationItemForm(forms.ModelForm):
+    class Meta:
+        model = ReservationItem
+        fields = ["asset", "quantity_reserved"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Afficher uniquement les articles disponibles
+        self.fields["asset"].queryset = Asset.objects.filter(stock_quantity__gt=0)

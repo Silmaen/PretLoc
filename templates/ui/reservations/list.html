@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 1000px;">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-calendar-check auth-icon"></i>
+            <h2>{% trans "Gestion des Réservations" %}</h2>
+        </div>
+
+        <!-- Barre de recherche et boutons d'action -->
+        <div class="search-action-bar">
+            <form method="get" class="search-container">
+                <div class="search-input-group">
+                    <input type="text" name="search" value="{{ search_query }}"
+                           placeholder="{% trans 'Rechercher une réservation...' %}" class="search-input">
+                    <button type="submit" class="auth-button search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <input type="hidden" name="status" value="{{ status_filter }}">
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <input type="hidden" name="direction" value="{{ direction }}">
+            </form>
+
+            <div class="actions-buttons">
+                {% if capability.can_add_reservations %}
+                <a href="{% url 'ui:reservation_create' %}" class="auth-button">
+                    <i class="fas fa-plus"></i> {% trans "Nouvelle réservation" %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Filtres par statut -->
+        <div class="filters-row">
+            <div class="filter-group">
+                <div class="filter-label">
+                    <i class="fas fa-filter"></i> {% trans "Statut:" %}
+                </div>
+                <div class="filter-buttons-container">
+                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}sort={{ sort }}&direction={{ direction }}"
+                       class="filter-button {% if not status_filter %}active{% endif %}">
+                        {% trans "Tous" %}
+                    </a>
+                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}status=created&sort={{ sort }}&direction={{ direction }}"
+                       class="filter-button {% if status_filter == 'created' %}active{% endif %}">
+                        <i class="fas fa-file-alt"></i> {% trans "Créée" %}
+                    </a>
+                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}status=validated&sort={{ sort }}&direction={{ direction }}"
+                       class="filter-button {% if status_filter == 'validated' %}active{% endif %}">
+                        <i class="fas fa-check"></i> {% trans "Validée" %}
+                    </a>
+                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}status=checked_out&sort={{ sort }}&direction={{ direction }}"
+                       class="filter-button {% if status_filter == 'checked_out' %}active{% endif %}">
+                        <i class="fas fa-arrow-right"></i> {% trans "Sortie" %}
+                    </a>
+                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}status=returned&sort={{ sort }}&direction={{ direction }}"
+                       class="filter-button {% if status_filter == 'returned' %}active{% endif %}">
+                        <i class="fas fa-arrow-left"></i> {% trans "Rendue" %}
+                    </a>
+                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}status=cancelled&sort={{ sort }}&direction={{ direction }}"
+                       class="filter-button {% if status_filter == 'cancelled' %}active{% endif %}">
+                        <i class="fas fa-ban"></i> {% trans "Annulée" %}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Toggle pour n'afficher que les réservations actives -->
+            <div class="filter-group">
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort={{ sort }}&direction={{ direction }}&active_only={% if active_only == 'true' %}false{% else %}true{% endif %}"
+                   class="filter-button {% if active_only == 'true' %}active{% endif %}">
+                    <i class="fas {% if active_only == 'true' %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i>
+                    {% trans "Actives uniquement" %}
+                </a>
+            </div>
+        </div>
+
+        <!-- Liste des réservations -->
+        <div class="users-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>
+                        {% trans "Client" %}
+                        <div class="sort-buttons">
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort=customer&direction=asc"
+                               class="sort-btn {% if sort == 'customer' and direction == 'asc' %}active{% endif %}">
+                                <i class="fas fa-sort-alpha-down"></i>
+                            </a>
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort=customer&direction=desc"
+                               class="sort-btn {% if sort == 'customer' and direction == 'desc' %}active{% endif %}">
+                                <i class="fas fa-sort-alpha-down-alt"></i>
+                            </a>
+                        </div>
+                    </th>
+                    <th>
+                        {% trans "Dates" %}
+                        <div class="sort-buttons">
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort=checkout_date&direction=asc"
+                               class="sort-btn {% if sort == 'checkout_date' and direction == 'asc' %}active{% endif %}">
+                                <i class="fas fa-sort-numeric-down"></i>
+                            </a>
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort=checkout_date&direction=desc"
+                               class="sort-btn {% if sort == 'checkout_date' and direction == 'desc' %}active{% endif %}">
+                                <i class="fas fa-sort-numeric-down-alt"></i>
+                            </a>
+                        </div>
+                    </th>
+                    <th>
+                        {% trans "Statut" %}
+                        <div class="sort-buttons">
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort=status&direction=asc"
+                               class="sort-btn {% if sort == 'status' and direction == 'asc' %}active{% endif %}">
+                                <i class="fas fa-sort-alpha-down"></i>
+                            </a>
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort=status&direction=desc"
+                               class="sort-btn {% if sort == 'status' and direction == 'desc' %}active{% endif %}">
+                                <i class="fas fa-sort-alpha-down-alt"></i>
+                            </a>
+                        </div>
+                    </th>
+                    <th>{% trans "Don" %}</th>
+                    <th>{% trans "Actions" %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for reservation in reservations %}
+                <tr>
+                    <td>
+                        <div class="item-info">
+                            <span class="item-title">{{ reservation.customer }}</span>
+                            <span class="item-subtitle">
+                                {% if reservation.customer.customer_type == 'physical' %}
+                                <i class="fas fa-user"></i> 
+                                {% else %}
+                                <i class="fas fa-building"></i>
+                                {% endif %}
+                                {{ reservation.customer.email }}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="item-info">
+                            <span><i class="fas fa-arrow-right"></i> {{ reservation.checkout_date }}</span>
+                            <span><i class="fas fa-arrow-left"></i> {{ reservation.return_date }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if reservation.status == 'created' %}
+                        <span class="badge" style="background-color: #6c757d;">
+                            <i class="fas fa-file-alt"></i> {% trans "Créée" %}
+                        </span>
+                        {% elif reservation.status == 'validated' %}
+                        <span class="badge" style="background-color: #28a745;">
+                            <i class="fas fa-check"></i> {% trans "Validée" %}
+                        </span>
+                        {% elif reservation.status == 'checked_out' %}
+                        <span class="badge" style="background-color: #007bff;">
+                            <i class="fas fa-arrow-right"></i> {% trans "Sortie" %}
+                        </span>
+                        {% elif reservation.status == 'returned' %}
+                        <span class="badge" style="background-color: #17a2b8;">
+                            <i class="fas fa-arrow-left"></i> {% trans "Rendue" %}
+                        </span>
+                        {% elif reservation.status == 'cancelled' %}
+                        <span class="badge" style="background-color: #dc3545;">
+                            <i class="fas fa-ban"></i> {% trans "Annulée" %}
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="values-container">
+                            <span class="value-item"><i class="fas fa-hand-holding-heart"></i> {{ reservation.donation_amount }} €</span>
+                            <span class="value-item"><small>{% trans "Attendu" %}: {{ reservation.total_expected_donation }} €</small></span>
+                        </div>
+                    </td>
+                    <td style="width: 120px; white-space: nowrap; text-align: right;">
+                        <a href="{% url 'ui:reservation_detail' reservation.id %}" class="action-button">
+                            <i class="fas fa-eye"></i>
+                        </a>
+
+                        {% if reservation.status == 'created' or reservation.status == 'validated' %}
+                        {% if capability.can_edit_reservations %}
+                        <a href="{% url 'ui:reservation_update' reservation.id %}" class="action-button">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if reservation.status == 'validated' %}
+                        <a href="{% url 'ui:reservation_checkout' reservation.id %}" class="action-button"
+                           title="{% trans 'Sortir le matériel' %}">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if capability.can_delete_reservations %}
+                        <a href="{% url 'ui:reservation_cancel' reservation.id %}" class="action-button danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                        {% endif %}
+                        {% endif %}
+
+                        {% if reservation.status == 'checked_out' %}
+                        <a href="{% url 'ui:reservation_return' reservation.id %}" class="action-button"
+                           title="{% trans 'Enregistrer le retour' %}">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px;">
+                        {% trans "Aucune réservation trouvée" %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

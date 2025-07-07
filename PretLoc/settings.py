@@ -135,8 +135,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/static/"
 # Directory for app-specific static files
 STATICFILES_DIRS = [
-    BASE_DIR / "ui" / "static",  # Use a different source directory name
-    BASE_DIR / "static",  # Use a different source directory name
+    BASE_DIR / "static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 

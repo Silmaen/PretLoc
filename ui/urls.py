@@ -11,9 +11,41 @@ app_name = "ui"
 urlpatterns = [
     path("health/", views.health_check, name="health_check"),
     path("", views.home, name="home"),  # Page d'accueil
+    # Gestion des réservations
+    path("reservations/", views.reservation_list, name="reservations"),
+    path("reservations/add/", views.reservation_create, name="reservation_create"),
+    path("reservations/<int:pk>/", views.reservation_detail, name="reservation_detail"),
     path(
-        "reservations/", views.home, name="reservations"
-    ),  # Dummy path for reservations
+        "reservations/<int:pk>/validate/",
+        views.reservation_validate,
+        name="reservation_validate",
+    ),
+    path(
+        "reservations/<int:pk>/edit/",
+        views.reservation_update,
+        name="reservation_update",
+    ),
+    path(
+        "reservations/<int:pk>/cancel/",
+        views.reservation_cancel,
+        name="reservation_cancel",
+    ),
+    path(
+        "reservations/<int:pk>/checkout/",
+        views.reservation_checkout,
+        name="reservation_checkout",
+    ),
+    path(
+        "reservations/<int:pk>/return/",
+        views.reservation_return,
+        name="reservation_return",
+    ),
+    path(
+        "reservations/search_customer/",
+        views.search_customers,
+        name="search_customers",
+    ),
+    path("reservations/search_assets/", views.search_assets, name="search_assets"),
     # Gestion des clients
     path("customers/", views.customers_view, name="customers"),
     path("customers/add/", views.customer_create, name="customer_create"),

@@ -6,14 +6,22 @@ defines the views for the UI application, including a health check endpoint.
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse
+from django.forms import inlineformset_factory
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from accounts.decorators import user_type_required, get_capability
-from .forms import CategoryForm, AssetForm, CustomerForm
-from .models import Category, Asset, Customer
+from .forms import (
+    CategoryForm,
+    AssetForm,
+    CustomerForm,
+    ReservationForm,
+    ReservationItemForm,
+)
+from .models import Category, Asset, Customer, Reservation, ReservationItem
 
 
 def health_check(request):
@@ -321,3 +329,456 @@ def customer_delete(request, pk):
             "capability": get_capability(request.user),
         },
     )
+
+
+@login_required
+@user_type_required("manager")
+def reservation_list(request):
+    """Vue pour afficher la liste des réservations"""
+    search_query = request.GET.get("search", "")
+    status_filter = request.GET.get("status", "")
+    sort = request.GET.get("sort", "checkout_date")
+    direction = request.GET.get("direction", "desc")
+    active_only = request.GET.get("active_only", "false")
+
+    # Déterminer le champ de tri
+    order_by = sort
+
+    # Cas spécial pour le tri par statut (ordre personnalisé)
+    if sort == "status":
+        from django.db.models.expressions import Case, When
+        from django.db.models import IntegerField, Value
+
+        # Définir l'ordre personnalisé: created, validated, checked_out, returned, cancelled
+        status_order = {
+            "created": 1,
+            "validated": 2,
+            "checked_out": 3,
+            "returned": 4,
+            "cancelled": 5,
+        }
+
+        # Utiliser Case/When pour trier avec un ordre personnalisé
+        status_ordering = Case(
+            *[When(status=k, then=Value(v)) for k, v in status_order.items()],
+            output_field=IntegerField(),
+        )
+
+        # Appliquer la direction du tri
+        if direction == "desc":
+            status_ordering = status_ordering.desc()
+
+        # Utiliser annotate pour créer un champ temporaire pour le tri
+        reservations_query = Reservation.objects.annotate(status_order=status_ordering)
+        order_by = "status_order"
+    else:
+        reservations_query = Reservation.objects.all()
+        # Appliquer la direction du tri
+        if direction == "desc" and sort != "status":
+            order_by = f"-{order_by}"
+
+    # Initialiser les filtres de base
+    filters = {}
+
+    # Filtrer par statut si spécifié
+    if status_filter:
+        filters["status"] = status_filter
+
+    # Filtrer pour n'afficher que les réservations actives si demandé
+    if active_only == "true":
+        if "status" in filters:
+            # Si un filtre de statut est déjà appliqué, vérifier qu'il est compatible
+            if filters["status"] not in ["returned", "cancelled"]:
+                # Le filtre de statut est compatible, pas besoin d'autres filtres
+                pass
+            else:
+                # Le filtre de statut est incompatible avec active_only, ignorer active_only
+                active_only = "false"
+        else:
+            # Pas de filtre de statut spécifique, exclure les statuts "returned" et "cancelled"
+            filters["status__in"] = ["created", "validated", "checked_out"]
+
+    # Filtrer par recherche si spécifiée
+    if search_query:
+        reservations = reservations_query.filter(
+            Q(customer__last_name__icontains=search_query)
+            | Q(customer__first_name__icontains=search_query)
+            | Q(customer__company_name__icontains=search_query)
+            | Q(customer__email__icontains=search_query)
+            | Q(notes__icontains=search_query),
+            **filters,
+        ).order_by(order_by)
+    else:
+        reservations = reservations_query.filter(**filters).order_by(order_by)
+
+    context = {
+        "reservations": reservations,
+        "search_query": search_query,
+        "status_filter": status_filter,
+        "sort": sort,
+        "direction": direction,
+        "active_only": active_only,
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/reservations/list.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_detail(request, pk):
+    """Vue pour afficher les détails d'une réservation"""
+    reservation = get_object_or_404(Reservation, pk=pk)
+    items = reservation.items.all().order_by("asset__category__name", "asset__name")
+
+    context = {
+        "reservation": reservation,
+        "items": items,
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/reservations/detail.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_create(request):
+    """Vue pour créer une nouvelle réservation"""
+    ReservationItemFormSet = inlineformset_factory(
+        Reservation, ReservationItem, form=ReservationItemForm, extra=1, can_delete=True
+    )
+
+    if request.method == "POST":
+        form = ReservationForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                reservation = form.save()
+                formset = ReservationItemFormSet(request.POST, instance=reservation)
+                if formset.is_valid():
+                    formset.save()
+                    messages.success(request, _("Réservation créée avec succès"))
+                    return redirect("ui:reservation_detail", pk=reservation.pk)
+        else:
+            formset = ReservationItemFormSet(request.POST)
+    else:
+        form = ReservationForm()
+        formset = ReservationItemFormSet()
+
+    context = {
+        "form": form,
+        "formset": formset,
+        "categories": Category.objects.all(),
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/reservations/reservation_form.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_validate(request, pk):
+    """Vue pour valider une réservation"""
+    reservation = get_object_or_404(Reservation, pk=pk)
+
+    # Vérifier si la réservation peut être validée
+    if reservation.status != "created":
+        messages.error(request, _("Cette réservation ne peut pas être validée"))
+        return redirect("ui:reservation_detail", pk=reservation.pk)
+
+    if request.method == "POST":
+        reservation.status = "validated"
+        reservation.save()
+        messages.success(request, _("Réservation validée avec succès"))
+        return redirect("ui:reservation_detail", pk=reservation.pk)
+
+    context = {
+        "reservation": reservation,
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/reservations/reservation_confirm_validate.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_update(request, pk):
+    """Vue pour modifier une réservation existante"""
+    reservation = get_object_or_404(Reservation, pk=pk)
+
+    # Ne pas autoriser les modifications pour les réservations déjà sorties ou rendues
+    if reservation.status in ["checked_out", "returned"]:
+        messages.error(
+            request, _("Impossible de modifier une réservation sortie ou rendue")
+        )
+        return redirect("ui:reservation_detail", pk=reservation.pk)
+
+    ReservationItemFormSet = inlineformset_factory(
+        Reservation, ReservationItem, form=ReservationItemForm, extra=1, can_delete=True
+    )
+
+    if request.method == "POST":
+        form = ReservationForm(request.POST, instance=reservation)
+        if form.is_valid():
+            with transaction.atomic():
+                reservation = form.save()
+                formset = ReservationItemFormSet(request.POST, instance=reservation)
+                if formset.is_valid():
+                    formset.save()
+                    messages.success(request, _("Réservation modifiée avec succès"))
+                    return redirect("ui:reservation_detail", pk=reservation.pk)
+    else:
+        form = ReservationForm(instance=reservation)
+        formset = ReservationItemFormSet(instance=reservation)
+
+    context = {
+        "form": form,
+        "formset": formset,
+        "reservation": reservation,
+        "categories": Category.objects.all(),
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/reservations/reservation_form.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_cancel(request, pk):
+    """Vue pour annuler une réservation"""
+    reservation = get_object_or_404(Reservation, pk=pk)
+
+    # Ne permettre l'annulation que pour les réservations en état "created" ou "validated"
+    if reservation.status not in ["created", "validated"]:
+        messages.error(
+            request,
+            _(
+                "Seules les réservations à l'état 'créée' ou 'validée' peuvent être annulées"
+            ),
+        )
+        return redirect("ui:reservation_detail", pk=reservation.pk)
+
+    if request.method == "POST":
+        reservation.status = "cancelled"
+        reservation.save()
+        messages.success(request, _("Réservation annulée avec succès"))
+        return redirect("ui:reservations")
+
+    context = {
+        "reservation": reservation,
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/reservations/reservation_confirm_cancel.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_checkout(request, pk):
+    """Vue pour effectuer une sortie de matériel"""
+    reservation = get_object_or_404(Reservation, pk=pk)
+
+    # Vérifier si la réservation peut être passée en statut "sortie"
+    if reservation.status not in ["created", "validated"]:
+        messages.error(request, _("Cette réservation ne peut pas être sortie"))
+        return redirect("ui:reservation_detail", pk=reservation.pk)
+
+    items = reservation.items.all().order_by("asset__category__name", "asset__name")
+
+    if request.method == "POST":
+        with transaction.atomic():
+            # Mettre à jour les quantités sorties pour chaque article
+            errors = False
+            for item in items:
+                quantity_key = f"checkout_{item.id}"
+                if quantity_key in request.POST:
+                    quantity = int(request.POST.get(quantity_key, 0))
+                    if quantity > item.asset.stock_quantity:
+                        messages.error(
+                            request,
+                            _(
+                                f"Quantité insuffisante pour {item.asset.name} (disponible: {item.asset.stock_quantity})"
+                            ),
+                        )
+                        errors = True
+                    else:
+                        item.quantity_checked_out = quantity
+                        item.save()
+
+                        # Mettre à jour le stock
+                        asset = item.asset
+                        asset.stock_quantity -= quantity
+                        asset.save()
+
+            if not errors:
+                # Mettre à jour le statut de la réservation
+                reservation.status = "checked_out"
+                # Enregistrer la date réelle de sortie
+                actual_date = request.POST.get("actual_checkout_date")
+                if actual_date:
+                    reservation.actual_checkout_date = actual_date
+                else:
+                    from datetime import date
+
+                    reservation.actual_checkout_date = date.today()
+                reservation.notes = request.POST.get("notes", reservation.notes)
+                reservation.save()
+
+                messages.success(request, _("Sortie de matériel effectuée avec succès"))
+                return redirect("ui:reservation_detail", pk=reservation.pk)
+
+    context = {
+        "reservation": reservation,
+        "items": items,
+        "total_expected": reservation.total_expected_donation,
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/reservations/reservation_checkout.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_return(request, pk):
+    """Vue pour enregistrer un retour de matériel"""
+    reservation = get_object_or_404(Reservation, pk=pk)
+
+    # Vérifier si la réservation peut être retournée
+    if reservation.status != "checked_out":
+        messages.error(request, _("Cette réservation ne peut pas être retournée"))
+        return redirect("ui:reservation_detail", pk=reservation.pk)
+
+    items = reservation.items.filter(quantity_checked_out__gt=0).order_by(
+        "asset__category__name", "asset__name"
+    )
+
+    if request.method == "POST":
+        with transaction.atomic():
+            for item in items:
+                return_key = f"return_{item.id}"
+                damaged_key = f"damaged_{item.id}"
+                destroyed_key = f"destroyed_{item.id}"
+
+                if (
+                        return_key in request.POST
+                        and damaged_key in request.POST
+                        and destroyed_key in request.POST
+                ):
+                    returned_qty = int(request.POST.get(return_key, 0))
+                    damaged_qty = int(request.POST.get(damaged_key, 0))
+                    destroyed_qty = int(request.POST.get(destroyed_key, 0))
+
+                    # Vérifier que les quantités sont valides
+                    total_returned = returned_qty + damaged_qty + destroyed_qty
+                    if total_returned > item.quantity_checked_out:
+                        messages.error(
+                            request, _(f"Quantités invalides pour {item.asset.name}")
+                        )
+                        break
+
+                    # Mettre à jour les quantités
+                    item.quantity_returned = returned_qty
+                    item.quantity_damaged = damaged_qty
+                    # Ajouter un champ pour les articles détruits ou créer une note
+                    item.notes = (
+                        f"Détruits: {destroyed_qty}" if destroyed_qty > 0 else ""
+                    )
+                    item.save()
+
+                    # Remettre en stock uniquement les articles en bon état
+                    asset = item.asset
+                    asset.stock_quantity += returned_qty
+                    asset.save()
+            else:  # Ce bloc s'exécute si la boucle se termine normalement (sans break)
+                # Mettre à jour le statut de la réservation
+                donation = float(request.POST.get("donation_amount", 0))
+                reservation.donation_amount = donation
+                reservation.status = "returned"
+
+                # Enregistrer la date réelle de retour
+                actual_date = request.POST.get("actual_return_date")
+                if actual_date:
+                    reservation.actual_return_date = actual_date
+                else:
+                    from datetime import date
+
+                    reservation.actual_return_date = date.today()
+
+                reservation.save()
+
+                messages.success(
+                    request, _("Retour de matériel enregistré avec succès")
+                )
+                return redirect("ui:reservation_detail", pk=reservation.pk)
+
+    context = {
+        "reservation": reservation,
+        "items": items,
+        "total_expected": reservation.total_expected_donation,
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/reservations/reservation_return.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def search_customers(request):
+    search_query = request.GET.get("q", "")
+    page = int(request.GET.get("page", 1))
+    page_size = 10
+
+    offset = (page - 1) * page_size
+
+    customers = Customer.objects.filter(
+        Q(last_name__icontains=search_query)
+        | Q(first_name__icontains=search_query)
+        | Q(company_name__icontains=search_query)
+        | Q(email__icontains=search_query)
+    ).order_by("last_name", "company_name")[offset: offset + page_size + 1]
+
+    has_more = len(customers) > page_size
+    if has_more:
+        customers = customers[:page_size]
+
+    results = [
+        {
+            "id": c.id,
+            "text": str(c),
+            "email": c.email,  # Ajoutez d'autres champs si nécessaire
+        }
+        for c in customers
+    ]
+
+    return JsonResponse({"results": results, "has_more": has_more})
+
+
+def search_assets(request):
+    query = request.GET.get("q", "")
+    category_id = request.GET.get("category", None)
+    # Récupérer les IDs d'articles déjà dans la réservation
+    excluded_ids = request.GET.getlist("exclude[]", [])
+
+    assets = Asset.objects.filter(stock_quantity__gt=0)
+
+    # Filtrage par catégorie
+    if category_id and category_id.isdigit():
+        assets = assets.filter(category_id=int(category_id))
+
+    # Recherche par nom ou description
+    if query:
+        assets = assets.filter(
+            models.Q(name__icontains=query) | models.Q(description__icontains=query)
+        )
+
+    # Exclure les articles déjà sélectionnés
+    if excluded_ids:
+        assets = assets.exclude(id__in=excluded_ids)
+
+    # Trier par catégorie puis par nom
+    assets = assets.order_by("category__name", "name")
+    # Limiter les résultats et formater la réponse
+    # assets = assets[:20]  # Limite à 20 résultats
+    results = [
+        {
+            "id": asset.id,
+            "text": asset.name,
+            "category": asset.category.name,
+            "stock": asset.stock_quantity,
+            "rental_value": float(asset.rental_value),
+        }
+        for asset in assets
+    ]
+
+    return JsonResponse({"results": results})

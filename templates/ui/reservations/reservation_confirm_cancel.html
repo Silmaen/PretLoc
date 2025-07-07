@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-calendar-times auth-icon"></i>
+            <h2>{% trans "Annuler la réservation" %}</h2>
+        </div>
+
+        <p>{% trans "Êtes-vous sûr de vouloir annuler cette réservation?" %}</p>
+
+        <p><strong>{% trans "Client" %}:</strong> {{ reservation.customer }}</p>
+        <p><strong>{% trans "Date prévue" %}:</strong> {{ reservation.checkout_date }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="actions-buttons" style="justify-content: center; margin-top: 20px;">
+                <a href="{% url 'ui:reservation_detail' reservation.pk %}" class="auth-button">
+                    <i class="fas fa-times"></i> {% trans "Annuler" %}
+                </a>
+                <button type="submit" class="auth-button" style="background-color: var(--accent-red);">
+                    <i class="fas fa-check"></i> {% trans "Confirmer l'annulation" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

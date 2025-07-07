@@ -1,0 +1,68 @@
+/* Style personnalisé pour Select2 qui correspond à votre thème */
+.select2-container--default {
+    width: 100% !important;
+}
+
+.select2-container--default .select2-selection--single {
+    width: 100%;
+    height: auto;
+    padding: 10px 15px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-primary);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--text-primary);
+    line-height: 20px;
+    padding: 0;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px;
+}
+
+.select2-dropdown {
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    background-color: var(--bg-container);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.select2-container--default .select2-results__option {
+    padding: 8px 15px;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--accent-blue);
+}
+
+.actions-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .actions-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-group {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #add-item-button {
+        width: 100%;
+        max-width: none !important;
+    }
+}

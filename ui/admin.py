@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .models import Category, Asset, Customer
+from .models import Category, Asset, Customer, Reservation, ReservationItem
 
 
 @admin.register(Category)
@@ -40,24 +40,106 @@ class AssetAdmin(admin.ModelAdmin):
         (_("Valeurs"), {"fields": ("replacement_value", "rental_value")}),
     )
 
-    actions = ["reset_stock_to_zero"]
-
-    def reset_stock_to_zero(self, request, queryset):
-        updated = queryset.update(stock_quantity=0)
-        self.message_user(request, _(f"{updated} articles ont été remis à zéro."))
-
-    reset_stock_to_zero.short_description = _(
-        "Remettre le stock à zéro pour les articles sélectionnés"
-    )
-
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("last_name", "email", "phone")
-    search_fields = ("last_name", "email", "phone", "address", "notes")
-    ordering = ("last_name",)
+    list_display = ("get_full_name", "customer_type", "email", "phone")
+    list_filter = ("customer_type",)
+    search_fields = (
+        "last_name",
+        "first_name",
+        "company_name",
+        "email",
+        "phone",
+        "address",
+    )
+    ordering = ("last_name", "company_name")
 
     fieldsets = (
-        (_("Informations générales"), {"fields": ("last_name", "email", "phone")}),
-        (_("Détails"), {"fields": ("address", "notes")}),
+        (_("Type de client"), {"fields": ("customer_type",)}),
+        (
+            _("Personne physique"),
+            {
+                "fields": ("first_name", "last_name"),
+                "classes": ("collapse",),
+                "description": _("Informations pour une personne physique"),
+            },
+        ),
+        (
+            _("Personne morale"),
+            {
+                "fields": (
+                    "company_name",
+                    "legal_rep_first_name",
+                    "legal_rep_last_name",
+                ),
+                "classes": ("collapse",),
+                "description": _("Informations pour une personne morale"),
+            },
+        ),
+        (_("Coordonnées"), {"fields": ("email", "phone", "address")}),
     )
+
+    def get_full_name(self, obj):
+        if obj.customer_type == "physical":
+            return f"{obj.last_name} {obj.first_name}"
+        else:
+            return obj.company_name
+
+    get_full_name.short_description = _("Nom")
+
+
+class ReservationItemInline(admin.TabularInline):
+    model = ReservationItem
+    extra = 1
+    fields = [
+        "asset",
+        "quantity_reserved",
+        "quantity_checked_out",
+        "quantity_returned",
+        "quantity_damaged",
+    ]
+
+
+@admin.register(Reservation)
+class ReservationAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "customer",
+        "status",
+        "checkout_date",
+        "actual_checkout_date",
+        "return_date",
+        "actual_return_date",
+        "donation_amount",
+        "total_expected_donation",
+    )
+    list_filter = ("status", "checkout_date", "return_date")
+    search_fields = (
+        "customer__last_name",
+        "customer__first_name",
+        "customer__company_name",
+        "notes",
+    )
+    readonly_fields = ("total_expected_donation",)
+    date_hierarchy = "checkout_date"
+    inlines = [ReservationItemInline]
+
+    fieldsets = (
+        (_("Client"), {"fields": ("customer",)}),
+        (_("Dates prévues"), {"fields": ("checkout_date", "return_date")}),
+        (
+            _("Dates réelles"),
+            {"fields": ("actual_checkout_date", "actual_return_date")},
+        ),
+        (
+            _("Statut et don"),
+            {"fields": ("status", "donation_amount", "total_expected_donation")},
+        ),
+        (_("Notes"), {"fields": ("notes",)}),
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status in ["checked_out", "returned", "cancelled"]:
+            return self.readonly_fields + ("customer", "checkout_date", "return_date")
+        return self.readonly_fields

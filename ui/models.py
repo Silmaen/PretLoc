@@ -85,3 +85,94 @@ class Customer(models.Model):
         if self.customer_type == "legal":
             return self.company_name
         return f"{self.last_name} {self.first_name}"
+
+
+class Reservation(models.Model):
+    STATUS_CHOICES = (
+        ("created", _("Créée")),
+        ("validated", _("Validée")),
+        ("checked_out", _("Sortie")),
+        ("returned", _("Rendue")),
+        ("cancelled", _("Annulée")),
+    )
+
+    checkout_date = models.DateField(verbose_name=_("Date de sortie prévue"))
+    return_date = models.DateField(verbose_name=_("Date de retour prévue"))
+    actual_checkout_date = models.DateField(
+        null=True, blank=True, verbose_name=_("Date de sortie réelle")
+    )
+    actual_return_date = models.DateField(
+        null=True, blank=True, verbose_name=_("Date de retour réelle")
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="created",
+        verbose_name=_("Statut"),
+    )
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE,
+        related_name="reservations",
+        verbose_name=_("Client"),
+    )
+    donation_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name=_("Don effectué")
+    )
+    notes = models.TextField(blank=True, verbose_name=_("Notes"))
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Réservation")
+        verbose_name_plural = _("Réservations")
+        ordering = ["-checkout_date", "-created_at"]
+
+    def __str__(self):
+        return f"{self.customer} - {self.checkout_date}"
+
+    @property
+    def total_expected_donation(self):
+        """Calcule le don minimum total attendu pour cette réservation"""
+        return sum(item.expected_donation for item in self.items.all())
+
+
+class ReservationItem(models.Model):
+    reservation = models.ForeignKey(
+        Reservation,
+        on_delete=models.CASCADE,
+        related_name="items",
+        verbose_name=_("Réservation"),
+    )
+    asset = models.ForeignKey(
+        Asset,
+        on_delete=models.CASCADE,
+        related_name="reservation_items",
+        verbose_name=_("Article"),
+    )
+    quantity_reserved = models.PositiveIntegerField(
+        default=1, verbose_name=_("Quantité réservée")
+    )
+    quantity_checked_out = models.PositiveIntegerField(
+        default=0, verbose_name=_("Quantité sortie")
+    )
+    quantity_returned = models.PositiveIntegerField(
+        default=0, verbose_name=_("Quantité rendue")
+    )
+    quantity_damaged = models.PositiveIntegerField(
+        default=0, verbose_name=_("Quantité en panne")
+    )
+
+    class Meta:
+        verbose_name = _("Élément de réservation")
+        verbose_name_plural = _("Éléments de réservation")
+        unique_together = [["reservation", "asset"]]
+
+    def __str__(self):
+        return f"{self.asset.name} ({self.quantity_reserved})"
+
+    @property
+    def expected_donation(self):
+        """Calcule le don minimum attendu pour cet élément"""
+        return self.quantity_reserved * self.asset.rental_value

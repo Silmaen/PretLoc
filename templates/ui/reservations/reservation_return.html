@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 800px;">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-arrow-left auth-icon" style="color: var(--accent-blue);"></i>
+            <h2>{% trans "Enregistrer le retour" %}</h2>
+        </div>
+
+        <!-- En-tête avec informations de la réservation -->
+        <div class="form-group">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; background-color: var(--bg-element); padding: 15px; border-radius: 5px;">
+                <!-- Informations client -->
+                <div>
+                    <h3 style="margin: 0 0 5px 0;">{{ reservation.customer }}</h3>
+                    <p style="margin: 0; font-size: 0.9rem;">
+                        <i class="fas fa-envelope"></i> {{ reservation.customer.email }}
+                        {% if reservation.customer.phone %}
+                        | <i class="fas fa-phone"></i> {{ reservation.customer.phone }}
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Dates -->
+                <div style="text-align: right;">
+                    <!-- Dates prévues -->
+                    <p style="margin: 0; font-weight: bold;">
+                        <i class="fas fa-calendar"></i> {% trans "Dates prévues" %}:
+                    </p>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9rem;">
+                        <i class="fas fa-arrow-right"></i> {{ reservation.checkout_date }} |
+                        <i class="fas fa-arrow-left"></i> {{ reservation.return_date }}
+                    </p>
+
+                    <!-- Dates réelles -->
+                    {% if reservation.actual_checkout_date or reservation.actual_return_date %}
+                    <p style="margin: 0; font-weight: bold; color: var(--accent-blue);">
+                        <i class="fas fa-calendar-check"></i> {% trans "Dates réelles" %}:
+                    </p>
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--accent-blue);">
+                        {% if reservation.actual_checkout_date %}
+                        <i class="fas fa-arrow-right"></i> {{ reservation.actual_checkout_date }}
+                        {% endif %}
+                        {% if reservation.actual_return_date %}
+                        | <i class="fas fa-arrow-left"></i> {{ reservation.actual_return_date }}
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="actual_return_date">
+                    <i class="fas fa-calendar-alt"></i> {% trans "Date de retour réelle" %}
+                </label>
+                <input type="date" name="actual_return_date" id="actual_return_date"
+                       value="{% now 'Y-m-d' %}" class="form-control">
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Articles à retourner -->
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-top: 0;">{% trans "Articles à retourner" %}</h4>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>{% trans "Article" %}</th>
+                        <th style="width: 80px; text-align: center;">{% trans "Sortie" %}</th>
+                        <th style="width: 80px; text-align: center;">{% trans "Retour" %}</th>
+                        <th style="width: 80px; text-align: center;">{% trans "Panne" %}</th>
+                        <th style="width: 80px; text-align: center;">{% trans "Détruit" %}</th>
+                        <th style="width: 120px; text-align: right;">{% trans "Remplacement" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody id="items-table">
+                    {% for item in items %}
+                    <tr class="item-row" data-rental="{{ item.asset.rental_value }}"
+                        data-replacement="{{ item.asset.replacement_value }}">
+                        <td>
+                            <div class="item-info">
+                                <span class="item-title">{{ item.asset.name }}</span>
+                                <span class="item-subtitle">{{ item.asset.category.name }}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">{{ item.quantity_checked_out }}</td>
+                        <td style="text-align: center;">
+                            <input type="number" name="return_{{ item.id }}" id="return_{{ item.id }}"
+                                   value="{{ item.quantity_checked_out }}" min="0" max="{{ item.quantity_checked_out }}"
+                                   style="width: 50px; text-align: center;" onchange="updateCalculations(true)">
+                        </td>
+                        <td style="text-align: center;">
+                            <input type="number" name="damaged_{{ item.id }}" id="damaged_{{ item.id }}"
+                                   value="0" min="0" max="{{ item.quantity_checked_out }}"
+                                   style="width: 50px; text-align: center;" onchange="updateCalculations()">
+                        </td>
+                        <td style="text-align: center;">
+                            <input type="number" name="destroyed_{{ item.id }}" id="destroyed_{{ item.id }}"
+                                   value="0" min="0" max="{{ item.quantity_checked_out }}"
+                                   style="width: 50px; text-align: center;" onchange="updateCalculations()">
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="values-container">
+                                <span class="value-item" style="display: unset;">0.00 €</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center;">
+                            {% trans "Aucun article à retourner pour cette réservation" %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="5" style="text-align: right; font-weight: bold;">
+                            {% trans "Don minimum attendu" %}:
+                        </td>
+                        <td style="text-align: right; font-weight: bold;">
+                            <span id="expected-donation">{{ reservation.total_expected_donation }} €</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align: right; font-weight: bold;">
+                            {% trans "Articles non retournés/endommagés" %}:
+                        </td>
+                        <td style="text-align: right; font-weight: bold;">
+                            <span id="replacement-value">0.00 €</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align: right; font-weight: bold;">
+                            {% trans "Don exigible" %}
+                        </td>
+                        <td style="text-align: right; font-weight: bold;">
+                            <span id="total-amount">{{ reservation.total_expected_donation }} €</span>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Notes -->
+            <div class="form-group">
+                <label for="notes">
+                    <i class="fas fa-sticky-note"></i> {% trans "Notes" %}
+                </label>
+                <textarea id="notes" name="notes" rows="3">{{ reservation.notes }}</textarea>
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i>
+                    {% trans "Ajoutez des remarques ou informations complémentaires" %}
+                </div>
+            </div>
+
+            <!-- Don effectué (placé à la fin du formulaire) -->
+            <div class="form-group">
+                <label for="donation_amount">
+                    <i class="fas fa-hand-holding-heart"></i> {% trans "Don effectué" %}
+                </label>
+                <input type="number" step="0.01" min="0" id="donation_amount" name="donation_amount"
+                       value="{{ reservation.total_expected_donation }}" class="form-control">
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i>
+                    {% trans "Don effectué par le client pour cette réservation" %}
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                <a href="{% url 'ui:reservation_detail' reservation.pk %}" class="auth-button"
+                   style="background-color: var(--bg-element);">
+                    <i class="fas fa-times"></i> {% trans "Annuler" %}
+                </a>
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-check"></i> {% trans "Valider le retour" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function updateCalculations(isReturnChange = false) {
+        const rows = document.querySelectorAll('.item-row');
+        let totalReplacement = 0;
+        const expectedDonation = parseFloat('{{ reservation.total_expected_donation }}'.replace(',', '.'));
+
+        rows.forEach(row => {
+            const checkedOut = parseInt(row.querySelector('td:nth-child(2)').textContent);
+            let returned = parseInt(row.querySelector('input[id^="return_"]').value) || 0;
+            let damaged = parseInt(row.querySelector('input[id^="damaged_"]').value) || 0;
+            let destroyed = parseInt(row.querySelector('input[id^="destroyed_"]').value) || 0;
+
+
+            // Vérifier que la somme ne dépasse pas la quantité sortie
+            let total = returned + damaged + destroyed;
+            if (total > checkedOut) {
+                // ajuste la quantité retournée pour ne pas dépasser la quantité sortie
+                if (isReturnChange) {
+                    if (destroyed > 0) {
+                        destroyed = destroyed - 1;
+                    } else if (damaged > 0) {
+                        damaged = damaged - 1;
+                    }
+                } else {
+                    returned = checkedOut - damaged - destroyed;
+                }
+                total = returned + damaged + destroyed;
+                if (total > checkedOut) {
+                    alert("La somme des articles retournés, endommagés et détruits ne peut pas dépasser la quantité sortie.");
+                    return;
+                }
+                // Mettre à jour les valeurs dans les champs
+                row.querySelector('input[id^="return_"]').value = returned;
+                row.querySelector('input[id^="damaged_"]').value = damaged;
+                row.querySelector('input[id^="destroyed_"]').value = destroyed;
+            }
+
+            // Calculer la valeur de remplacement pour les articles non retournés ou endommagés
+            const replacementValue = parseFloat(row.dataset.replacement);
+            const replacementCost = destroyed * replacementValue; // Les articles endommagés sont comptés à 50% de leur valeur
+
+            // Mettre à jour l'affichage de la valeur de remplacement
+            const replacementValueElem = row.querySelector('.value-item');
+            replacementValueElem.textContent = replacementCost.toFixed(2) + ' €';
+
+            totalReplacement += replacementCost;
+        });
+
+        // Mettre à jour les affichages
+        document.getElementById('replacement-value').textContent = totalReplacement.toFixed(2) + ' €';
+
+        // Calculer le total à régler (don minimum + valeur de remplacement)
+        const totalAmount = expectedDonation + totalReplacement;
+        document.getElementById('total-amount').textContent = totalAmount.toFixed(2) + ' €';
+
+        // Mettre à jour le montant du don préremplit
+        document.getElementById('donation_amount').value = totalAmount.toFixed(2);
+    }
+
+    // Initialiser les calculs au chargement de la page
+    document.addEventListener('DOMContentLoaded', function () {
+        updateCalculations();
+    });
+</script>
+{% endblock %}
