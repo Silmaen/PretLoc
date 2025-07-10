@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .models import Category, Asset, Customer, Reservation, ReservationItem
+from .models import Category, Asset, Customer, Reservation, ReservationItem, StockEvent
 
 
 @admin.register(Category)
@@ -143,3 +143,11 @@ class ReservationAdmin(admin.ModelAdmin):
         if obj and obj.status in ["checked_out", "returned", "cancelled"]:
             return self.readonly_fields + ("customer", "checkout_date", "return_date")
         return self.readonly_fields
+
+
+@admin.register(StockEvent)
+class StockEventAdmin(admin.ModelAdmin):
+    list_display = ("asset", "event_type", "quantity", "date", "user")
+    list_filter = ("event_type", "date", "user")
+    search_fields = ("asset__name", "description")
+    date_hierarchy = "date"

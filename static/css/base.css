@@ -229,7 +229,7 @@ footer {
 
 /* Styles pour l'authentification */
 .auth-container {
-    max-width: 500px;
+    max-width: 1000px;
     width: 95%;
     margin: 0 auto;
     padding: 20px 10px;

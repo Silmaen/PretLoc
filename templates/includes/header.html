@@ -45,22 +45,22 @@
         <div class="header-right">
             {% if user.is_authenticated %}
             {% if user.profile.user_type == 'admin' %}
-            <a href="{% url 'accounts:manage_users' %}">
+            <a href="{% url 'accounts:manage_users' %}" title="{% trans 'Utilisateurs' %}">
                 <i class="fas fa-users"></i><span>{% trans "Utilisateurs" %}</span>
             </a>
             {% endif %}
             {% if capability.can_view_reservations %}
-            <a href="{% url 'ui:reservations' %}">
+            <a href="{% url 'ui:reservations' %}" title="{% trans 'Reservations' %}">
                 <i class="fas fa-calendar-check"></i><span>{% trans "Réservations" %}</span>
             </a>
             {% endif %}
             {% if capability.can_view_articles %}
-            <a href="{% url 'ui:stock' %}">
+            <a href="{% url 'ui:stock' %}" title="{% trans 'Stock' %}">
                 <i class="fas fa-boxes"></i><span>{% trans "Stock" %}</span>
             </a>
             {% endif %}
             {% if capability.can_view_customers %}
-            <a href="{% url 'ui:customers' %}">
+            <a href="{% url 'ui:customers' %}" title="{% trans 'Clients' %}">
                 <i class="fas fa-users-cog"></i><span>{% trans "Clients" %}</span>
             </a>
             {% endif %}

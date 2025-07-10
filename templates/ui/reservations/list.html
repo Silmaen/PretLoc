@@ -26,8 +26,9 @@
 
             <div class="actions-buttons">
                 {% if capability.can_add_reservations %}
-                <a href="{% url 'ui:reservation_create' %}" class="auth-button">
-                    <i class="fas fa-plus"></i> {% trans "Nouvelle réservation" %}
+                <a href="{% url 'ui:reservation_create' %}" class="auth-button"
+                   title="{% trans 'Nouvelle réservation' %}">
+                    <i class="fas fa-plus"></i>
                 </a>
                 {% endif %}
             </div>
@@ -177,13 +178,15 @@
                         </div>
                     </td>
                     <td style="width: 120px; white-space: nowrap; text-align: right;">
-                        <a href="{% url 'ui:reservation_detail' reservation.id %}" class="action-button">
+                        <a href="{% url 'ui:reservation_detail' reservation.id %}" class="action-button"
+                           title="{% trans 'Details de la réservation' %}">
                             <i class="fas fa-eye"></i>
                         </a>
 
                         {% if reservation.status == 'created' or reservation.status == 'validated' %}
                         {% if capability.can_edit_reservations %}
-                        <a href="{% url 'ui:reservation_update' reservation.id %}" class="action-button">
+                        <a href="{% url 'ui:reservation_update' reservation.id %}" class="action-button"
+                           title="{% trans 'Editer la réservation' %}">
                             <i class="fas fa-edit"></i>
                         </a>
                         {% endif %}
@@ -196,7 +199,8 @@
                         {% endif %}
 
                         {% if capability.can_delete_reservations %}
-                        <a href="{% url 'ui:reservation_cancel' reservation.id %}" class="action-button danger">
+                        <a href="{% url 'ui:reservation_cancel' reservation.id %}" class="action-button danger"
+                           title="{% trans 'Annuler la réservation' %}">>
                             <i class="fas fa-trash"></i>
                         </a>
                         {% endif %}

@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import Category, Asset, Customer, Reservation, ReservationItem
+from .models import Category, Asset, Customer, Reservation, ReservationItem, StockEvent
 
 
 class CategoryForm(forms.ModelForm):
@@ -99,3 +99,21 @@ class ReservationItemForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Afficher uniquement les articles disponibles
         self.fields["asset"].queryset = Asset.objects.filter(stock_quantity__gt=0)
+
+
+class StockEventForm(forms.ModelForm):
+    class Meta:
+        model = StockEvent
+        fields = ["asset", "event_type", "quantity", "description", "date"]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+            "date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Définir la date actuelle comme valeur par défaut
+        from django.utils import timezone
+
+        if not self.instance.pk:  # Si c'est une nouvelle instance
+            self.fields["date"].initial = timezone.now().strftime("%Y-%m-%dT%H:%M")

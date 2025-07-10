@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>{% trans "Enregistrer un événement de stock" %}</h2>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="form-actions">
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-save"></i>
+                    {% trans "Enregistrer" %}
+                </button>
+            </div>
+        </form>
+        <div style="margin-top: 20px;"></div>
+        <a href="{% url 'ui:stock' %}" class="auth-button">
+            <i class="fas fa-arrow-left"></i>{% trans "Annuler" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

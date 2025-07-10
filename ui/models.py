@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -176,3 +177,43 @@ class ReservationItem(models.Model):
     def expected_donation(self):
         """Calcule le don minimum attendu pour cet élément"""
         return self.quantity_reserved * self.asset.rental_value
+
+
+class StockEvent(models.Model):
+    """
+    Modèle pour tracer les différents événements qui affectent le stock
+    (pannes, destructions, acquisitions, ventes...)
+    """
+
+    class EventType(models.TextChoices):
+        REPAIRABLE_ISSUE = "ISSUE", _("Panne réparable")
+        DESTRUCTION = "DESTRUCTION", _("Destruction")
+        ACQUISITION = "ACQUISITION", _("Acquisition")
+        SALE = "SALE", _("Vente")
+        INVENTORY_ADJUSTMENT = "INVENTORY_ADJUSTMENT", _("Ajustement d'inventaire")
+
+    asset = models.ForeignKey(
+        "Asset",  # Supposant que votre modèle d'article s'appelle Asset
+        on_delete=models.CASCADE,
+        verbose_name=_("Article"),
+    )
+    event_type = models.CharField(
+        max_length=20, choices=EventType.choices, verbose_name=_("Type d'événement")
+    )
+    quantity = models.IntegerField(default=1, verbose_name=_("Quantité"))
+    date = models.DateTimeField(verbose_name=_("Date"))
+    description = models.TextField(blank=True, verbose_name=_("Description"))
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_("Utilisateur responsable"),
+    )
+
+    class Meta:
+        verbose_name = _("Événement de stock")
+        verbose_name_plural = _("Événements de stock")
+        ordering = ["-date"]
+
+    def __str__(self):
+        return f"{self.get_event_type_display()} - {self.asset.name} ({self.date.strftime('%d/%m/%Y')})"

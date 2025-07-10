@@ -68,4 +68,12 @@ urlpatterns = [
     path("stock/items/add/", views.item_create, name="item_create"),
     path("stock/items/<int:pk>/edit/", views.item_update, name="item_update"),
     path("stock/items/<int:pk>/delete/", views.item_delete, name="item_delete"),
+    path("stock/items/<int:pk>/", views.item_detail, name="item_detail"),
+    # Gestion des événements de stock
+    path("stock/events/add/", views.stock_event_create, name="stock_event_create"),
+    path(
+        "stock/events/add/<int:asset_id>/",
+        views.stock_event_create,
+        name="stock_event_create_for_asset",
+    ),
 ]

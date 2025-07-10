@@ -20,6 +20,7 @@ from .forms import (
     CustomerForm,
     ReservationForm,
     ReservationItemForm,
+    StockEventForm,
 )
 from .models import Category, Asset, Customer, Reservation, ReservationItem
 
@@ -29,7 +30,8 @@ def health_check(request):
 
 
 def home(request):
-    return render(request, "ui/home.html", {"capability": get_capability(request.user)})
+    return redirect("ui:reservations")
+    # return render(request, "ui/home.html", {"capability": get_capability(request.user)})
 
 
 @login_required
@@ -220,6 +222,22 @@ def item_delete(request, pk):
             "capability": get_capability(request.user),
         },
     )
+
+
+@login_required
+@user_type_required("member")
+def item_detail(request, pk):
+    """Vue pour afficher les détails d'un article"""
+    item = get_object_or_404(Asset, pk=pk)
+    # Récupérer l'historique des événements de stock pour cet article
+    stock_events = item.stockevent_set.all().order_by("-date")
+
+    context = {
+        "item": item,
+        "stock_events": stock_events,
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/stock/item_detail.html", context)
 
 
 @login_required
@@ -782,3 +800,37 @@ def search_assets(request):
     ]
 
     return JsonResponse({"results": results})
+
+
+@login_required
+@user_type_required("manager")
+def stock_event_create(request, asset_id=None):
+    """Vue pour créer un nouvel événement de stock"""
+    initial = {}
+    if asset_id:
+        asset = get_object_or_404(Asset, pk=asset_id)
+        initial["asset"] = asset
+
+    if request.method == "POST":
+        form = StockEventForm(request.POST, initial=initial)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.user = request.user
+
+            # Sauvegarder les changements
+            with transaction.atomic():
+                event.save()
+
+            messages.success(request, _("Événement de stock enregistré avec succès"))
+            return redirect("ui:stock")
+    else:
+        form = StockEventForm(initial=initial)
+
+    return render(
+        request,
+        "ui/stock/stock_event_form.html",
+        {
+            "form": form,
+            "capability": get_capability(request.user),
+        },
+    )

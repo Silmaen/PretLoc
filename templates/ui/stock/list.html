@@ -25,13 +25,19 @@
 
             <div class="actions-buttons">
                 {% if capability.can_view_categories %}
-                <a href="{% url 'ui:category_list' %}" class="auth-button">
-                    <i class="fas fa-tags"></i> {% trans "Catégories" %}
+                <a href="{% url 'ui:category_list' %}" class="auth-button"
+                   title="{% trans 'Catégories' %}">
+                    <i class="fas fa-tags"></i>
+                </a>
+                <a href="{% url 'ui:stock_event_create' %}" class="auth-button"
+                   title="{% trans 'Nouvel événement de stock' %}">
+                    <i class="fas fa-history"></i>
                 </a>
                 {% endif %}
                 {% if capability.can_add_articles %}
-                <a href="{% url 'ui:item_create' %}" class="auth-button">
-                    <i class="fas fa-plus"></i> {% trans "Ajouter" %}
+                <a href="{% url 'ui:item_create' %}" class="auth-button"
+                   title="{% trans 'Ajouter' %}">
+                    <i class="fas fa-plus"></i>
                 </a>
                 {% endif %}
             </div>
@@ -115,13 +121,23 @@
                         </div>
                     </td>
                     <td style="text-align: right;">
+                        <a href="{% url 'ui:item_detail' item.id %}" class="action-button"
+                           title="{% trans 'Voir les détails' %}">
+                            <i class="fas fa-eye"></i>
+                        </a>
                         {% if capability.can_edit_articles %}
-                        <a href="{% url 'ui:item_update' item.id %}" class="action-button">
+                        <a href="{% url 'ui:stock_event_create_for_asset' item.id %}" class="action-button"
+                           title="{% trans 'Enregistrer un événement' %}">
+                            <i class="fas fa-history"></i>
+                        </a>
+                        <a href="{% url 'ui:item_update' item.id %}" class="action-button"
+                           title="{% trans 'Editer cet article' %}">
                             <i class="fas fa-edit"></i>
                         </a>
                         {% endif %}
                         {% if capability.can_delete_articles %}
-                        <a href="{% url 'ui:item_delete' item.id %}" class="action-button danger">
+                        <a href="{% url 'ui:item_delete' item.id %}" class="action-button danger"
+                           title="{% trans 'Supprimer cet article' %}">
                             <i class="fas fa-trash"></i>
                         </a>
                         {% endif %}
