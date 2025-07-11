@@ -150,23 +150,23 @@
                     </td>
                     <td>
                         {% if reservation.status == 'created' %}
-                        <span class="badge" style="background-color: #6c757d;">
+                        <span class="badge-status badge-created">
                             <i class="fas fa-file-alt"></i> {% trans "Créée" %}
                         </span>
                         {% elif reservation.status == 'validated' %}
-                        <span class="badge" style="background-color: #28a745;">
+                        <span class="badge-status badge-validated">
                             <i class="fas fa-check"></i> {% trans "Validée" %}
                         </span>
                         {% elif reservation.status == 'checked_out' %}
-                        <span class="badge" style="background-color: #007bff;">
+                        <span class="badge-status badge-checkedout">
                             <i class="fas fa-arrow-right"></i> {% trans "Sortie" %}
                         </span>
                         {% elif reservation.status == 'returned' %}
-                        <span class="badge" style="background-color: #17a2b8;">
+                        <span class="badge-status badge-returned">
                             <i class="fas fa-arrow-left"></i> {% trans "Rendue" %}
                         </span>
                         {% elif reservation.status == 'cancelled' %}
-                        <span class="badge" style="background-color: #dc3545;">
+                        <span class="badge-status badge-cancelled">
                             <i class="fas fa-ban"></i> {% trans "Annulée" %}
                         </span>
                         {% endif %}

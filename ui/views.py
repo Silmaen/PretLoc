@@ -526,6 +526,8 @@ def reservation_create(request):
         if form.is_valid():
             with transaction.atomic():
                 reservation = form.save()
+                reservation.created_by = request.user
+                reservation.save()
                 formset = ReservationItemFormSet(request.POST, instance=reservation)
                 if formset.is_valid():
                     formset.save()
@@ -559,6 +561,8 @@ def reservation_validate(request, pk):
 
     if request.method == "POST":
         reservation.status = "validated"
+        reservation.validated_at = timezone.now()
+        reservation.validated_by = request.user
         reservation.save()
         messages.success(request, _("Réservation validée avec succès"))
         return redirect("ui:reservation_detail", pk=reservation.pk)
@@ -629,6 +633,8 @@ def reservation_cancel(request, pk):
 
     if request.method == "POST":
         reservation.status = "cancelled"
+        reservation.cancelled_by = request.user
+        reservation.cancelled_at = timezone.now()
         reservation.save()
         messages.success(request, _("Réservation annulée avec succès"))
         return redirect("ui:reservations")
@@ -681,6 +687,7 @@ def reservation_checkout(request, pk):
             if not errors:
                 # Mettre à jour le statut de la réservation
                 reservation.status = "checked_out"
+                reservation.checkout_by = request.user
                 # Enregistrer la date réelle de sortie
                 actual_date = request.POST.get("actual_checkout_date")
                 if actual_date:
@@ -761,6 +768,7 @@ def reservation_return(request, pk):
                 donation = float(request.POST.get("donation_amount", 0))
                 reservation.donation_amount = donation
                 reservation.status = "returned"
+                reservation.returned_by = request.user
 
                 # Enregistrer la date réelle de retour
                 actual_date = request.POST.get("actual_return_date")

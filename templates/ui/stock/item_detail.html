@@ -138,7 +138,7 @@
                         </a>
                     </td>
                     <td>{{ reservation_item.quantity_checked_out }}</td>
-                    <td>-</td>
+                    <td>{{ res.checkout_by|default:"-" }}</td>
                 </tr>
                 {% endif %}
                 {% if res.actual_return_date %}
@@ -152,7 +152,7 @@
                         </a>
                     </td>
                     <td>{{ reservation_item.quantity_returned }}</td>
-                    <td>-</td>
+                    <td>{{ res.returned_by|default:"-" }</td>
                 </tr>
                 {% endif %}
                 {% endif %}

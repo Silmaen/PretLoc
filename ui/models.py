@@ -124,6 +124,47 @@ class Reservation(models.Model):
     notes = models.TextField(blank=True, verbose_name=_("Notes"))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    validated_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="created_reservations",
+        verbose_name=_("Créé par"),
+    )
+    validated_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="validated_reservations",
+        verbose_name=_("Validé par"),
+    )
+    cancelled_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="cancelled_reservations",
+        verbose_name=_("Annulé par"),
+    )
+    checkout_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="checkedout_reservations",
+        verbose_name=_("Sortie par"),
+    )
+    returned_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="returned_reservations",
+        verbose_name=_("Retour par"),
+    )
 
     class Meta:
         verbose_name = _("Réservation")

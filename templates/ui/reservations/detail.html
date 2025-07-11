@@ -10,7 +10,7 @@
         </div>
 
         <!-- En-tête avec informations principales -->
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; background-color: var(--bg-element); padding: 15px; border-radius: 5px;">
+        <div class="auth-card-secondary">
             <div>
                 <h3 style="margin: 0 0 10px 0;">{{ reservation.customer }}</h3>
                 <p style="margin: 0; font-size: 0.9rem;">
@@ -23,25 +23,29 @@
             <div style="text-align: right;">
                 <div style="font-size: 1.1rem; margin-bottom: 5px;">
                     {% if reservation.status == 'created' %}
-                    <span class="badge" style="background-color: #6c757d; padding: 5px 10px;">
+                    <span class="badge-status badge-created">
                         <i class="fas fa-file-alt"></i> {% trans "Créée" %}
                     </span>
                     {% elif reservation.status == 'validated' %}
-                    <span class="badge" style="background-color: #28a745; padding: 5px 10px;">
+                    <span class="badge-status badge-validated">
                         <i class="fas fa-check"></i> {% trans "Validée" %}
                     </span>
                     {% elif reservation.status == 'checked_out' %}
-                    <span class="badge" style="background-color: #007bff; padding: 5px 10px;">
+                    <span class="badge-status badge-checkedout">
                         <i class="fas fa-arrow-right"></i> {% trans "Sortie" %}
                     </span>
                     {% elif reservation.status == 'returned' %}
-                    <span class="badge" style="background-color: #17a2b8; padding: 5px 10px;">
+                    <span class="badge-status badge-returned">
                         <i class="fas fa-arrow-left"></i> {% trans "Rendue" %}
+                    </span>
+                    {% elif reservation.status == 'cancelled' %}
+                    <span class="badge-status badge-cancelled">
+                        <i class="fas fa-ban"></i> {% trans "Annulée" %}
                     </span>
                     {% endif %}
                 </div>
                 <!-- Section des dates dans la partie droite -->
-                <div style="font-size: 0.9rem;">
+                <div>
                     <div>
                         <i class="fas fa-arrow-right"></i> {% trans "Sortie prévue" %}: {{ reservation.checkout_date }}
                         {% if reservation.actual_checkout_date %}
@@ -61,7 +65,7 @@
         </div>
 
         <!-- Don -->
-        <div style="margin-bottom: 20px; background-color: var(--bg-element); padding: 15px; border-radius: 5px;">
+        <div class="auth-card-secondary">
             <h4 style="margin-top: 0;">{% trans "Don" %}</h4>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
@@ -94,19 +98,29 @@
                     </a>
                     {% endif %}
                 </div>
+                {% if reservation.notes %}
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-sticky-note"></i> {% trans "Notes" %}
+                    </label>
+                    <div style="background-color: var(--bg-element); padding: 12px 15px; border-radius: 5px;">
+                        {{ reservation.notes|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
 
         <!-- Notes -->
         {% if reservation.notes %}
-        <div style="margin-bottom: 20px; background-color: var(--bg-element); padding: 15px; border-radius: 5px;">
+        <div class="auth-card-secondary">
             <h4 style="margin-top: 0;">{% trans "Notes" %}</h4>
             <p style="white-space: pre-line; margin: 0;">{{ reservation.notes }}</p>
         </div>
         {% endif %}
 
         <!-- Liste des articles -->
-        <div style="margin-bottom: 20px;">
+        <div class="auth-card-secondary">
             <h4>{% trans "Articles réservés" %}</h4>
             <div class="users-table">
                 <table>
@@ -150,9 +164,76 @@
                 </table>
             </div>
         </div>
+        <!-- Section historique des statuts -->
+        <div class="auth-card-secondary">
+            <h4>
+                <i class="fas fa-history"></i> {% trans "Historique des statuts" %}
+            </h4>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Statut" %}</th>
+                    <th>{% trans "Utilisateur" %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if reservation.created_by %}
+                <tr>
+                    <td>{{ reservation.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <i class="fas fa-plus-circle"></i> {% trans "Créée" %}
+                    </td>
+                    <td>{{ reservation.created_by }}</td>
+                </tr>
+                {% endif %}
+
+                {% if reservation.validated_by %}
+                <tr>
+                    <td>{{ reservation.validated_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <i class="fas fa-check-circle"></i> {% trans "Validée" %}
+                    </td>
+                    <td>{{ reservation.validated_by }}</td>
+                </tr>
+                {% endif %}
+
+                {% if reservation.cancelled_by %}
+                <tr>
+                    <td>{{ reservation.cancelled_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <i class="fas fa-times-circle"></i> {% trans "Annulée" %}
+                    </td>
+                    <td>{{ reservation.cancelled_by }}</td>
+                </tr>
+                {% endif %}
+
+                {% if reservation.checkout_by %}
+                <tr>
+                    <td>{{ reservation.actual_checkout_date|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <i class="fas fa-arrow-right"></i> {% trans "Sortie" %}
+                    </td>
+                    <td>{{ reservation.checkout_by }}</td>
+                </tr>
+                {% endif %}
+
+                {% if reservation.returned_by %}
+                <tr>
+                    <td>{{ reservation.actual_return_date|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <i class="fas fa-arrow-left"></i> {% trans "Retournée" %}
+                    </td>
+                    <td>{{ reservation.returned_by }}</td>
+                </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
 
         <!-- Boutons d'action -->
-        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <div style="margin-top: 20px;display: flex; gap: 10px; justify-content: flex-end;">
             <a href="{% url 'ui:reservations' %}" class="auth-button" style="background-color: var(--bg-element);">
                 <i class="fas fa-arrow-left"></i> {% trans "Retour à la liste" %}
             </a>

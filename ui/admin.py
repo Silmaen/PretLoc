@@ -104,7 +104,6 @@ class ReservationItemInline(admin.TabularInline):
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
         "customer",
         "status",
         "checkout_date",
@@ -127,27 +126,49 @@ class ReservationAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (_("Client"), {"fields": ("customer",)}),
-        (_("Dates prévues"), {"fields": ("checkout_date", "return_date")}),
         (
-            _("Dates réelles"),
-            {"fields": ("actual_checkout_date", "actual_return_date")},
+            _("Dates"),
+            {
+                "fields": (
+                    "checkout_date",
+                    "return_date",
+                    "actual_checkout_date",
+                    "actual_return_date",
+                    "validated_at",
+                    "cancelled_at",
+                )
+            },
         ),
         (
             _("Statut et don"),
-            {"fields": ("status", "donation_amount", "total_expected_donation")},
+            {
+                "fields": (
+                    "status",
+                    "created_by",
+                    "validated_by",
+                    "cancelled_by",
+                    "checkout_by",
+                    "returned_by",
+                )
+            },
+        ),
+        (
+            _("Don"),
+            {"fields": ("donation_amount", "total_expected_donation")},
         ),
         (_("Notes"), {"fields": ("notes",)}),
     )
 
-    def get_readonly_fields(self, request, obj=None):
-        if obj and obj.status in ["checked_out", "returned", "cancelled"]:
-            return self.readonly_fields + ("customer", "checkout_date", "return_date")
-        return self.readonly_fields
-
 
 @admin.register(StockEvent)
 class StockEventAdmin(admin.ModelAdmin):
-    list_display = ("asset", "event_type", "quantity", "date", "user")
-    list_filter = ("event_type", "date", "user")
-    search_fields = ("asset__name", "description")
+    list_display = ("date", "asset", "event_type", "quantity", "user")
+    list_filter = ("event_type", "date", "asset__category")
+    search_fields = ("asset__name", "description", "user__username")
     date_hierarchy = "date"
+    raw_id_fields = ("asset",)
+    readonly_fields = ("user",)
+    fieldsets = (
+        (None, {"fields": ("asset", "event_type", "quantity")}),
+        (_("Détails"), {"fields": ("description", "date", "user")}),
+    )

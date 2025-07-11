@@ -262,6 +262,14 @@ footer {
     color: var(--accent-blue);
 }
 
+.auth-card-secondary {
+    background-color: var(--bg-element);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+}
+
 .auth-icon {
     font-size: 2rem;
     color: var(--accent-blue);
@@ -896,4 +904,38 @@ h6.mb-0 {
         display: flex;
         justify-content: flex-end;
     }
+}
+
+.badge-status {
+    display: inline-block;
+    min-width: 10px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    border-radius: 10px;
+}
+
+.badge-created {
+    background-color: #6c757d;
+}
+
+.badge-validated {
+    background-color: #28a745;
+}
+
+.badge-checkedout {
+    background-color: #007bff;
+}
+
+.badge-returned {
+    background-color: #17a2b8;
+}
+
+.badge-cancelled {
+    background-color: #dc3545;
 }
