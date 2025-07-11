@@ -446,6 +446,7 @@ tr:hover {
     display: flex;
     gap: 10px;
     white-space: nowrap;
+    justify-content: flex-end;
 }
 
 .action-button {
@@ -938,4 +939,109 @@ h6.mb-0 {
 
 .badge-cancelled {
     background-color: #dc3545;
+}
+
+.quantity-overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.quantity-badge {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    min-width: 120px;
+}
+
+.quantity-badge i {
+    font-size: 24px;
+    margin-right: 12px;
+}
+
+.quantity-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.quantity-value {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.quantity-label {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 4px;
+}
+
+.quantity-badge.total {
+    background-color: #6c757d;
+}
+
+.quantity-badge.available {
+    background-color: #28a745;
+}
+
+.quantity-badge.reserved {
+    background-color: #fd7e14;
+}
+
+.quantity-badge.checked-out {
+    background-color: #007bff;
+}
+
+.quantity-badge.damaged {
+    background-color: #dc3545;
+}
+
+@media (max-width: 768px) {
+    .quantity-badge {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .quantity-overview {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .quantity-badge {
+        width: 100%;
+    }
+}
+
+.detail-row {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 15px;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    width: 40%;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.detail-label i {
+    margin-right: 10px;
+    color: var(--accent-blue);
+    width: 16px;
+    text-align: center;
+}
+
+.detail-value {
+    width: 60%;
 }

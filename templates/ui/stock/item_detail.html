@@ -25,11 +25,42 @@
                 <span class="detail-value">{{ item.description }}</span>
             </div>
 
-            <div class="detail-row">
-                <span class="detail-label">
-                    <i class="fas fa-boxes auth-blue"></i> {% trans "Quantité en stock" %}
-                </span>
-                <span class="detail-value">{{ item.stock_quantity }}</span>
+            <div class="quantity-overview">
+                <div class="quantity-badge total">
+                    <i class="fas fa-boxes"></i>
+                    <div class="quantity-info">
+                        <span class="quantity-value">{{ quantities.total }}</span>
+                        <span class="quantity-label">Total</span>
+                    </div>
+                </div>
+                <div class="quantity-badge available">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="quantity-info">
+                        <span class="quantity-value">{{ quantities.available }}</span>
+                        <span class="quantity-label">Disponibles</span>
+                    </div>
+                </div>
+                <div class="quantity-badge reserved">
+                    <i class="fas fa-calendar-check"></i>
+                    <div class="quantity-info">
+                        <span class="quantity-value">{{ quantities.reserved }}</span>
+                        <span class="quantity-label">Réservés</span>
+                    </div>
+                </div>
+                <div class="quantity-badge checked-out">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <div class="quantity-info">
+                        <span class="quantity-value">{{ quantities.checked_out }}</span>
+                        <span class="quantity-label">En prêt</span>
+                    </div>
+                </div>
+                <div class="quantity-badge damaged">
+                    <i class="fas fa-tools"></i>
+                    <div class="quantity-info">
+                        <span class="quantity-value">{{ quantities.damaged }}</span>
+                        <span class="quantity-label">En panne</span>
+                    </div>
+                </div>
             </div>
 
             <div class="detail-row">
@@ -47,15 +78,15 @@
             </div>
         </div>
 
-        <div class="item-actions">
-            {% if capability.can_edit_stock %}
+        <div class="actions-buttons">
+            {% if capability.can_edit_articles %}
             <a href="{% url 'ui:item_update' item.id %}" class="auth-button secondary-button">
                 <i class="fas fa-edit"></i>
                 {% trans "Modifier" %}
             </a>
             {% endif %}
 
-            {% if capability.can_manage_stock %}
+            {% if capability.can_add_articles %}
             <a href="{% url 'ui:stock_event_create_for_asset' item.id %}" class="auth-button secondary-button">
                 <i class="fas fa-history"></i>
                 {% trans "Nouvel événement" %}

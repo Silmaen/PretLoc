@@ -14,6 +14,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from accounts.decorators import user_type_required, get_capability
+from .computations import get_asset_status_at_date
 from .forms import (
     CategoryForm,
     AssetForm,
@@ -240,6 +241,8 @@ def item_detail(request, pk):
         (timezone.now() - datetime.timedelta(days=365)).strftime("%Y-%m-%dT%H:%M"),
     )
 
+    quantities = get_asset_status_at_date(item)
+
     # Conversion des dates en objets datetime{% endif %}
     # {% endfor %}
     try:
@@ -288,6 +291,7 @@ def item_detail(request, pk):
 
     context = {
         "item": item,
+        "quantities": quantities,
         "stock_events": stock_events,
         "reservations": reservations,
         "start_date": start_date,

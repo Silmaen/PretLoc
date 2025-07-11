@@ -232,6 +232,7 @@ class StockEvent(models.Model):
         ACQUISITION = "ACQUISITION", _("Acquisition")
         SALE = "SALE", _("Vente")
         INVENTORY_ADJUSTMENT = "INVENTORY_ADJUSTMENT", _("Ajustement d'inventaire")
+        REPARATION = "REPAIR", _("Réparation")
 
     asset = models.ForeignKey(
         "Asset",  # Supposant que votre modèle d'article s'appelle Asset
