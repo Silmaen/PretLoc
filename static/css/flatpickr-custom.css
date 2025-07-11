@@ -1,0 +1,98 @@
+/* Personnalisation de Flatpickr pour correspondre au thème sombre */
+.flatpickr-calendar {
+    background-color: var(--bg-container);
+    color: var(--text-primary);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.flatpickr-months {
+    background-color: var(--bg-element);
+    border-radius: 10px 10px 0 0;
+}
+
+.flatpickr-month {
+    color: var(--text-primary);
+}
+
+.flatpickr-weekdays {
+    background-color: var(--bg-element);
+}
+
+span.flatpickr-weekday {
+    color: var(--accent-blue);
+    font-weight: bold;
+    background-color: transparent;
+}
+
+.flatpickr-day {
+    color: var(--text-primary);
+    border-radius: 5px;
+}
+
+.flatpickr-day:hover {
+    background-color: var(--bg-element);
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background-color: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+.flatpickr-day.today {
+    border-color: var(--accent-blue);
+}
+
+.flatpickr-time {
+    background-color: var(--bg-element);
+    border-top: 1px solid var(--border-color);
+}
+
+.flatpickr-time .numInputWrapper input {
+    background-color: var(--bg-container);
+    color: var(--text-primary);
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    background-color: var(--bg-element);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.flatpickr-current-month input.cur-year {
+    color: var(--text-primary);
+}
+
+.arrowUp, .arrowDown {
+    border-bottom-color: var(--text-primary);
+}
+
+.flatpickr-time .flatpickr-am-pm {
+    color: var(--text-primary);
+}
+
+.flatpickr-time .flatpickr-am-pm:hover {
+    background-color: var(--bg-element);
+}
+
+.flatpickr-wrapper {
+    position: relative;
+    display: flex;
+}
+
+.flatpickr-wrapper input {
+    flex: 1;
+}
+
+.flatpickr-wrapper .input-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-blue);
+    cursor: pointer;
+}

@@ -1,0 +1,46 @@
+{% load i18n %}
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% get_current_language as CURRENT_LANGUAGE %}
+{% if CURRENT_LANGUAGE == 'fr' %}
+<script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+<script>
+  flatpickr.localize(flatpickr.l10ns.fr);
+</script>
+{% elif CURRENT_LANGUAGE == 'en' %}
+<!-- L'anglais est la langue par défaut de flatpickr, pas besoin de charger un fichier supplémentaire -->
+{% endif %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        {% get_current_language as CURRENT_LANGUAGE %}
+        let currentLang = "{{ CURRENT_LANGUAGE }}";
+        if (currentLang === 'en') {
+            currentLang = "en-GB"
+        }
+        // Options de configuration pour Flatpickr
+        const fpConfig = {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            altFormat: "j F Y H:i",
+            time_24hr: true,
+            locale: currentLang,  // Utiliser la langue actuelle
+            allowInput: true
+        };
+
+        // Initialiser Flatpickr sur les champs date
+        const dateInputs = document.querySelectorAll('.datepicker');
+        dateInputs.forEach(input => {
+            // Pour les inputs enveloppés (avec la classe flatpickr-wrapper)
+            if (input.closest('.flatpickr-wrapper')) {
+               flatpickr(input.closest('.flatpickr-wrapper'), {
+                   ...fpConfig,
+                   wrap: true,
+                   clickOpens: true
+               });
+            } else {
+                // Pour les inputs standards
+                flatpickr(input, fpConfig);
+            }
+        });
+    });
+</script>

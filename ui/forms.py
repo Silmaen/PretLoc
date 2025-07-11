@@ -84,8 +84,6 @@ class ReservationForm(forms.ModelForm):
         model = Reservation
         fields = ["customer", "checkout_date", "return_date", "notes"]
         widgets = {
-            "checkout_date": forms.DateInput(attrs={"type": "date"}),
-            "return_date": forms.DateInput(attrs={"type": "date"}),
             "notes": forms.Textarea(attrs={"rows": 3}),
         }
 
@@ -107,7 +105,6 @@ class StockEventForm(forms.ModelForm):
         fields = ["asset", "event_type", "quantity", "description", "date"]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
-            "date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
 
     def __init__(self, *args, **kwargs):

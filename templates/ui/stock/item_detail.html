@@ -8,31 +8,41 @@
             <h2>{% trans "Détails de l'article" %}</h2>
         </div>
 
-        <div class="item-details">
+        <div class="auth-card">
             <h3>{{ item.name }}</h3>
 
             <div class="detail-row">
-                <span class="detail-label">{% trans "Catégorie" %}:</span>
+                <span class="detail-label">
+                    <i class="fas fa-tag auth-blue"></i> {% trans "Catégorie" %}
+                </span>
                 <span class="detail-value">{{ item.category.name }}</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">{% trans "Description" %}:</span>
-                <div class="detail-value">{{ item.description|linebreaks }}</div>
+                <span class="detail-label">
+                    <i class="fas fa-align-left auth-blue"></i> {% trans "Description" %}
+                </span>
+                <span class="detail-value">{{ item.description }}</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">{% trans "Quantité en stock" %}:</span>
+                <span class="detail-label">
+                    <i class="fas fa-boxes auth-blue"></i> {% trans "Quantité en stock" %}
+                </span>
                 <span class="detail-value">{{ item.stock_quantity }}</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">{% trans "Valeur de remplacement" %}:</span>
+                <span class="detail-label">
+                    <i class="fas fa-euro-sign auth-blue"></i> {% trans "Valeur de remplacement" %}
+                </span>
                 <span class="detail-value">{{ item.replacement_value }} €</span>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">{% trans "Don minimum exigé" %}:</span>
+                <span class="detail-label">
+                    <i class="fas fa-hand-holding-heart auth-blue"></i>{% trans "Don minimum" %}
+                </span>
                 <span class="detail-value">{{ item.rental_value }} €</span>
             </div>
         </div>
@@ -53,39 +63,152 @@
             {% endif %}
         </div>
 
-        <h3>{% trans "Historique des événements" %}</h3>
+        <div class="auth-card">
+            <h3>{% trans "Historique de l'article" %}</h3>
+            <form method="get" id="date-filter-form" class="auth-form form-group">
+                <div class="filters-row" style="flex-wrap: unset; align-items: center;">
+                    <label for="start_date">{% trans "Du" %}</label>
+                    <div class="flatpickr-wrapper">
+                        <input type="text" id="start_date" name="start_date" value="{{ start_date }}"
+                               class="datepicker" data-input>
+                        <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
+                            <i class="fas fa-calendar-alt"></i>
+                        </a>
+                    </div>
+                    <label for="end_date">{% trans "Au" %}</label>
+                    <div class="flatpickr-wrapper">
+                        <input type="text" id="end_date" name="end_date" value="{{ end_date }}"
+                               class="datepicker" data-input>
+                        <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
+                            <i class="fas fa-calendar-alt"></i>
+                        </a>
+                    </div>
+                    <button type="submit" class="filter-button">
+                        <i class="fas fa-filter auth-blue"></i> {% trans "Filtrer" %}
+                    </button>
+                </div>
+            </form>
 
-        {% if stock_events %}
-        <table class="data-table">
-            <thead>
-            <tr>
-                <th>{% trans "Date" %}</th>
-                <th>{% trans "Type" %}</th>
-                <th>{% trans "Quantité" %}</th>
-                <th>{% trans "Description" %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for event in stock_events %}
-            <tr>
-                <td>{{ event.date|date:"d/m/Y H:i" }}</td>
-                <td>{{ event.get_event_type_display }}</td>
-                <td>{{ event.quantity }}</td>
-                <td>{{ event.description|default:"-" }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>{% trans "Aucun événement enregistré pour cet article." %}</p>
-        {% endif %}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Type d'événement" %}</th>
+                    <th>{% trans "Détails" %}</th>
+                    <th>{% trans "Quantité" %}</th>
+                    <th>{% trans "Utilisateur" %}</th>
+                </tr>
+                </thead>
+                <tbody id="combinedTableBody">
+                <!-- Le contenu sera généré par JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tableaux masqués contenant les données d'origine -->
+        <div style="display: none;">
+            <table id="stockEventsTable">
+                <tbody>
+                {% for event in stock_events %}
+                <tr data-date="{{ event.date|date:'Y-m-d H:i:s' }}">
+                    <td><i class="fas fa-history auth-blue"></i> {{ event.date|date:"d/m/Y H:i" }}</td>
+                    <td>{{ event.get_event_type_display }}</td>
+                    <td>{{ event.description|default:"-" }}</td>
+                    <td>{{ event.quantity }}</td>
+                    <td>{{ event.user|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <table id="reservationsTable">
+                <tbody>
+                {% for res in reservations %}
+                {% for reservation_item in res.items.all %}
+                {% if reservation_item.asset == item %}
+                {% if res.actual_checkout_date %}
+                <tr data-date="{{ res.actual_checkout_date|date:'Y-m-d H:i:s' }}">
+                    <td><i class="fas fa-arrow-right auth-blue"></i> {{ res.actual_checkout_date|date:"d/m/Y H:i" }}
+                    </td>
+                    <td>{% trans "Sortie" %} {{ res.customer }}</td>
+                    <td>
+                        <a href="{% url 'ui:reservation_detail' pk=res.id %}" class="action-button"
+                           title="{% trans 'Voir les détails' %}">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                    <td>{{ reservation_item.quantity_checked_out }}</td>
+                    <td>-</td>
+                </tr>
+                {% endif %}
+                {% if res.actual_return_date %}
+                <tr data-date="{{ res.actual_return_date|date:'Y-m-d H:i:s' }}">
+                    <td><i class="fas fa-arrow-left auth-blue"></i> {{ res.actual_return_date|date:"d/m/Y H:i" }}</td>
+                    <td>{% trans "Retour" %} {{ res.customer }}</td>
+                    <td>
+                        <a href="{% url 'ui:reservation_detail' pk=res.id %}" class="action-button"
+                           title="{% trans 'Voir les détails' %}">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                    <td>{{ reservation_item.quantity_returned }}</td>
+                    <td>-</td>
+                </tr>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <div class="back-action" style="margin-top: 20px;">
             <a href="{% url 'ui:stock' %}" class="auth-button">
                 <i class="fas fa-arrow-left"></i>
-                {% trans "Retour à la liste" %}
+                {% trans "Retour" %}
             </a>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Combiner et trier les tableaux
+        const combinedRows = [];
+
+        // Récupérer les lignes des événements de stock
+        document.querySelectorAll('#stockEventsTable tbody tr').forEach(row => {
+            combinedRows.push({
+                date: new Date(row.getAttribute('data-date')),
+                html: row.innerHTML
+            });
+        });
+
+        // Récupérer les lignes des réservations
+        document.querySelectorAll('#reservationsTable tbody tr').forEach(row => {
+            combinedRows.push({
+                date: new Date(row.getAttribute('data-date')),
+                html: row.innerHTML
+            });
+        });
+
+        // Trier par date (du plus récent au plus ancien)
+        combinedRows.sort((a, b) => b.date - a.date);
+
+        // Remplir le tableau combiné
+        const tableBody = document.getElementById('combinedTableBody');
+
+        if (combinedRows.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5">{% trans "Aucun événement trouvé pour cette période" %}</td></tr>';
+        } else {
+            combinedRows.forEach(row => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = row.html;
+                tableBody.appendChild(newRow);
+            });
+        }
+    });
+</script>
 {% endblock %}

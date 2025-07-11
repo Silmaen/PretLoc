@@ -228,13 +228,70 @@ def item_delete(request, pk):
 @user_type_required("member")
 def item_detail(request, pk):
     """Vue pour afficher les détails d'un article"""
+    from django.utils import timezone
+    import datetime
+
     item = get_object_or_404(Asset, pk=pk)
-    # Récupérer l'historique des événements de stock pour cet article
-    stock_events = item.stockevent_set.all().order_by("-date")
+
+    # Dates par défaut : maintenant et un an en arrière
+    end_date = request.GET.get("end_date", timezone.now().strftime("%Y-%m-%dT%H:%M"))
+    start_date = request.GET.get(
+        "start_date",
+        (timezone.now() - datetime.timedelta(days=365)).strftime("%Y-%m-%dT%H:%M"),
+    )
+
+    # Conversion des dates en objets datetime{% endif %}
+    # {% endfor %}
+    try:
+        start_date_obj = timezone.make_aware(
+            datetime.datetime.strptime(start_date, "%Y-%m-%dTH:M")
+        )
+        end_date_obj = timezone.make_aware(
+            datetime.datetime.strptime(end_date, "%Y-%m-%dTH:M")
+        )
+        # Inclure toute la journée de fin
+        end_date_obj = timezone.make_aware(
+            end_date_obj.replace(hour=23, minute=59, second=59)
+        )
+    except ValueError:
+        start_date_obj = timezone.now() - datetime.timedelta(days=365)
+        end_date_obj = timezone.now()
+        start_date = start_date_obj.strftime("%Y-%m-%dTH:M")
+        end_date = end_date_obj.strftime("%Y-%m-%dTH:M")
+
+    # Filtrer les événements de stock par date
+    stock_events = item.stockevent_set.filter(
+        date__gte=start_date_obj, date__lte=end_date_obj
+    ).order_by("-date")
+
+    # Récupérer les réservations terminées ou sorties
+    reservations = (
+        Reservation.objects.filter(
+            items__asset=item,
+            status__in=["checked_out", "returned"],
+            actual_checkout_date__isnull=False,
+        )
+        .filter(
+            # Date de sortie ou de retour dans l'intervalle
+            Q(
+                actual_checkout_date__gte=start_date_obj,
+                actual_checkout_date__lte=end_date_obj,
+            )
+            | Q(
+                actual_return_date__gte=start_date_obj,
+                actual_return_date__lte=end_date_obj,
+            )
+        )
+        .distinct()
+        .order_by("-actual_checkout_date")
+    )
 
     context = {
         "item": item,
         "stock_events": stock_events,
+        "reservations": reservations,
+        "start_date": start_date,
+        "end_date": end_date,
         "capability": get_capability(request.user),
     }
     return render(request, "ui/stock/item_detail.html", context)

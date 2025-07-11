@@ -57,10 +57,16 @@
                         <label for="{{ form.checkout_date.id_for_label }}">
                             <i class="fas fa-arrow-right"></i> {{ form.checkout_date.label }}
                         </label>
-                        <input type="date" name="{{ form.checkout_date.name }}"
-                               id="{{ form.checkout_date.id_for_label }}"
-                               {% if reservation %}value="{{ reservation.checkout_date|date:'Y-m-d' }}" {% endif %}
-                               required>
+                        <div class="flatpickr-wrapper">
+                            <input type="text" id="{{ form.checkout_date.id_for_label }}"
+                                   name="{{ form.checkout_date.name }}"
+                                   placeholder="{% trans 'Sélectionner une date' %}"
+                                   {% if reservation %}value="{{ reservation.checkout_date }}" {% endif %}
+                                   class="datepicker" data-input required>
+                            <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
+                                <i class="fas fa-calendar-alt"></i>
+                            </a>
+                        </div>
                         {% if form.checkout_date.errors %}
                         <ul class="errorlist">
                             {% for error in form.checkout_date.errors %}
@@ -75,9 +81,15 @@
                         <label for="{{ form.return_date.id_for_label }}">
                             <i class="fas fa-arrow-left"></i> {{ form.return_date.label }}
                         </label>
-                        <input type="date" name="{{ form.return_date.name }}" id="{{ form.return_date.id_for_label }}"
-                               {% if reservation %}value="{{ reservation.return_date|date:'Y-m-d' }}" {% endif %}
-                               required>
+                        <div class="flatpickr-wrapper">
+                            <input type="text" id="{{ form.return_date.id_for_label }}" name="{{ form.return_date.name }}"
+                                   placeholder="{% trans 'Sélectionner une date' %}"
+                                   {% if reservation %}value="{{ reservation.return_date }}" {% endif %}
+                                   class="datepicker" data-input required>
+                            <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
+                                <i class="fas fa-calendar-alt"></i>
+                            </a>
+                        </div>
                         {% if form.return_date.errors %}
                         <ul class="errorlist">
                             {% for error in form.return_date.errors %}
@@ -188,7 +200,9 @@
         </form>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <!-- Script pour gérer l'ajout dynamique de lignes au formset -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -250,9 +264,7 @@
         }
     });
 </script>
-{% endblock %}
 
-{% block extra_js %}
 <!-- D'abord jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Inclure le JS de Select2 en bas de page -->

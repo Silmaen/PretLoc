@@ -97,12 +97,12 @@ class Reservation(models.Model):
         ("cancelled", _("Annulée")),
     )
 
-    checkout_date = models.DateField(verbose_name=_("Date de sortie prévue"))
-    return_date = models.DateField(verbose_name=_("Date de retour prévue"))
-    actual_checkout_date = models.DateField(
+    checkout_date = models.DateTimeField(verbose_name=_("Date de sortie prévue"))
+    return_date = models.DateTimeField(verbose_name=_("Date de retour prévue"))
+    actual_checkout_date = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Date de sortie réelle")
     )
-    actual_return_date = models.DateField(
+    actual_return_date = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Date de retour réelle")
     )
 

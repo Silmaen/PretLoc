@@ -1,27 +1,130 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block content %}
-<div class="auth-container">
+<div class="auth-container" style="max-width: 800px;">
     <div class="auth-card">
         <div class="auth-header">
-            <h2>{% trans "Enregistrer un événement de stock" %}</h2>
+            <i class="fas fa-history auth-icon"></i>
+            <h2>{% trans "Nouvel événement de stock" %}</h2>
         </div>
 
-        <form method="post" class="auth-form">
+        <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <div class="form-actions">
+
+            <div class="form-group">
+                <label for="{{ form.asset.id_for_label }}">
+                    <i class="fas fa-box"></i> {% trans "Article" %}
+                </label>
+                {{ form.asset }}
+                {% if form.asset.errors %}
+                <ul class="errorlist">
+                    {% for error in form.asset.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% if form.asset.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.asset.help_text }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.event_type.id_for_label }}">
+                    <i class="fas fa-tag"></i> {% trans "Type d'événement" %}
+                </label>
+                {{ form.event_type }}
+                {% if form.event_type.errors %}
+                <ul class="errorlist">
+                    {% for error in form.event_type.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% if form.event_type.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.event_type.help_text }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.quantity.id_for_label }}">
+                    <i class="fas fa-sort-amount-up"></i> {% trans "Quantité" %}
+                </label>
+                {{ form.quantity }}
+                {% if form.quantity.errors %}
+                <ul class="errorlist">
+                    {% for error in form.quantity.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% if form.quantity.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.quantity.help_text }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.date.id_for_label }}">
+                    <i class="fas fa-calendar-alt"></i> {% trans "Date" %}
+                </label>
+                <div class="flatpickr-wrapper">
+                    <input type="text" id="{{ form.date.id_for_label }}"
+                           name="{{ form.date.name }}"
+                           placeholder="{% trans 'Sélectionner une date' %}"
+                           {% if reservation %}value="{{ reservation.checkout_date }}" {% endif %}
+                           class="datepicker" data-input required>
+                    <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
+                        <i class="fas fa-calendar-alt"></i>
+                    </a>
+                </div>
+                {% if form.date.errors %}
+                <ul class="errorlist">
+                    {% for error in form.date.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% if form.date.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.date.help_text }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">
+                    <i class="fas fa-sticky-note"></i> {% trans "Description" %}
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <ul class="errorlist">
+                    {% for error in form.description.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% if form.description.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.description.help_text }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                <a href="{% url 'ui:stock' %}" class="auth-button" style="background-color: var(--bg-element);">
+                    <i class="fas fa-times"></i> {% trans "Annuler" %}
+                </a>
                 <button type="submit" class="auth-button">
-                    <i class="fas fa-save"></i>
-                    {% trans "Enregistrer" %}
+                    <i class="fas fa-save"></i> {% trans "Enregistrer" %}
                 </button>
             </div>
         </form>
-        <div style="margin-top: 20px;"></div>
-        <a href="{% url 'ui:stock' %}" class="auth-button">
-            <i class="fas fa-arrow-left"></i>{% trans "Annuler" %}
-        </a>
     </div>
 </div>
 {% endblock %}

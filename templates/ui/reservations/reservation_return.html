@@ -54,8 +54,15 @@
                 <label for="actual_return_date">
                     <i class="fas fa-calendar-alt"></i> {% trans "Date de retour réelle" %}
                 </label>
-                <input type="date" name="actual_return_date" id="actual_return_date"
-                       value="{% now 'Y-m-d' %}" class="form-control">
+                <div class="flatpickr-wrapper">
+                    <input type="text" id="actual_return_date" name="actual_return_date"
+                           placeholder="{% trans 'Sélectionner une date' %}"
+                           value="{% now 'Y-m-d H:M' %}"
+                           class="datepicker" data-input>
+                    <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
+                        <i class="fas fa-calendar-alt"></i>
+                    </a>
+                </div>
             </div>
         </div>
 

@@ -258,6 +258,10 @@ footer {
     position: relative;
 }
 
+.auth-blue {
+    color: var(--accent-blue);
+}
+
 .auth-icon {
     font-size: 2rem;
     color: var(--accent-blue);
