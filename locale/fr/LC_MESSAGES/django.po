@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-11 21:09+0000\n"
+"POT-Creation-Date: 2025-07-13 09:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -288,6 +288,18 @@ msgstr "Se connecter"
 #: templates/base.html:9
 msgid "Réservation CDF"
 msgstr "Réservation CDF"
+
+#: templates/includes/flatpickr_script_reservation.html:85
+msgid "Privilégiez les lundis et vendredis pour la date de départ"
+msgstr "Privilégiez les lundis et vendredis pour la date de départ"
+
+#: templates/includes/flatpickr_script_reservation.html:108
+msgid "Privilégiez les lundis et vendredis pour la date de retour"
+msgstr "Privilégiez les lundis et vendredis pour la date de retour"
+
+#: templates/includes/flatpickr_script_reservation.html:122
+msgid " La date de retour doit être postérieure à la date de départ"
+msgstr " La date de retour doit être postérieure à la date de départ"
 
 #: templates/includes/footer.html:5
 msgid "Tous droits réservés"
@@ -967,7 +979,7 @@ msgstr "Détails"
 msgid "Voir les détails"
 msgstr "Voir les détails"
 
-#: templates/ui/stock/item_detail.html:235
+#: templates/ui/stock/item_detail.html:236
 msgid "Aucun événement trouvé pour cette période"
 msgstr "Aucun événement trouvé pour cette période"
 

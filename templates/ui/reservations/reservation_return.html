@@ -191,7 +191,10 @@
         </form>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
+{% include "includes/flatpickr_script.html" %}
 <script>
     function updateCalculations(isReturnChange = false) {
         const rows = document.querySelectorAll('.item-row');

@@ -1,0 +1,144 @@
+{% load i18n %}
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% get_current_language as CURRENT_LANGUAGE %}
+{% if CURRENT_LANGUAGE == 'fr' %}
+<script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+<script>
+  flatpickr.localize(flatpickr.l10ns.fr);
+</script>
+{% elif CURRENT_LANGUAGE == 'en' %}
+<!-- L'anglais est la langue par défaut de flatpickr, pas besoin de charger un fichier supplémentaire -->
+{% endif %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        {% get_current_language as CURRENT_LANGUAGE %}
+        let currentLang = "{{ CURRENT_LANGUAGE }}";
+        if (currentLang === 'en') {
+            currentLang = "en-GB"
+        }
+        // Options de configuration pour Flatpickr
+        const fpConfig = {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            altFormat: "j F Y H:i",
+            time_24hr: true,
+            locale: currentLang,  // Utiliser la langue actuelle
+            minuteIncrement: 30,
+            allowInput: true,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                // Ajouter des classes pour les lundis (1) et vendredis (5)
+                const dayOfWeek = dayElem.dateObj.getDay();
+                if (dayOfWeek === 1) {
+                    dayElem.classList.add('lundi');
+                } else if (dayOfWeek === 5) {
+                    dayElem.classList.add('vendredi');
+                }
+            }
+        };
+
+        // Sélecteur de date de départ
+        const checkoutDatePicker = flatpickr("#{{ form.checkout_date.id_for_label }}", {
+            ...fpConfig,
+            defaultHour: 19,
+            defaultMinute: 0,
+            onChange: function(selectedDates, dateStr) {
+                if (selectedDates.length > 0) {
+                    const selectedDate = selectedDates[0];
+                    const dayOfWeek = selectedDate.getDay();
+                    const nextReturnDate = new Date(selectedDate);
+
+                    // Suggérer le prochain lundi ou vendredi comme date de retour
+                    if (dayOfWeek === 1) { // Lundi
+                        // Suggérer le vendredi suivant
+                        nextReturnDate.setDate(selectedDate.getDate() + 4);
+                    } else if (dayOfWeek === 5) { // Vendredi
+                        // Suggérer le lundi suivant
+                        nextReturnDate.setDate(selectedDate.getDate() + 3);
+                    } else {
+                        // Pour les autres jours, suggérer le prochain vendredi ou lundi
+                        const daysToFriday = (5 - dayOfWeek + 7) % 7;
+                        const daysToMonday = (8 - dayOfWeek) % 7;
+                        const daysToAdd = Math.min(daysToFriday, daysToMonday);
+                        nextReturnDate.setDate(selectedDate.getDate() + daysToAdd);
+                    }
+
+                    // Définir l'heure de retour à 18h00
+                    nextReturnDate.setHours(18, 0, 0, 0);
+
+                    // Mettre à jour le sélecteur de date de retour
+                    returnDatePicker.setDate(nextReturnDate);
+
+                    validateDates();
+                }
+            },
+            onOpen: function() {
+                // On supprime d'abord tout message préexistant
+                document.querySelectorAll(".date-suggestion").forEach(el => el.remove());
+
+                // On ajoute le message au bon calendrier (celui qui vient de s'ouvrir)
+                setTimeout(() => {
+                    const calendarContainer = document.querySelector(".flatpickr-calendar.open");
+                    if (calendarContainer) {
+                        const infoMsg = document.createElement("div");
+                        infoMsg.className = "date-suggestion";
+                        infoMsg.innerHTML = "<i class='fas fa-info-circle'></i> {% trans 'Privilégiez les lundis et vendredis pour la date de départ' %}";
+                        calendarContainer.appendChild(infoMsg);
+                    }
+                }, 50);
+            }
+        });
+
+        // Sélecteur de date de retour
+        const returnDatePicker = flatpickr("#{{ form.return_date.id_for_label }}", {
+            ...fpConfig,
+            defaultHour: 18,
+            defaultMinute: 0,
+            onChange: validateDates,
+            onOpen: function() {
+                // On supprime d'abord tout message préexistant
+                document.querySelectorAll(".date-suggestion").forEach(el => el.remove());
+
+                // On ajoute le message au bon calendrier (celui qui vient de s'ouvrir)
+                setTimeout(() => {
+                    const calendarContainer = document.querySelector(".flatpickr-calendar.open");
+                    if (calendarContainer) {
+                        const infoMsg = document.createElement("div");
+                        infoMsg.className = "date-suggestion";
+                        infoMsg.innerHTML = "<i class='fas fa-info-circle'></i> {% trans 'Privilégiez les lundis et vendredis pour la date de retour' %}";
+                        calendarContainer.appendChild(infoMsg);
+                    }
+                }, 50);
+            }
+        });
+
+        // Message d'avertissement
+        const warningContainer = document.createElement("div");
+        warningContainer.className = "date-warning";
+        warningContainer.style.color = "#dc3545";
+        warningContainer.style.display = "none";
+        warningContainer.style.marginTop = "5px";
+        warningContainer.style.fontSize = "0.9em";
+        warningContainer.innerHTML = "<i class='fas fa-exclamation-triangle'></i>{% trans ' La date de retour doit être postérieure à la date de départ' %}";
+
+        const returnDateField = document.querySelector("#{{ form.return_date.id_for_label }}").parentNode.parentNode;
+        returnDateField.appendChild(warningContainer);
+
+        // Fonction de validation des dates
+        function validateDates() {
+            const checkoutDate = checkoutDatePicker.selectedDates[0];
+            const returnDate = returnDatePicker.selectedDates[0];
+
+            if (checkoutDate && returnDate && returnDate <= checkoutDate) {
+                warningContainer.style.display = "block";
+                document.querySelector('button[type="submit"]').disabled = true;
+            } else {
+                warningContainer.style.display = "none";
+                document.querySelector('button[type="submit"]').disabled = false;
+            }
+        }
+
+        // Initialisation de la validation
+        validateDates();
+    });
+</script>

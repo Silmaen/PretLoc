@@ -96,3 +96,75 @@ span.flatpickr-weekday {
     color: var(--accent-blue);
     cursor: pointer;
 }
+
+.flatpickr-calendar .flatpickr-weekday:nth-child(1),
+.flatpickr-calendar .flatpickr-weekday:nth-child(5) {
+    color: var(--accent-blue) !important;
+    font-weight: bold !important;
+}
+
+.flatpickr-day.date-suggestion-highlight {
+    border-color: var(--text-primary);
+    background-color: rgba(0.0, 0.0, 0.0, 0.1);
+    font-weight: bold !important;
+}
+
+.flatpickr-day.lundi, .flatpickr-day.vendredi {
+    font-weight: bold !important;
+    background-color: rgba(var(--accent-blue-rgb, 0, 120, 210), 0.1);
+    border: 1px dashed var(--accent-blue, #0078d2);
+}
+
+/* Effet de survol sur les jours mis en surbrillance */
+.flatpickr-day.lundi:hover, .flatpickr-day.vendredi:hover {
+    background-color: var(--bg-element);
+    border: 1px solid var(--accent-blue);
+}
+
+/* Style prioritaire pour les jours sélectionnés */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background-color: var(--accent-blue) !important;
+    color: white !important;
+    border-color: var(--accent-blue) !important;
+    font-weight: bold;
+}
+
+/* Assurer que le style sélectionné s'applique même aux lundis/vendredis */
+.flatpickr-day.lundi.selected,
+.flatpickr-day.vendredi.selected,
+.flatpickr-day.lundi.startRange,
+.flatpickr-day.vendredi.startRange,
+.flatpickr-day.lundi.endRange,
+.flatpickr-day.vendredi.endRange {
+    background-color: var(--accent-blue) !important;
+    border-color: var(--accent-blue) !important;
+    border-style: solid !important;
+}
+
+.date-suggestion {
+    padding: 5px 10px;
+    background-color: var(--bg-element);
+    border-radius: 4px;
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.date-warning {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.7;
+    }
+}

@@ -203,6 +203,7 @@
 {% endblock %}
 
 {% block extra_js %}
+{% include "includes/flatpickr_script_reservation.html" %}
 <!-- Script pour gérer l'ajout dynamique de lignes au formset -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -264,7 +265,6 @@
         }
     });
 </script>
-
 <!-- D'abord jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Inclure le JS de Select2 en bas de page -->

@@ -135,7 +135,10 @@
         </form>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
+{% include "includes/flatpickr_script.html" %}
 <script>
     function updateTotal() {
         const rows = document.querySelectorAll('tbody tr');
