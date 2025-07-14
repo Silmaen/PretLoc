@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-14 07:15+0000\n"
+"POT-Creation-Date: 2025-07-14 10:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -346,7 +346,7 @@ msgstr "Are you sure you want to delete this customer?"
 #: templates/ui/reservations/reservation_checkout.html:129
 #: templates/ui/reservations/reservation_confirm_cancel.html:21
 #: templates/ui/reservations/reservation_confirm_validate.html:23
-#: templates/ui/reservations/reservation_form.html:189
+#: templates/ui/reservations/reservation_form.html:188
 #: templates/ui/reservations/reservation_return.html:185
 #: templates/ui/stock/category_confirm_delete.html:34
 #: templates/ui/stock/item_confirm_delete.html:33
@@ -385,7 +385,7 @@ msgid "Gestion des Clients"
 msgstr "Customer management"
 
 #: templates/ui/customers/list.html:17
-#: templates/ui/reservations/reservation_form.html:276
+#: templates/ui/reservations/reservation_form.html:490
 msgid "Rechercher un client..."
 msgstr "Search for a customer..."
 
@@ -776,37 +776,38 @@ msgstr "Amount"
 msgid "Action"
 msgstr "Action"
 
-#: templates/ui/reservations/reservation_form.html:182
-#: templates/ui/reservations/reservation_form.html:330
+#: templates/ui/reservations/reservation_form.html:181
+#: templates/ui/reservations/reservation_form.html:254
 #: templates/ui/stock/item_form.html:13
 msgid "Ajouter un article"
 msgstr "Add asset"
 
-#: templates/ui/reservations/reservation_form.html:194
+#: templates/ui/reservations/reservation_form.html:193
 msgid "Mettre à jour"
 msgstr "Update"
 
-#: templates/ui/reservations/reservation_form.html:196
+#: templates/ui/reservations/reservation_form.html:195
 msgid "Créer la réservation"
 msgstr "Create reservation"
 
-#: templates/ui/reservations/reservation_form.html:318
+#: templates/ui/reservations/reservation_form.html:242
 #: templates/ui/stock/item_confirm_delete.html:16
 #: templates/ui/stock/item_detail.html:16 templates/ui/stock/list.html:96
 #: ui/models.py:12 ui/models.py:29
 msgid "Catégorie"
 msgstr "Category"
 
-#: templates/ui/reservations/reservation_form.html:320
+#: templates/ui/reservations/reservation_form.html:244
 msgid "Toutes les catégories"
 msgstr "All categories"
 
-#: templates/ui/reservations/reservation_form.html:340
+#: templates/ui/reservations/reservation_form.html:382
+#: templates/ui/reservations/reservation_form.html:450
 #: templates/ui/stock/list.html:16 templates/ui/stock/stock_event_form.html:150
 msgid "Rechercher un article..."
 msgstr "Search for an asset..."
 
-#: templates/ui/reservations/reservation_form.html:381
+#: templates/ui/reservations/reservation_form.html:434
 #: templates/ui/stock/stock_event_form.html:181
 msgid "Stock:"
 msgstr "Stock:"
@@ -1256,40 +1257,44 @@ msgstr "Successfully modified customer"
 msgid "Client supprimé avec succès"
 msgstr "Successfully deleted customer"
 
-#: ui/views.py:556
+#: ui/views.py:551 ui/views.py:630
+msgid "Veuillez ajouter au moins un article à la réservation."
+msgstr "Please add at least one asset to the reservation."
+
+#: ui/views.py:564
 msgid "Réservation créée avec succès"
 msgstr "Successfully created reservation"
 
-#: ui/views.py:581
+#: ui/views.py:589
 msgid "Cette réservation ne peut pas être validée"
 msgstr "This reservation cannot be validated"
 
-#: ui/views.py:589
+#: ui/views.py:597
 msgid "Réservation validée avec succès"
 msgstr "Successfully validated reservation"
 
-#: ui/views.py:608
+#: ui/views.py:616
 msgid "Impossible de modifier une réservation sortie ou rendue"
 msgstr "Impossible to modify a checkout or returned reservation"
 
-#: ui/views.py:624
+#: ui/views.py:653
 msgid "Réservation modifiée avec succès"
 msgstr "Successfully modified reservation"
 
-#: ui/views.py:651
+#: ui/views.py:680
 msgid ""
 "Seules les réservations à l'état 'créée' ou 'validée' peuvent être annulées"
 msgstr "Only reservations in 'created' or 'validated' state can be canceled"
 
-#: ui/views.py:661
+#: ui/views.py:690
 msgid "Réservation annulée avec succès"
 msgstr "Successfully canceled reservation"
 
-#: ui/views.py:679
+#: ui/views.py:708
 msgid "Cette réservation ne peut pas être sortie"
 msgstr "This reservation cannot be checked out"
 
-#: ui/views.py:696
+#: ui/views.py:725
 #, python-brace-format
 msgid ""
 "Quantité insuffisante pour {item.asset.name} (disponible: {item.asset."
@@ -1298,23 +1303,23 @@ msgstr ""
 "Insufficient quantity for {item.asset.name} (available: {item.asset."
 "stock_quantity})"
 
-#: ui/views.py:722
+#: ui/views.py:751
 msgid "Sortie de matériel effectuée avec succès"
 msgstr "Successfully created assets checkout"
 
-#: ui/views.py:742
+#: ui/views.py:771
 msgid "Cette réservation ne peut pas être retournée"
 msgstr "This reservation cannot be returned"
 
-#: ui/views.py:769
+#: ui/views.py:798
 #, python-brace-format
 msgid "Quantités invalides pour {item.asset.name}"
 msgstr "Invalid quantities for {item.asset.name}"
 
-#: ui/views.py:803
+#: ui/views.py:832
 msgid "Retour de matériel enregistré avec succès"
 msgstr "Successfully registered assets return"
 
-#: ui/views.py:917
+#: ui/views.py:946
 msgid "Événement de stock enregistré avec succès"
 msgstr "Stock event successfully registered"

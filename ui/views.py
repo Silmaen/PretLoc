@@ -54,7 +54,7 @@ def stock_view(request):
     if stock_date:
         try:
             stock_date = timezone.make_aware(
-                datetime.datetime.strptime(stock_date, "%Y-%m-%dTH:M")
+                datetime.datetime.strptime(stock_date, "%Y-%m-%dT%H:%M")
             )
         except ValueError:
             stock_date = timezone.now()
@@ -267,10 +267,10 @@ def item_detail(request, pk):
     # {% endfor %}
     try:
         start_date_obj = timezone.make_aware(
-            datetime.datetime.strptime(start_date, "%Y-%m-%dTH:M")
+            datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M")
         )
         end_date_obj = timezone.make_aware(
-            datetime.datetime.strptime(end_date, "%Y-%m-%dTH:M")
+            datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M")
         )
         # Inclure toute la journée de fin
         end_date_obj = timezone.make_aware(
@@ -279,8 +279,8 @@ def item_detail(request, pk):
     except ValueError:
         start_date_obj = timezone.now() - datetime.timedelta(days=365)
         end_date_obj = timezone.now()
-        start_date = start_date_obj.strftime("%Y-%m-%dTH:M")
-        end_date = end_date_obj.strftime("%Y-%m-%dTH:M")
+        start_date = start_date_obj.strftime("%Y-%m-%dT%H:%M")
+        end_date = end_date_obj.strftime("%Y-%m-%dT%H:%M")
 
     # Filtrer les événements de stock par date
     stock_events = item.stockevent_set.filter(
@@ -545,12 +545,22 @@ def reservation_create(request):
 
     if request.method == "POST":
         form = ReservationForm(request.POST)
-        if form.is_valid():
+        formset = ReservationItemFormSet(request.POST, instance=reservation)
+        if form.is_valid() and formset.is_valid():
+            if formset.total_form_count() == 0:
+                messages.error(
+                    request, _("Veuillez ajouter au moins un article à la réservation.")
+                )
+                return redirect("ui:reservation_create")
             with transaction.atomic():
                 reservation = form.save()
                 reservation.created_by = request.user
                 reservation.save()
-                formset = ReservationItemFormSet(request.POST, instance=reservation)
+                for form in formset:
+                    if form.is_valid() and not form.cleaned_data.get("DELETE"):
+                        # Ne pas enregistrer les articles avec quantité 0
+                        if form.cleaned_data.get("quantity_reserved", 0) > 0:
+                            form.save()
                 if formset.is_valid():
                     formset.save()
                     messages.success(request, _("Réservation créée avec succès"))
@@ -615,10 +625,33 @@ def reservation_update(request, pk):
 
     if request.method == "POST":
         form = ReservationForm(request.POST, instance=reservation)
-        if form.is_valid():
+        formset = ReservationItemFormSet(request.POST, instance=reservation)
+        if form.is_valid() and formset.is_valid():
+
+            if formset.total_form_count() == 0:
+                messages.error(
+                    request, _("Veuillez ajouter au moins un article à la réservation.")
+                )
+                return redirect("ui:reservation_update", pk=reservation.pk)
             with transaction.atomic():
                 reservation = form.save()
-                formset = ReservationItemFormSet(request.POST, instance=reservation)
+                # Récupérer les IDs des éléments soumis
+                submitted_ids = [
+                    form.cleaned_data.get("id").pk
+                    for form in formset.forms
+                    if form.cleaned_data.get("id")
+                ]
+
+                # Supprimer les éléments manquants
+                ReservationItem.objects.filter(reservation=reservation).exclude(
+                    pk__in=submitted_ids
+                ).delete()
+
+                for form in formset:
+                    if form.is_valid() and not form.cleaned_data.get("DELETE"):
+                        # Ne pas enregistrer les articles avec quantité 0
+                        if form.cleaned_data.get("quantity_reserved", 0) > 0:
+                            form.save()
                 if formset.is_valid():
                     formset.save()
                     messages.success(request, _("Réservation modifiée avec succès"))

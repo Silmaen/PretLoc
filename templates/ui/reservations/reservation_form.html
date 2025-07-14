@@ -61,7 +61,7 @@
                             <input type="text" id="{{ form.checkout_date.id_for_label }}"
                                    name="{{ form.checkout_date.name }}"
                                    placeholder="{% trans 'Sélectionner une date' %}"
-                                   {% if reservation %}value="{{ reservation.checkout_date }}" {% endif %}
+                                   {% if reservation %}value="{{ reservation.checkout_date|date:'Y-m-d H:i' }}" {% endif %}
                                    class="datepicker" data-input required>
                             <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
                                 <i class="fas fa-calendar-alt"></i>
@@ -84,7 +84,7 @@
                         <div class="flatpickr-wrapper">
                             <input type="text" id="{{ form.return_date.id_for_label }}" name="{{ form.return_date.name }}"
                                    placeholder="{% trans 'Sélectionner une date' %}"
-                                   {% if reservation %}value="{{ reservation.return_date }}" {% endif %}
+                                   {% if reservation %}value="{{ reservation.return_date|date:'Y-m-d H:i' }}" {% endif %}
                                    class="datepicker" data-input required>
                             <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
                                 <i class="fas fa-calendar-alt"></i>
@@ -163,7 +163,6 @@
                         <td style="text-align: center;">
                             {% if formset.can_delete %}
                             <div style="display: flex; align-items: center; justify-content: center;">
-                                {{ form.DELETE }}
                                 <label for="{{ form.DELETE.id_for_label }}" class="action-button danger"
                                        style="cursor: pointer;">
                                     <i class="fas fa-trash"></i>
@@ -203,212 +202,320 @@
 {% endblock %}
 
 {% block extra_js %}
-{% include "includes/flatpickr_script_reservation.html" %}
-<!-- Script pour gérer l'ajout dynamique de lignes au formset -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const formsetContainer = document.getElementById('formset-table').querySelector('tbody');
-        const addButton = document.getElementById('add-item-button');
-        const totalForms = document.getElementById('id_items-TOTAL_FORMS');
-        const initialForms = document.getElementById('id_items-INITIAL_FORMS');
-
-        // Ajouter une nouvelle ligne
-        addButton.addEventListener('click', function () {
-            const formCount = parseInt(totalForms.value);
-            const newRow = formsetContainer.querySelector('.formset-row').cloneNode(true);
-
-            // Mettre à jour les attributs name et id des éléments du nouveau formulaire
-            updateElementAttributes(newRow, formCount);
-
-            // Vider les valeurs
-            newRow.querySelectorAll('input:not([type="checkbox"]), select').forEach(input => {
-                input.value = '';
-            });
-
-            // Décocher la case de suppression
-            const deleteCheckbox = newRow.querySelector('input[type="checkbox"]');
-            if (deleteCheckbox) {
-                deleteCheckbox.checked = false;
-            }
-
-            // Ajouter la nouvelle ligne au tableau
-            formsetContainer.appendChild(newRow);
-
-            // Mettre à jour le total
-            totalForms.value = formCount + 1;
-        });
-
-        // Fonction pour mettre à jour les attributs des éléments
-        function updateElementAttributes(row, index) {
-            row.querySelectorAll('input, select').forEach(element => {
-                const name = element.getAttribute('name');
-                if (name) {
-                    const newName = name.replace(/items-\d+/, `items-${index}`);
-                    element.setAttribute('name', newName);
-
-                    const id = element.getAttribute('id');
-                    if (id) {
-                        const newId = id.replace(/items-\d+/, `items-${index}`);
-                        element.setAttribute('id', newId);
-                    }
-                }
-            });
-
-            // Mettre à jour les labels également
-            row.querySelectorAll('label').forEach(label => {
-                const forAttr = label.getAttribute('for');
-                if (forAttr) {
-                    const newForAttr = forAttr.replace(/items-\d+/, `items-${index}`);
-                    label.setAttribute('for', newForAttr);
-                }
-            });
-        }
-    });
+{% get_current_language as CURRENT_LANGUAGE %}
+let currentLang = "{{ CURRENT_LANGUAGE }}";
+if (currentLang === 'en') {
+    currentLang = "en-GB"
+}
 </script>
+{% include "includes/flatpickr_script_reservation.html" %}
 <!-- D'abord jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Inclure le JS de Select2 en bas de page -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- Script pour gérer l'ajout dynamique de lignes au formset -->
+
 <script>
-    $(document).ready(function () {
-        // Initialiser Select2 sur le champ de sélection de client
-        $('#id_customer').select2({
-            placeholder: "{% trans 'Rechercher un client...' %}",
-            allowClear: true,
-            width: '100%',
-            language: "fr",
-            // Pour la recherche améliorée
-            minimumInputLength: 2,
-            templateResult: formatClient,
-            templateSelection: formatClientSelection
+<!-- Script pour gérer la sélection des articles -->
+$(document).ready(function () {
+    // Initialisation des éléments existants
+    initializeFormset();
+
+    // Fonction pour initialiser le formset
+    function initializeFormset() {
+        // Initialiser Select2 pour tous les champs d'articles existants
+        $('.formset-row').each(function (index) {
+            $(this).find('select[name$="-asset"]').each(function () {
+                initAssetSelect(this);
+            });
         });
+    }
 
-        // Format personnalisé pour les résultats dans la liste déroulante
-        function formatClient(client) {
-            if (!client.id) return client.text;
+    // Créer une barre d'actions contenant le filtre de catégories et le bouton d'ajout
+    let addButtonContainer = $('#add-item-button').parent();
+    // Remplacer le contenu par une barre d'actions flexible
+    addButtonContainer.html('').addClass('actions-bar');
 
-            // Vous pouvez ajouter des informations supplémentaires comme l'email
-            // Note: Cela nécessite d'adapter vos données côté serveur
-            if (client.email) {
-                return $(`<div>
-                    <strong>${client.text}</strong><br>
-                    <small><i class="fas fa-envelope"></i> ${client.email}</small>
-                </div>`);
+    // Créer le filtre de catégories
+    let categoryFilter = $('<div class="filter-group" style="flex: 1;">' +
+        '<div class="filter-label"><i class="fas fa-filter"></i> {% trans "Catégorie" %}:</div>' +
+        '<select id="category-filter" class="search-input" style="max-width: 200px;">' +
+        '<option value="">{% trans "Toutes les catégories" %}</option>' +
+        {% for category in categories %}
+        '<option value="{{ category.id }}">{{ category.name }}</option>' +
+        {% endfor %}
+        '</select>' +
+        '</div>');
+
+
+    // Créer le bouton d'ajout
+    let addButton = $('<button type="button" id="add-item-button" class="auth-button" style="max-width: 200px;">' +
+        '<i class="fas fa-plus"></i> {% trans "Ajouter un article" %}' +
+        '</button>'
+    );
+
+    // Ajouter les éléments à la barre d'actions
+    addButtonContainer.append(categoryFilter).append(addButton);
+
+    // Mettre à jour les attributs des éléments de formulaire
+    function updateElementAttributes(row, index) {
+        // Mettre à jour les attributs name et id pour tous les champs
+        row.find('input, select, label').each(function () {
+            let element = $(this);
+            let name = element.attr('name');
+            let id = element.attr('id');
+            let for_attr = element.attr('for');
+
+            if (name) {
+                // Remplacer le numéro d'index dans le nom
+                let newName = name.replace(/-\d+-/, '-' + index + '-');
+                element.attr('name', newName);
             }
 
-            return client.text;
-        }
+            if (id) {
+                // Remplacer le numéro d'index dans l'id
+                let newId = id.replace(/-\d+-/, '-' + index + '-');
+                element.attr('id', newId);
 
-        // Format personnalisé pour l'élément sélectionné
-        function formatClientSelection(client) {
-            return client.text;
-        }
+                // Mettre à jour les attributs for des labels associés
+                row.find('label[for="' + id + '"]').attr('for', newId);
+            }
+            if (for_attr) {
+                let newFor = for_attr.replace(/items-\d+/, 'items-' + index);
+                element.attr('for', newFor);
+            }
+        });
+    }
 
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        // Créer une barre d'actions contenant le filtre de catégories et le bouton d'ajout
-        let addButtonContainer = $('#add-item-button').parent();
-        // Remplacer le contenu par une barre d'actions flexible
-        addButtonContainer.html('').addClass('actions-bar');
+    // Gestionnaire pour les boutons de suppression
+    $(document).on('click', '.formset-row label.action-button.danger', function () {
+        // Obtenir la ligne du tableau
+        const row = $(this).closest('.formset-row');
 
-        // Créer le filtre de catégories
-        let categoryFilter = $('<div class="filter-group" style="flex: 1;">' +
-            '<div class="filter-label"><i class="fas fa-filter"></i> {% trans "Catégorie" %}:</div>' +
-            '<select id="category-filter" class="search-input" style="max-width: 200px;">' +
-            '<option value="">{% trans "Toutes les catégories" %}</option>' +
-            {% for category in categories %}
-            '<option value="{{ category.id }}">{{ category.name }}</option>' +
-            {% endfor %}
-            '</select>' +
-            '</div>'
-        );
+        // Vérifier si c'est la dernière ligne
+        if ($('.formset-row').length > 1) {
+            // Supprimer la ligne du DOM
+            row.remove();
 
-        // Créer le bouton d'ajout
-        let addButton = $('<button type="button" id="add-item-button" class="auth-button" style="max-width: 200px;">' +
-            '<i class="fas fa-plus"></i> {% trans "Ajouter un article" %}' +
-            '</button>'
-        );
-
-        // Ajouter les éléments à la barre d'actions
-        addButtonContainer.append(categoryFilter).append(addButton);
-
-        // Fonction pour initialiser Select2 sur un champ d'article
-        function initAssetSelect(element) {
-            $(element).select2({
-                placeholder: "{% trans 'Rechercher un article...' %}",
-                allowClear: true,
-                width: '100%',
-                language: "fr",
-                ajax: {
-                    url: "{% url 'ui:search_assets' %}",
-                    dataType: 'json',
-                    delay: 300,
-                    data: function(params) {
-                        // Récupérer les IDs des articles déjà sélectionnés
-                        let selectedAssets = [];
-                        $('.formset-row:not(.d-none) select[name$="-asset"]').each(function() {
-                            let val = $(this).val();
-                            if (val) selectedAssets.push(val);
-                        });
-
-                        return {
-                            q: params.term || '',
-                            category: $('#category-filter').val(),
-                            exclude: selectedAssets
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.results
-                        };
-                    }
-                },
-                templateResult: formatAssetResult,
-                templateSelection: formatAssetSelection
+            // Réindexer les lignes restantes
+            $('.formset-row').each(function (index) {
+                updateElementAttributes($(this), index);
             });
+
+            // Mettre à jour le nombre total de formulaires
+            $('#id_items-TOTAL_FORMS').val($('.formset-row').length);
+        } else {
+            // Si c'est la dernière ligne, juste la vider au lieu de la supprimer
+            row.find('input:not([type="checkbox"]), select').val('');
+            row.find('select').trigger('change');
+
+            // Initialiser la quantité à 0
+            row.find('input[name$="-quantity_reserved"]').val('0');
         }
+    });
 
-        // Format des résultats dans la liste déroulante
-        function formatAssetResult(asset) {
-            if (!asset.id) return asset.text;
+    addButton.on('click', function () {
+        const formsetContainer = $('#formset-table tbody');
+        const totalForms = $('#id_items-TOTAL_FORMS');
+        const formCount = parseInt(totalForms.val());
+        const newRow = formsetContainer.find('.formset-row').first().clone();
 
-            return $('<div class="select2-result-asset">' +
-                    '<strong>' + asset.text + '</strong>' +
-                    '<div style="display: flex; justify-content: space-between; font-size: 0.8em;">' +
-                    '<span><i class="fas fa-tag"></i> ' + asset.category + '</span>' +
-                    '<span><i class="fas fa-boxes"></i>{% trans "Stock:" %} ' + asset.stock + ' / ' + asset.stock_total + '</span>' +
-                    '<span><i class="fas fa-euro-sign"></i> ' + asset.rental_value + ' €</span>' +
-                    '</div>' +
-                    '</div>');
-        }
+        // Mettre à jour les attributs name et id
+        updateElementAttributes(newRow, formCount);
 
-        // Format de l'élément sélectionné
-        function formatAssetSelection(asset) {
-            return asset.text || asset.id;
-        }
+        // Vider les valeurs
+        newRow.find('input:not([type="checkbox"]), select').val('');
+        // Initialiser la quantité à 0
+        newRow.find('input[name$="-quantity_reserved"]').val('0');
 
-        // Initialiser Select2 sur tous les champs d'articles existants
-        $('.formset-row select[name$="-asset"]').each(function() {
+        // Supprimer les éléments select2 existants dans le clone
+        newRow.find('.select2-container').remove();
+
+
+        // Ajouter la nouvelle ligne
+        formsetContainer.append(newRow);
+
+        // Mettre à jour le total
+        totalForms.val(formCount + 1);
+
+        // Initialiser Select2 sur le nouvel élément
+        newRow.find('select[name$="-asset"]').each(function () {
             initAssetSelect(this);
         });
+    });
 
-        // Filtrage par catégorie
-        $('#category-filter').change(function() {
-            // Réinitialiser toutes les sélections d'articles
-            // $('.formset-row select[name$="-asset"]').val(null).trigger('change');
+    // Intercepter la soumission du formulaire pour traiter les lignes vides
+    $('#reservation-form').on('submit', function (e) {
+        /// Supprimer les lignes vides ou avec quantité 0 avant soumission
+        $('.formset-row').each(function () {
+            const row = $(this);
+            const assetSelect = row.find('select[name$="-asset"]');
+            const quantityInput = row.find('input[name$="-quantity_reserved"]');
+
+            // Si l'article n'est pas sélectionné ou la quantité est 0, supprimer la ligne
+            if (!assetSelect.val() || parseInt(quantityInput.val()) === 0) {
+                if ($('.formset-row').length > 1) {
+                    row.remove();
+                } else {
+                    // Ne pas soumettre si la seule ligne est vide
+                    e.preventDefault();
+                    return false;
+                }
+            }
         });
 
-        // Initialiser Select2 sur les nouvelles lignes ajoutées
-        $('#add-item-button').click(function() {
-            // Attendre que le DOM soit mis à jour
-            setTimeout(function() {
-                $('.formset-row:last select[name$="-asset"]').each(function() {
-                    initAssetSelect(this);
+        // Réindexer les lignes après suppression
+        if ($('.formset-row').length > 0) {
+            $('.formset-row').each(function (index) {
+                updateElementAttributes($(this), index);
+            });
+
+            // Mettre à jour le nombre total de formulaires
+            $('#id_items-TOTAL_FORMS').val($('.formset-row').length);
+        }
+    });
+
+    // Fonction pour initialiser Select2 sur un champ d'article
+    function initAssetSelect(element) {
+        $(element).select2({
+            placeholder: "{% trans 'Rechercher un article...' %}",
+            allowClear: true,
+            width: '100%',
+            language: currentLang,
+            ajax: {
+                url: "{% url 'ui:search_assets' %}",
+                dataType: 'json',
+                delay: 300,
+                data: function (params) {
+                    // Récupérer les IDs des articles déjà sélectionnés
+                    let selectedAssets = [];
+                    $('.formset-row:not(.d-none) select[name$="-asset"]').each(function () {
+                        let val = $(this).val();
+                        if (val) selectedAssets.push(val);
+                    });
+
+                    return {
+                        q: params.term || '',
+                        category: $('#category-filter').val(),
+                        exclude: selectedAssets
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                }
+            },
+            templateResult: formatAsset,
+        }).on('select2:select', function (e) {
+            // Récupérer les informations sur l'article sélectionné
+            const data = e.params.data;
+
+            // Trouver la quantité dans la même ligne
+            const row = $(this).closest('.formset-row');
+            const quantityField = row.find('input[name$="-quantity_reserved"]');
+
+            // Initialiser la quantité à 0 pour un nouvel article
+            if (!quantityField.val()) {
+                quantityField.val('0');
+            }
+        });
+    }
+
+    // Format des résultats dans la liste déroulante
+    function formatAsset(asset) {
+        if (!asset.id) return asset.text;
+
+        return $('<div class="select2-result-asset">' +
+            '<strong>' + asset.text + '</strong>' +
+            '<div style="display: flex; justify-content: space-between; font-size: 0.8em;">' +
+            '<span><i class="fas fa-tag"></i> ' + asset.category + '</span>' +
+            '<span><i class="fas fa-boxes"></i>{% trans "Stock:" %} ' + asset.stock + ' / ' + asset.stock_total + '</span>' +
+            '<span><i class="fas fa-euro-sign"></i> ' + asset.rental_value + ' €</span>' +
+            '</div>' +
+            '</div>');
+    }
+
+
+    // Filtrer les articles par catégorie
+    $('#category-filter').on('change', function () {
+        const selectedCategory = $(this).val();
+
+        // Appliquer le filtre uniquement aux nouveaux champs de sélection
+        $('.formset-row select[name$="-asset"]').each(function () {
+            const currentValue = $(this).val();
+            if (!currentValue) { // Ne modifier que les champs vides
+                $(this).select2({
+                    placeholder: "{% trans 'Rechercher un article...' %}",
+                    allowClear: true,
+                    width: '100%',
+                    language: currentLang,
+                    ajax: {
+                        url: "{% url 'ui:search_assets' %}",
+                        dataType: 'json',
+                        delay: 300,
+                        data: function (params) {
+                            let selectedAssets = [];
+                            $('.formset-row select[name$="-asset"]').each(function () {
+                                let val = $(this).val();
+                                if (val) selectedAssets.push(val);
+                            });
+
+                            return {
+                                q: params.term || '',
+                                category: selectedCategory, // Appliquer le filtre de catégorie
+                                exclude: selectedAssets
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.results
+                            };
+                        }
+                    },
+                    templateResult: formatAsset,
                 });
-            }, 100);
+            };
         });
     });
+});
+</script>
+
+<!-- script pour le formatage des clients dans la liste déroulante -->
+<script>
+$(document).ready(function () {
+    // Initialiser Select2 sur le champ de sélection de client
+    $('#id_customer').select2({
+        placeholder: "{% trans 'Rechercher un client...' %}",
+        allowClear: true,
+        width: '100%',
+        language: currentLang,
+        templateResult: formatClient,
+        templateSelection: formatClientSelection
+    });
+
+    // Format personnalisé pour les résultats dans la liste déroulante
+    function formatClient(client) {
+        if (!client.id) return client.text;
+
+        // Vous pouvez ajouter des informations supplémentaires comme l'email
+        // Note: Cela nécessite d'adapter vos données côté serveur
+        if (client.email) {
+            return $(`<div>
+                <strong>${client.text}</strong><br>
+                <small><i class="fas fa-envelope"></i> ${client.email}</small>
+            </div>`);
+        }
+
+        return client.text;
+    }
+
+    // Format personnalisé pour l'élément sélectionné
+    function formatClientSelection(client) {
+        return client.text;
+    }
+
+});
 </script>
 {% endblock %}

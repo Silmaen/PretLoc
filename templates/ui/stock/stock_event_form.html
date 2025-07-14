@@ -85,7 +85,7 @@
                     <input type="text" id="{{ form.date.id_for_label }}"
                            name="{{ form.date.name }}"
                            placeholder="{% trans 'Sélectionner une date' %}"
-                           {% if reservation %}value="{{ reservation.checkout_date }}" {% endif %}
+                           {% if reservation %}value="{{ reservation.checkout_date|date:'Y-m-d H:i' }}" {% endif %}
                            class="datepicker" data-input required>
                     <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
                         <i class="fas fa-calendar-alt"></i>

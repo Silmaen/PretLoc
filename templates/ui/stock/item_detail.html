@@ -100,7 +100,7 @@
                 <div class="filters-row" style="flex-wrap: unset; align-items: center;">
                     <label for="start_date">{% trans "Du" %}</label>
                     <div class="flatpickr-wrapper">
-                        <input type="text" id="start_date" name="start_date" value="{{ start_date }}"
+                        <input type="text" id="start_date" name="start_date" value="{{ start_date|date:'Y-m-d H:i' }}"
                                class="datepicker" data-input>
                         <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
                             <i class="fas fa-calendar-alt"></i>
@@ -108,7 +108,7 @@
                     </div>
                     <label for="end_date">{% trans "Au" %}</label>
                     <div class="flatpickr-wrapper">
-                        <input type="text" id="end_date" name="end_date" value="{{ end_date }}"
+                        <input type="text" id="end_date" name="end_date" value="{{ end_date |date:'Y-m-d H:i'}}"
                                class="datepicker" data-input>
                         <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
                             <i class="fas fa-calendar-alt"></i>
