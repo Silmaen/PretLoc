@@ -4,17 +4,21 @@ views.py
 defines the views for the UI application, including a health check endpoint.
 """
 
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import IntegerField, Value, Q
+from django.db.models.expressions import Case, When
 from django.forms import inlineformset_factory
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.decorators import user_type_required, get_capability
-from .computations import get_asset_status_at_date
+from .computations import get_asset_status_at_date, analyze_asset_availability
 from .forms import (
     CategoryForm,
     AssetForm,
@@ -45,6 +49,18 @@ def stock_view(request):
     direction = request.GET.get("direction", "asc")  # Par défaut, ordre ascendant
     search_query = request.GET.get("search", "")  # Récupération de la recherche
 
+    # Récupérer la date sélectionnée ou utiliser la date actuelle par défaut
+    stock_date = request.GET.get("stock_date")
+    if stock_date:
+        try:
+            stock_date = timezone.make_aware(
+                datetime.datetime.strptime(stock_date, "%Y-%m-%dTH:M")
+            )
+        except ValueError:
+            stock_date = timezone.now()
+    else:
+        stock_date = timezone.now()
+
     # Déterminer le champ de tri
     if sort == "category":
         order_by = "category__name"  # Pour trier par nom de catégorie
@@ -59,10 +75,11 @@ def stock_view(request):
     filters = {}
 
     # Filtrer par catégorie si spécifiée
-    if category_id:
+    if category_id not in [None, "", "None"]:
         filters["category_id"] = category_id
         current_category = get_object_or_404(Category, id=category_id)
     else:
+        category_id = None
         current_category = None
 
     # Filtrer par recherche si spécifiée
@@ -76,6 +93,10 @@ def stock_view(request):
     else:
         items = Asset.objects.filter(**filters).order_by(order_by)
 
+    # Calculer l'état du stock pour chaque article à la date spécifiée
+    for item in items:
+        item.stock_status = get_asset_status_at_date(item, stock_date)
+
     context = {
         "items": items,
         "categories": categories,
@@ -84,6 +105,7 @@ def stock_view(request):
         "sort": sort,
         "direction": direction,
         "search_query": search_query,  # Ajouter la recherche au contexte
+        "stock_date": stock_date,
         "capability": get_capability(request.user),
     }
     return render(request, "ui/stock/list.html", context)
@@ -229,8 +251,6 @@ def item_delete(request, pk):
 @user_type_required("member")
 def item_detail(request, pk):
     """Vue pour afficher les détails d'un article"""
-    from django.utils import timezone
-    import datetime
 
     item = get_object_or_404(Asset, pk=pk)
 
@@ -425,8 +445,6 @@ def reservation_list(request):
 
     # Cas spécial pour le tri par statut (ordre personnalisé)
     if sort == "status":
-        from django.db.models.expressions import Case, When
-        from django.db.models import IntegerField, Value
 
         # Définir l'ordre personnalisé: created, validated, checked_out, returned, cancelled
         status_order = {
@@ -697,9 +715,7 @@ def reservation_checkout(request, pk):
                 if actual_date:
                     reservation.actual_checkout_date = actual_date
                 else:
-                    from datetime import date
-
-                    reservation.actual_checkout_date = date.today()
+                    reservation.actual_checkout_date = timezone.now()
                 reservation.notes = request.POST.get("notes", reservation.notes)
                 reservation.save()
 
@@ -779,9 +795,7 @@ def reservation_return(request, pk):
                 if actual_date:
                     reservation.actual_return_date = actual_date
                 else:
-                    from datetime import date
-
-                    reservation.actual_return_date = date.today()
+                    reservation.actual_return_date = timezone.now()
 
                 reservation.save()
 
@@ -836,6 +850,8 @@ def search_assets(request):
     category_id = request.GET.get("category", None)
     # Récupérer les IDs d'articles déjà dans la réservation
     excluded_ids = request.GET.getlist("exclude[]", [])
+    start_date = request.GET.get("start_date", timezone.now())
+    end_date = request.GET.get("end_date", None)
 
     assets = Asset.objects.filter(stock_quantity__gt=0)
 
@@ -846,7 +862,7 @@ def search_assets(request):
     # Recherche par nom ou description
     if query:
         assets = assets.filter(
-            models.Q(name__icontains=query) | models.Q(description__icontains=query)
+            Q(name__icontains=query) | Q(description__icontains=query)
         )
 
     # Exclure les articles déjà sélectionnés
@@ -856,17 +872,25 @@ def search_assets(request):
     # Trier par catégorie puis par nom
     assets = assets.order_by("category__name", "name")
     # Limiter les résultats et formater la réponse
-    # assets = assets[:20]  # Limite à 20 résultats
-    results = [
-        {
+    results = []
+    for asset in assets:
+        r_asset = {
             "id": asset.id,
             "text": asset.name,
             "category": asset.category.name,
-            "stock": asset.stock_quantity,
             "rental_value": float(asset.rental_value),
         }
-        for asset in assets
-    ]
+        if end_date:
+            # Calculer les quantités disponibles à la date de fin
+            quantities = analyze_asset_availability(asset, start_date, end_date)
+        else:
+            quantities = get_asset_status_at_date(asset, start_date)
+        r_asset["stock"] = quantities["available"]
+        r_asset["stock_total"] = quantities["total"]
+        r_asset["stock_damaged"] = quantities["damaged"]
+        r_asset["stock_checked_out"] = quantities["checked_out"]
+        r_asset["stock_reserved"] = quantities["reserved"]
+        results.append(r_asset)
 
     return JsonResponse({"results": results})
 

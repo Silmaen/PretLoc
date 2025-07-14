@@ -304,9 +304,12 @@
             return client.text;
         }
 
+    });
+</script>
+<script>
+    $(document).ready(function () {
         // Créer une barre d'actions contenant le filtre de catégories et le bouton d'ajout
         let addButtonContainer = $('#add-item-button').parent();
-
         // Remplacer le contenu par une barre d'actions flexible
         addButtonContainer.html('').addClass('actions-bar');
 
@@ -375,7 +378,7 @@
                     '<strong>' + asset.text + '</strong>' +
                     '<div style="display: flex; justify-content: space-between; font-size: 0.8em;">' +
                     '<span><i class="fas fa-tag"></i> ' + asset.category + '</span>' +
-                    '<span><i class="fas fa-boxes"></i> Stock: ' + asset.stock + '</span>' +
+                    '<span><i class="fas fa-boxes"></i>{% trans "Stock:" %} ' + asset.stock + ' / ' + asset.stock_total + '</span>' +
                     '<span><i class="fas fa-euro-sign"></i> ' + asset.rental_value + ' €</span>' +
                     '</div>' +
                     '</div>');

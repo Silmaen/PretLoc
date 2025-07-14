@@ -30,35 +30,35 @@
                     <i class="fas fa-boxes"></i>
                     <div class="quantity-info">
                         <span class="quantity-value">{{ quantities.total }}</span>
-                        <span class="quantity-label">Total</span>
+                        <span class="quantity-label">{% trans "Total" %}</span>
                     </div>
                 </div>
                 <div class="quantity-badge available">
                     <i class="fas fa-check-circle"></i>
                     <div class="quantity-info">
                         <span class="quantity-value">{{ quantities.available }}</span>
-                        <span class="quantity-label">Disponibles</span>
+                        <span class="quantity-label">{% trans "Disponibles" %}</span>
                     </div>
                 </div>
                 <div class="quantity-badge reserved">
                     <i class="fas fa-calendar-check"></i>
                     <div class="quantity-info">
                         <span class="quantity-value">{{ quantities.reserved }}</span>
-                        <span class="quantity-label">Réservés</span>
+                        <span class="quantity-label">{% trans "Réservés" %}</span>
                     </div>
                 </div>
                 <div class="quantity-badge checked-out">
                     <i class="fas fa-sign-out-alt"></i>
                     <div class="quantity-info">
                         <span class="quantity-value">{{ quantities.checked_out }}</span>
-                        <span class="quantity-label">En prêt</span>
+                        <span class="quantity-label">{% trans "En prêt" %}</span>
                     </div>
                 </div>
                 <div class="quantity-badge damaged">
                     <i class="fas fa-tools"></i>
                     <div class="quantity-info">
                         <span class="quantity-value">{{ quantities.damaged }}</span>
-                        <span class="quantity-label">En panne</span>
+                        <span class="quantity-label">{% trans "En panne" %}</span>
                     </div>
                 </div>
             </div>

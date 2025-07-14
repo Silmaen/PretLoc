@@ -24,7 +24,17 @@
             altFormat: "j F Y H:i",
             time_24hr: true,
             locale: currentLang,  // Utiliser la langue actuelle
-            allowInput: true
+            minuteIncrement: 10,
+            allowInput: true,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                // Ajouter des classes pour les lundis (1) et vendredis (5)
+                const dayOfWeek = dayElem.dateObj.getDay();
+                if (dayOfWeek === 1) {
+                    dayElem.classList.add('lundi');
+                } else if (dayOfWeek === 5) {
+                    dayElem.classList.add('vendredi');
+                }
+            }
         };
 
         // Initialiser Flatpickr sur les champs date

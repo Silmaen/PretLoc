@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
+
+
+{% block extra_css %}
+<!-- CSS Select2 pour la recherche avancée -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="{% static 'css/select2.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="auth-container">
@@ -14,7 +22,7 @@
 
             <div class="form-group">
                 <label for="{{ form.asset.id_for_label }}">
-                    <i class="fas fa-box"></i> {% trans "Article" %}
+                    <i class="fas fa-box"></i> {{ form.asset.label }}
                 </label>
                 {{ form.asset }}
                 {% if form.asset.errors %}
@@ -33,7 +41,7 @@
 
             <div class="form-group">
                 <label for="{{ form.event_type.id_for_label }}">
-                    <i class="fas fa-tag"></i> {% trans "Type d'événement" %}
+                    <i class="fas fa-tag"></i> {{ form.event_type.label }}
                 </label>
                 {{ form.event_type }}
                 {% if form.event_type.errors %}
@@ -52,7 +60,7 @@
 
             <div class="form-group">
                 <label for="{{ form.quantity.id_for_label }}">
-                    <i class="fas fa-sort-amount-up"></i> {% trans "Quantité" %}
+                    <i class="fas fa-sort-amount-up"></i> {{ form.quantity.label }}
                 </label>
                 {{ form.quantity }}
                 {% if form.quantity.errors %}
@@ -71,7 +79,7 @@
 
             <div class="form-group">
                 <label for="{{ form.date.id_for_label }}">
-                    <i class="fas fa-calendar-alt"></i> {% trans "Date" %}
+                    <i class="fas fa-calendar-alt"></i> {{ form.date.label }}
                 </label>
                 <div class="flatpickr-wrapper">
                     <input type="text" id="{{ form.date.id_for_label }}"
@@ -99,7 +107,7 @@
 
             <div class="form-group">
                 <label for="{{ form.description.id_for_label }}">
-                    <i class="fas fa-sticky-note"></i> {% trans "Description" %}
+                    <i class="fas fa-sticky-note"></i> {{ form.notes.label }}
                 </label>
                 {{ form.description }}
                 {% if form.description.errors %}
@@ -131,4 +139,55 @@
 
 {% block extra_js %}
 {% include "includes/flatpickr_script.html" %}
+
+<!-- Scripts pour Select2 -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Initialiser Select2 sur le champ de sélection d'article
+        $('#{{ form.asset.id_for_label }}').select2({
+            placeholder: "{% trans 'Rechercher un article...' %}",
+            allowClear: true,
+            width: '100%',
+            language: "fr",
+            ajax: {
+                url: "{% url 'ui:search_assets' %}",
+                dataType: 'json',
+                delay: 300,
+                data: function (params) {
+                    return {
+                        q: params.term || ''
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                }
+            },
+            templateResult: formatAssetResult,
+            templateSelection: formatAssetSelection
+        });
+
+        // Format des résultats dans la liste déroulante
+        function formatAssetResult(asset) {
+            if (!asset.id) return asset.text;
+
+            return $('<div class="select2-result-asset">' +
+                '<strong>' + asset.text + '</strong>' +
+                '<div style="display: flex; justify-content: space-between; font-size: 0.8em;">' +
+                '<span><i class="fas fa-tag"></i> ' + asset.category + '</span>' +
+                '<span><i class="fas fa-boxes"></i>{% trans "Stock:" %} ' + asset.stock + ' / ' + asset.stock_total + '</span>' +
+                '<span><i class="fas fa-euro-sign"></i> ' + asset.rental_value + ' €</span>' +
+                '</div>' +
+                '</div>');
+        }
+
+        // Format de l'élément sélectionné
+        function formatAssetSelection(asset) {
+            return asset.text || asset.id;
+        }
+    });
+</script>
 {% endblock %}

@@ -93,3 +93,107 @@ def get_asset_status_at_date(asset, date=None):
         "available": available_count,
         "total": total_stock,
     }
+
+
+def analyze_asset_availability(asset, start_date, end_date):
+    """
+    Analyse la disponibilité d'un article sur une période donnée.
+    Calcule les valeurs critiques: stock minimal, maximum de produits endommagés,
+    maximum de produits sortis ou réservés et minimum de produits disponibles.
+
+    Args:
+        asset: L'article (Asset)
+        start_date: Date de début de la période
+        end_date: Date de fin de la période (doit être postérieure à start_date)
+
+    Returns:
+        dict: Valeurs critiques sur la période:
+            - min_total: stock total minimum
+            - max_damaged: nombre maximum en panne
+            - max_checked_out: nombre maximum sorti en prêt
+            - max_reserved: nombre maximum réservé
+            - min_available: nombre minimum disponible
+    """
+    # Validation des dates
+    if start_date > end_date:
+        raise {
+            "total": 0,
+            "damaged": 0,
+            "checked_out": 0,
+            "reserved": 0,
+            "available": 0,
+        }
+
+    # 1. Collecter toutes les dates critiques (points de changement potentiels)
+    critical_dates = set([start_date, end_date])
+
+    # Ajouter les dates des événements de stock
+    stock_events = StockEvent.objects.filter(
+        asset=asset, date__gte=start_date, date__lte=end_date
+    ).order_by("date")
+
+    for event in stock_events:
+        critical_dates.add(event.date)
+
+    # Ajouter les dates de début et fin des réservations qui intersectent la période
+    reservations = asset.reservationitem_set.filter(
+        Q(reservation__checkout_date__lte=end_date)
+        & (
+                Q(reservation__return_date__gte=start_date)
+                | Q(reservation__actual_return_date__isnull=True)
+                | Q(reservation__actual_return_date__gte=start_date)
+        )
+    ).select_related("reservation")
+
+    for item in reservations:
+        if start_date <= item.reservation.checkout_date <= end_date:
+            critical_dates.add(item.reservation.checkout_date)
+        if (
+                item.reservation.actual_checkout_date
+                and start_date <= item.reservation.actual_checkout_date <= end_date
+        ):
+            critical_dates.add(item.reservation.actual_checkout_date)
+        if (
+                item.reservation.return_date
+                and start_date <= item.reservation.return_date <= end_date
+        ):
+            critical_dates.add(item.reservation.return_date)
+        if (
+                item.reservation.actual_return_date
+                and start_date <= item.reservation.actual_return_date <= end_date
+        ):
+            critical_dates.add(item.reservation.actual_return_date)
+
+    # 2. Calculer l'état à chaque date critique et garder les valeurs extrêmes
+    min_total = float("inf")
+    max_damaged = 0
+    max_checked_out = 0
+    max_reserved = 0
+    min_available = float("inf")
+
+    # Ordonner les dates
+    critical_dates = sorted(list(critical_dates))
+
+    for date in critical_dates:
+        status = get_asset_status_at_date(asset, date)
+
+        # Mettre à jour les valeurs extrêmes
+        min_total = min(min_total, status["total"])
+        max_damaged = max(max_damaged, status["damaged"])
+        max_checked_out = max(max_checked_out, status["checked_out"])
+        max_reserved = max(max_reserved, status["reserved"])
+        min_available = min(min_available, status["available"])
+
+    # Si aucune donnée n'a été trouvée, min_total sera toujours à l'infini
+    if min_total == float("inf"):
+        min_total = 0
+    if min_available == float("inf"):
+        min_available = 0
+
+    return {
+        "total": min_total,
+        "damaged": max_damaged,
+        "checked_out": max_checked_out,
+        "reserved": max_reserved,
+        "available": min_available,
+    }
