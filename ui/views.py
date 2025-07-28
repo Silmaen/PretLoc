@@ -18,7 +18,11 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.decorators import user_type_required, get_capability
-from .computations import get_asset_status_at_date, analyze_asset_availability
+from .computations import (
+    get_asset_status_at_date,
+    analyze_asset_availability,
+    check_reservation_availability,
+)
 from .forms import (
     CategoryForm,
     AssetForm,
@@ -508,6 +512,14 @@ def reservation_list(request):
     else:
         reservations = reservations_query.filter(**filters).order_by(order_by)
 
+    for reservation in reservations:
+        if reservation.status in ["created", "validated"]:
+            # Calculer la disponibilité des articles pour les réservations en cours
+            check_result = check_reservation_availability(reservation)
+            reservation.is_ok = check_result["is_ok"]
+        else:
+            reservation.is_ok = True
+
     context = {
         "reservations": reservations,
         "search_query": search_query,
@@ -526,6 +538,19 @@ def reservation_detail(request, pk):
     """Vue pour afficher les détails d'une réservation"""
     reservation = get_object_or_404(Reservation, pk=pk)
     items = reservation.items.all().order_by("asset__category__name", "asset__name")
+
+    if reservation.status in ["created", "validated"]:
+        # Calculer la disponibilité des articles pour les réservations en cours
+        check_result = check_reservation_availability(reservation)
+        reservation.is_ok = check_result["is_ok"]
+        for item in items:
+            if item.asset.name in check_result["problematic_items"].keys():
+                item.is_problematic = True
+                item.available = check_result["problematic_items"][item.asset.name][
+                    "available_quantity"
+                ]
+            else:
+                item.is_problematic = False
 
     context = {
         "reservation": reservation,
@@ -787,9 +812,9 @@ def reservation_return(request, pk):
                 destroyed_key = f"destroyed_{item.id}"
 
                 if (
-                        return_key in request.POST
-                        and damaged_key in request.POST
-                        and destroyed_key in request.POST
+                    return_key in request.POST
+                    and damaged_key in request.POST
+                    and destroyed_key in request.POST
                 ):
                     returned_qty = int(request.POST.get(return_key, 0))
                     damaged_qty = int(request.POST.get(damaged_key, 0))
@@ -848,6 +873,40 @@ def reservation_return(request, pk):
 
 @login_required
 @user_type_required("manager")
+def stock_event_create(request, asset_id=None):
+    """Vue pour créer un nouvel événement de stock"""
+    initial = {}
+    if asset_id:
+        asset = get_object_or_404(Asset, pk=asset_id)
+        initial["asset"] = asset
+
+    if request.method == "POST":
+        form = StockEventForm(request.POST, initial=initial)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.user = request.user
+
+            # Sauvegarder les changements
+            with transaction.atomic():
+                event.save()
+
+            messages.success(request, _("Événement de stock enregistré avec succès"))
+            return redirect("ui:stock")
+    else:
+        form = StockEventForm(initial=initial)
+
+    return render(
+        request,
+        "ui/stock/stock_event_form.html",
+        {
+            "form": form,
+            "capability": get_capability(request.user),
+        },
+    )
+
+
+@login_required
+@user_type_required("manager")
 def search_customers(request):
     search_query = request.GET.get("q", "")
     page = int(request.GET.get("page", 1))
@@ -860,7 +919,7 @@ def search_customers(request):
         | Q(first_name__icontains=search_query)
         | Q(company_name__icontains=search_query)
         | Q(email__icontains=search_query)
-    ).order_by("last_name", "company_name")[offset: offset + page_size + 1]
+    ).order_by("last_name", "company_name")[offset : offset + page_size + 1]
 
     has_more = len(customers) > page_size
     if has_more:
@@ -928,35 +987,12 @@ def search_assets(request):
     return JsonResponse({"results": results})
 
 
-@login_required
-@user_type_required("manager")
-def stock_event_create(request, asset_id=None):
-    """Vue pour créer un nouvel événement de stock"""
-    initial = {}
-    if asset_id:
-        asset = get_object_or_404(Asset, pk=asset_id)
-        initial["asset"] = asset
-
-    if request.method == "POST":
-        form = StockEventForm(request.POST, initial=initial)
-        if form.is_valid():
-            event = form.save(commit=False)
-            event.user = request.user
-
-            # Sauvegarder les changements
-            with transaction.atomic():
-                event.save()
-
-            messages.success(request, _("Événement de stock enregistré avec succès"))
-            return redirect("ui:stock")
-    else:
-        form = StockEventForm(initial=initial)
-
-    return render(
-        request,
-        "ui/stock/stock_event_form.html",
-        {
-            "form": form,
-            "capability": get_capability(request.user),
-        },
-    )
+def check_reservation(request):
+    request.GET.get("res_pk", "")
+    response = {"is_ok": False, "problematic_items": []}
+    if not res_pk:
+        # plus tard, on pourra tester toutes les réservations, ou les filtrer par date...
+        return JsonResponse(response, status=200)
+    reservation = get_object_or_404(Reservation, pk=pk)
+    response = check_reservation_availability(reservation)
+    return JsonResponse(response, status=200)

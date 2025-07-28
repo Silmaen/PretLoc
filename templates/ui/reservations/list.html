@@ -128,7 +128,7 @@
                 </thead>
                 <tbody>
                 {% for reservation in reservations %}
-                <tr>
+                <tr class="{% if not reservation.is_ok %}message-error{% endif %}">
                     <td>
                         <div class="item-info">
                             <span class="item-title">{{ reservation.customer }}</span>
@@ -144,8 +144,20 @@
                     </td>
                     <td>
                         <div class="item-info">
-                            <span><i class="fas fa-arrow-right"></i> {{ reservation.checkout_date }}</span>
-                            <span><i class="fas fa-arrow-left"></i> {{ reservation.return_date }}</span>
+                            <span><i class="fas fa-arrow-right"></i>
+                                {% if reservation.actual_checkout_date %}
+                                {{ reservation.actual_checkout_date }}
+                                {% else %}
+                                {{ reservation.checkout_date }}
+                                {% endif %}
+                            </span>
+                            <span><i class="fas fa-arrow-left"></i>
+                                {% if reservation.actual_return_date %}
+                                {{ reservation.actual_return_date }}
+                                {% else %}
+                                {{ reservation.return_date }}
+                                {% endif %}
+                            </span>
                         </div>
                     </td>
                     <td>

@@ -95,7 +95,7 @@ def get_asset_status_at_date(asset, date=None):
     }
 
 
-def analyze_asset_availability(asset, start_date, end_date):
+def analyze_asset_availability(asset, start_date, end_date, excluded_reservation=None):
     """
     Analyse la disponibilité d'un article sur une période donnée.
     Calcule les valeurs critiques: stock minimal, maximum de produits endommagés,
@@ -105,6 +105,7 @@ def analyze_asset_availability(asset, start_date, end_date):
         asset: L'article (Asset)
         start_date: Date de début de la période
         end_date: Date de fin de la période (doit être postérieure à start_date)
+        excluded_reservation: Réservation à exclure des calculs (optionnel)
 
     Returns:
         dict: Valeurs critiques sur la période:
@@ -124,8 +125,10 @@ def analyze_asset_availability(asset, start_date, end_date):
             "available": 0,
         }
 
+    print(f"Analyzing availability for {asset.name} from {start_date} to {end_date}")
+
     # 1. Collecter toutes les dates critiques (points de changement potentiels)
-    critical_dates = set([start_date, end_date])
+    critical_dates = {start_date, end_date}
 
     # Ajouter les dates des événements de stock
     stock_events = StockEvent.objects.filter(
@@ -136,33 +139,24 @@ def analyze_asset_availability(asset, start_date, end_date):
         critical_dates.add(event.date)
 
     # Ajouter les dates de début et fin des réservations qui intersectent la période
-    reservations = asset.reservationitem_set.filter(
+    reservations = asset.reservation_items.filter(
         Q(reservation__checkout_date__lte=end_date)
         & (
-                Q(reservation__return_date__gte=start_date)
-                | Q(reservation__actual_return_date__isnull=True)
-                | Q(reservation__actual_return_date__gte=start_date)
+            Q(reservation__return_date__gte=start_date)
+            | Q(reservation__actual_return_date__isnull=True)
+            | Q(reservation__actual_return_date__gte=start_date)
         )
+        & ~Q(reservation__status__in=["returned", "cancelled"])
     ).select_related("reservation")
 
+    if excluded_reservation:
+        reservations = reservations.exclude(reservation=excluded_reservation)
+
     for item in reservations:
-        if start_date <= item.reservation.checkout_date <= end_date:
-            critical_dates.add(item.reservation.checkout_date)
-        if (
-                item.reservation.actual_checkout_date
-                and start_date <= item.reservation.actual_checkout_date <= end_date
-        ):
-            critical_dates.add(item.reservation.actual_checkout_date)
-        if (
-                item.reservation.return_date
-                and start_date <= item.reservation.return_date <= end_date
-        ):
-            critical_dates.add(item.reservation.return_date)
-        if (
-                item.reservation.actual_return_date
-                and start_date <= item.reservation.actual_return_date <= end_date
-        ):
-            critical_dates.add(item.reservation.actual_return_date)
+        if start_date <= item.reservation.get_start_date() <= end_date:
+            critical_dates.add(item.reservation.get_start_date())
+        if start_date <= item.reservation.get_return_date() <= end_date:
+            critical_dates.add(item.reservation.get_return_date())
 
     # 2. Calculer l'état à chaque date critique et garder les valeurs extrêmes
     min_total = float("inf")
@@ -196,4 +190,38 @@ def analyze_asset_availability(asset, start_date, end_date):
         "checked_out": max_checked_out,
         "reserved": max_reserved,
         "available": min_available,
+    }
+
+
+def check_reservation_availability(reservation):
+    """
+    Vérifie la disponibilité des articles pour une réservation donnée.
+
+    Args:
+        reservation: Instance de la réservation (Reservation)
+
+    Returns:
+        dict: Résultat de la vérification:
+            - is_ok: booléen indiquant si la réservation est valide
+            - problematic_items: liste des articles problématiques
+    """
+    problematic_items = {}
+
+    for item in reservation.items.all():
+        availability = analyze_asset_availability(
+            asset=item.asset,
+            start_date=reservation.checkout_date,
+            end_date=reservation.return_date,
+            excluded_reservation=reservation,
+        )
+
+        if item.quantity_reserved > availability["available"]:
+            problematic_items[item.asset.name] = {
+                "reserved_quantity": item.quantity_reserved,
+                "available_quantity": availability["available"],
+            }
+
+    return {
+        "is_ok": len(problematic_items) == 0,
+        "problematic_items": problematic_items,
     }

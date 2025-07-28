@@ -46,6 +46,7 @@ urlpatterns = [
         name="search_customers",
     ),
     path("reservations/search_assets/", views.search_assets, name="search_assets"),
+    path("reservations/check/", views.check_reservation, name="check_reservation"),
     # Gestion des clients
     path("customers/", views.customers_view, name="customers"),
     path("customers/add/", views.customer_create, name="customer_create"),

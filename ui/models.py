@@ -25,7 +25,7 @@ class Asset(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
-        related_name=_("items"),
+        related_name="assets",
         verbose_name=_("Catégorie"),
     )
     replacement_value = models.DecimalField(
@@ -178,6 +178,18 @@ class Reservation(models.Model):
     def total_expected_donation(self):
         """Calcule le don minimum total attendu pour cette réservation"""
         return sum(item.expected_donation for item in self.items.all())
+
+    def get_start_date(self):
+        """Retourne la date de début de la réservation"""
+        if self.actual_checkout_date:
+            return self.actual_checkout_date
+        return self.checkout_date
+
+    def get_return_date(self):
+        """Retourne la date de fin de la réservation"""
+        if self.actual_return_date:
+            return self.actual_return_date
+        return self.return_date
 
 
 class ReservationItem(models.Model):

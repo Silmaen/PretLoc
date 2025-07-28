@@ -136,14 +136,20 @@
                     </thead>
                     <tbody>
                     {% for item in items %}
-                    <tr>
+                    <tr {% if item.is_problematic %}class="message-error" {% endif %}>
                         <td>
                             <div class="item-info">
                                 <span class="item-title">{{ item.asset.name }}</span>
                                 <span class="item-subtitle">{{ item.asset.category.name }}</span>
                             </div>
                         </td>
-                        <td style="text-align: center;">{{ item.quantity_reserved }}</td>
+                        <td style="text-align: center;">{{ item.quantity_reserved }}
+                            {% if item.is_problematic %}/
+                            <span style="color: red" title="{% trans 'Quantité rééllement disponible' %}">
+                                {{ item.available }}
+                            </span>
+                            {% endif %}
+                        </td>
                         <td style="text-align: center;">{{ item.quantity_checked_out }}</td>
                         <td style="text-align: center;">{{ item.quantity_returned }}</td>
                         <td style="text-align: center;">{{ item.quantity_damaged }}</td>
