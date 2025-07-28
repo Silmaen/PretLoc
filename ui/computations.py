@@ -125,8 +125,6 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
             "available": 0,
         }
 
-    print(f"Analyzing availability for {asset.name} from {start_date} to {end_date}")
-
     # 1. Collecter toutes les dates critiques (points de changement potentiels)
     critical_dates = {start_date, end_date}
 

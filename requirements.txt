@@ -5,3 +5,5 @@ Pillow==10.1.0
 python-dotenv==1.0.0
 gunicorn==21.2.0
 whitenoise>=6.0.0
+weasyprint>=57.0
+qrcode>=7.3.1

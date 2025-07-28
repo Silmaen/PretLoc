@@ -4,8 +4,13 @@ views.py
 defines the views for the UI application, including a health check endpoint.
 """
 
+import base64
 import datetime
+from io import BytesIO
+from pathlib import Path
 
+import qrcode
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -14,8 +19,11 @@ from django.db.models.expressions import Case, When
 from django.forms import inlineformset_factory
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from weasyprint import HTML
 
 from accounts.decorators import user_type_required, get_capability
 from .computations import (
@@ -869,6 +877,39 @@ def reservation_return(request, pk):
         "capability": get_capability(request.user),
     }
     return render(request, "ui/reservations/reservation_return.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_pdf(request, pk):
+    reservation = get_object_or_404(Reservation, pk=pk)
+    items = reservation.items.all().order_by("asset__category__name", "asset__name")
+    # Générer l'URL de détail
+    detail_url = request.build_absolute_uri(
+        reverse("ui:reservation_detail", args=[reservation.pk])
+    )
+    qr = qrcode.make(detail_url)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    logo_path = Path(settings.BASE_DIR) / "static" / "images" / "cdf_black.png"
+    context = {
+        "reservation": reservation,
+        "items": items,
+        "qr_base64": qr_base64,
+        "logo_path": f"file:{logo_path}",
+        "capability": get_capability(request.user),
+    }
+    html_string = render_to_string("ui/reservations/pdf_summary.html", context)
+    pdf_file = HTML(
+        string=html_string, base_url=request.build_absolute_uri()
+    ).write_pdf()
+    response = HttpResponse(pdf_file, content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="reservation_{reservation.pk}.pdf"'
+    )
+    return response
 
 
 @login_required

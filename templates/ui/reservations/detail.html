@@ -78,26 +78,6 @@
                         {% trans "Don minimum attendu" %}: {{ reservation.total_expected_donation }} €
                     </p>
                 </div>
-                <div>
-                    {% if reservation.status == 'created' or reservation.status == 'validated' %}
-                    <a href="{% url 'ui:reservation_update' reservation.pk %}" class="auth-button" style="margin: 0;">
-                        <i class="fas fa-edit"></i> {% trans "Modifier" %}
-                    </a>
-                    {% endif %}
-                    {% if reservation.status == 'created' %}
-                    <a href="{% url 'ui:reservation_validate' reservation.pk %}" class="auth-button">
-                        <i class="fas fa-check-circle"></i> {% trans "Valider la réservation" %}
-                    </a>
-                    {% elif reservation.status == 'validated' %}
-                    <a href="{% url 'ui:reservation_checkout' reservation.pk %}" class="auth-button" style="margin: 0;">
-                        <i class="fas fa-arrow-right"></i> {% trans "Sortir le matériel" %}
-                    </a>
-                    {% elif reservation.status == 'checked_out' %}
-                    <a href="{% url 'ui:reservation_return' reservation.pk %}" class="auth-button" style="margin: 0;">
-                        <i class="fas fa-arrow-left"></i> {% trans "Enregistrer le retour" %}
-                    </a>
-                    {% endif %}
-                </div>
                 {% if reservation.notes %}
                 <div class="form-group">
                     <label>
@@ -109,6 +89,32 @@
                 </div>
                 {% endif %}
             </div>
+        </div>
+        <div class="auth-card-secondary" style="display: flex; align-items: center;flex-direction: row">
+            {% if reservation.status == 'created' or reservation.status == 'validated' %}
+            <a href="{% url 'ui:reservation_update' reservation.pk %}" class="auth-button" style="margin: 0.05em;">
+                <i class="fas fa-edit"></i> {% trans "Modifier" %}
+            </a>
+            {% endif %}
+            {% if reservation.status == 'created' %}
+            <a href="{% url 'ui:reservation_validate' reservation.pk %}" class="auth-button" style="margin: 0.05em;">
+                <i class="fas fa-check-circle"></i> {% trans "Valider la réservation" %}
+            </a>
+            {% elif reservation.status == 'validated' %}
+            <a href="{% url 'ui:reservation_checkout' reservation.pk %}" class="auth-button" style="margin: 0.05em;">
+                <i class="fas fa-arrow-right"></i> {% trans "Sortir le matériel" %}
+            </a>
+            {% elif reservation.status == 'checked_out' %}
+            <a href="{% url 'ui:reservation_return' reservation.pk %}" class="auth-button" style="margin: 0.05em;">
+                <i class="fas fa-arrow-left"></i> {% trans "Enregistrer le retour" %}
+            </a>
+            {% endif %}
+            {% if reservation.status != 'returned' and reservation.status != 'canceled' %}
+            <a href="{% url 'ui:reservation_pdf' reservation.pk %}" class="auth-button" target="_blank"
+               style="margin: 0.05em;">
+                <i class="fas fa-file-pdf"></i> {% trans 'Bon de sortie' %}
+            </a>
+            {% endif %}
         </div>
 
         <!-- Notes -->
