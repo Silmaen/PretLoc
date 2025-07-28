@@ -28,7 +28,15 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = [os.environ.get("HOSTNAME", ""), "localhost", "127.0.0.1"]
+base_url = os.environ.get("BASE_SERVER_URL", "")
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+if base_url not in ["", None]:
+    ALLOWED_HOSTS.append(base_url)
+    CSRF_TRUSTED_ORIGINS = [
+        f"https://{base_url}",
+        f"http://{base_url}",
+    ]
 
 # Application definition
 
