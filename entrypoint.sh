@@ -25,24 +25,26 @@ done
 if [ ! -z "${PUID}" ] && [ ! -z "${PGID}" ]; then
     echo "Configuring user with PUID: ${PUID} and PGID: ${PGID}"
 
-    # Créer le groupe s'il n'existe pas
-    if ! getent group appgroup > /dev/null 2>&1; then
+    # Chercher si un groupe avec ce GID existe déjà
+    EXISTING_GROUP=$(getent group "${PGID}" | cut -d: -f1)
+    if [ -z "$EXISTING_GROUP" ]; then
         groupadd -g ${PGID} appgroup
+        GROUP_NAME="appgroup"
     else
-        # Si le groupe existe mais avec un GID différent
-        groupmod -g ${PGID} appgroup
+        GROUP_NAME="$EXISTING_GROUP"
     fi
 
-    # Créer l'utilisateur s'il n'existe pas
-    if ! getent passwd appuser > /dev/null 2>&1; then
-        useradd -u ${PUID} -g appgroup -m -s /bin/bash appuser
+    # Chercher si un utilisateur avec ce UID existe déjà
+    EXISTING_USER=$(getent passwd "${PUID}" | cut -d: -f1)
+    if [ -z "$EXISTING_USER" ]; then
+        useradd -u ${PUID} -g ${GROUP_NAME} -m -s /bin/bash appuser
+        USER_NAME="appuser"
     else
-        # Si l'utilisateur existe mais avec un UID différent
-        usermod -u ${PUID} -g appgroup appuser
+        USER_NAME="$EXISTING_USER"
+        usermod -g ${GROUP_NAME} ${USER_NAME}
     fi
 
-    # Attribuer les permissions aux dossiers nécessaires
-    chown -R appuser:appgroup /app/data /app/staticfiles
+    chown -R ${USER_NAME}:${GROUP_NAME} /app/data /app/staticfiles
 
 else
     # Si PUID/PGID ne sont pas définis, exécuter normalement
