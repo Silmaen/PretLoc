@@ -578,26 +578,30 @@ def reservation_create(request):
 
     if request.method == "POST":
         form = ReservationForm(request.POST)
-        formset = ReservationItemFormSet(request.POST, instance=reservation)
-        if form.is_valid() and formset.is_valid():
-            if formset.total_form_count() == 0:
-                messages.error(
-                    request, _("Veuillez ajouter au moins un article à la réservation.")
-                )
-                return redirect("ui:reservation_create")
-            with transaction.atomic():
-                reservation = form.save()
-                reservation.created_by = request.user
-                reservation.save()
-                for form in formset:
-                    if form.is_valid() and not form.cleaned_data.get("DELETE"):
-                        # Ne pas enregistrer les articles avec quantité 0
-                        if form.cleaned_data.get("quantity_reserved", 0) > 0:
-                            form.save()
-                if formset.is_valid():
-                    formset.save()
-                    messages.success(request, _("Réservation créée avec succès"))
-                    return redirect("ui:reservation_detail", pk=reservation.pk)
+        if form.is_valid():
+            reservation = form.save(commit=False)
+            reservation.created_by = request.user
+            formset = ReservationItemFormSet(request.POST, instance=reservation)
+            if formset.is_valid():
+                if formset.total_form_count() == 0:
+                    messages.error(
+                        request,
+                        _("Veuillez ajouter au moins un article à la réservation."),
+                    )
+                    return redirect("ui:reservation_create")
+                with transaction.atomic():
+                    reservation = form.save()
+                    reservation.created_by = request.user
+                    reservation.save()
+                    for form in formset:
+                        if form.is_valid() and not form.cleaned_data.get("DELETE"):
+                            # Ne pas enregistrer les articles avec quantité 0
+                            if form.cleaned_data.get("quantity_reserved", 0) > 0:
+                                form.save()
+                    if formset.is_valid():
+                        formset.save()
+                        messages.success(request, _("Réservation créée avec succès"))
+                        return redirect("ui:reservation_detail", pk=reservation.pk)
         else:
             formset = ReservationItemFormSet(request.POST)
     else:
@@ -1029,11 +1033,11 @@ def search_assets(request):
 
 
 def check_reservation(request):
-    request.GET.get("res_pk", "")
+    res_pk = request.GET.get("res_pk", "")
     response = {"is_ok": False, "problematic_items": []}
     if not res_pk:
         # plus tard, on pourra tester toutes les réservations, ou les filtrer par date...
         return JsonResponse(response, status=200)
-    reservation = get_object_or_404(Reservation, pk=pk)
+    reservation = get_object_or_404(Reservation, pk=res_pk)
     response = check_reservation_availability(reservation)
     return JsonResponse(response, status=200)
