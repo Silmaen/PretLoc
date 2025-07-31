@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -189,6 +190,9 @@ class Reservation(models.Model):
         """Retourne la date de fin de la réservation"""
         if self.actual_return_date:
             return self.actual_return_date
+        if self.status == "checked_out":
+            if self.return_date < timezone.now():
+                return timezone.now()
         return self.return_date
 
 

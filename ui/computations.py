@@ -2,13 +2,17 @@
 Calculations related to asset status and reservations.
 """
 
+import logging
+
 from django.db.models import Q
 from django.utils import timezone
 
 from .models import StockEvent, ReservationItem
 
+logger = logging.getLogger(__name__)
 
-def get_asset_status_at_date(asset, date=None):
+
+def get_asset_status_at_date(asset, date=None, excluded_reservation=None):
     """
     Calcule les quantités d'un article en tenant compte de l'historique complet
     des réservations et événements de stock à une date donnée.
@@ -16,6 +20,7 @@ def get_asset_status_at_date(asset, date=None):
     Args:
         asset: L'article (Asset)
         date: La date pour laquelle calculer l'état (par défaut: maintenant)
+        excluded_reservation: Réservation à exclure des calculs (optionnel)
 
     Returns:
         dict: État de l'article avec les quantités:
@@ -35,7 +40,9 @@ def get_asset_status_at_date(asset, date=None):
     )
 
     total_stock = asset.stock_quantity
-    damaged_from_events = 0
+    damaged_count = 0
+    reserved_count = 0
+    checked_out_count = 0
 
     for event in stock_events:
         if event.event_type in ["SALE", "DESTRUCTION"]:
@@ -43,43 +50,31 @@ def get_asset_status_at_date(asset, date=None):
         elif event.event_type in ["ACQUISITION", "INVENTORY_ADJUSTMENT"]:
             total_stock += event.quantity
         elif event.event_type == "ISSUE":
-            damaged_from_events += event.quantity
+            damaged_count += event.quantity
         elif event.event_type == "REPAIR":
-            damaged_from_events -= event.quantity
+            damaged_count -= event.quantity
 
-    # 2. Articles en sortie active à la date spécifiée
-    checked_out_items = ReservationItem.objects.filter(
-        Q(reservation__status="checked_out")
-        | Q(reservation__status="returned", reservation__actual_return_date__gt=date),
-        asset=asset,
-        reservation__actual_checkout_date__lte=date,
+    # reservation that concerns the asset
+    reservations = ReservationItem.objects.filter(asset=asset).exclude(
+        reservation__status__in=["cancelled", "returned"]
     )
+    if excluded_reservation:
+        reservations = reservations.exclude(reservation__pk=excluded_reservation.pk)
+    # exclude the reservation if start after the date or end before the date
+    reservations = [
+        reservation
+        for reservation in reservations
+        if (
+            reservation.reservation.get_start_date()
+            <= date
+            <= reservation.reservation.get_return_date()
+        )
+    ]
+    logger.debug(f"reservations for asset {asset.pk} at {date}: {reservations}")
 
-    checked_out_count = sum(item.quantity_checked_out for item in checked_out_items)
-
-    # 3. Articles endommagés suite aux retours
-    damaged_returns = ReservationItem.objects.filter(
-        asset=asset,
-        reservation__status="returned",
-        quantity_damaged__gt=0,
-        reservation__actual_return_date__lte=date,
-    )
-
-    damaged_from_returns = sum(item.quantity_damaged for item in damaged_returns)
-    damaged_count = damaged_from_events + damaged_from_returns
-    if damaged_count < 0:
-        damaged_count = 0
-
-    # 4. Articles réservés mais pas encore sortis
-    reserved_items = ReservationItem.objects.filter(
-        Q(reservation__actual_checkout_date__isnull=True)
-        | Q(reservation__actual_checkout_date__gt=date),
-        asset=asset,
-        reservation__status__in=["created", "validated"],
-        reservation__checkout_date__lte=date,
-    )
-
-    reserved_count = sum(item.quantity_reserved for item in reserved_items)
+    # for each reservation, determine its status at the given date
+    for reservation in reservations:
+        reserved_count += reservation.quantity_reserved
 
     # 5. Calculer les disponibles
     available_count = max(
@@ -111,7 +106,6 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
         dict: Valeurs critiques sur la période:
             - min_total: stock total minimum
             - max_damaged: nombre maximum en panne
-            - max_checked_out: nombre maximum sorti en prêt
             - max_reserved: nombre maximum réservé
             - min_available: nombre minimum disponible
     """
@@ -120,7 +114,6 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
         raise {
             "total": 0,
             "damaged": 0,
-            "checked_out": 0,
             "reserved": 0,
             "available": 0,
         }
@@ -138,19 +131,24 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
 
     # Ajouter les dates de début et fin des réservations qui intersectent la période
     reservations = asset.reservation_items.filter(
-        Q(reservation__checkout_date__lte=end_date)
-        & (
-            Q(reservation__return_date__gte=start_date)
-            | Q(reservation__actual_return_date__isnull=True)
-            | Q(reservation__actual_return_date__gte=start_date)
-        )
-        & ~Q(reservation__status__in=["returned", "cancelled"])
+        ~Q(reservation__status__in=["returned", "cancelled"])
     ).select_related("reservation")
 
     if excluded_reservation:
         reservations = reservations.exclude(reservation=excluded_reservation)
+    reservations = [
+        item
+        for item in reservations
+        if (
+            start_date < item.reservation.get_return_date() < end_date
+            or start_date < item.reservation.get_start_date() < end_date
+        )
+    ]
 
     for item in reservations:
+        logger.debug(
+            f"Potential critical res: {item.reservation.pk} ({item.reservation.customer} - {item.reservation.status}): "
+        )
         if start_date <= item.reservation.get_start_date() <= end_date:
             critical_dates.add(item.reservation.get_start_date())
         if start_date <= item.reservation.get_return_date() <= end_date:
@@ -159,7 +157,6 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
     # 2. Calculer l'état à chaque date critique et garder les valeurs extrêmes
     min_total = float("inf")
     max_damaged = 0
-    max_checked_out = 0
     max_reserved = 0
     min_available = float("inf")
 
@@ -167,12 +164,11 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
     critical_dates = sorted(list(critical_dates))
 
     for date in critical_dates:
-        status = get_asset_status_at_date(asset, date)
-
+        status = get_asset_status_at_date(asset, date, excluded_reservation)
+        logger.debug(f"availability at {date}: {status}")
         # Mettre à jour les valeurs extrêmes
         min_total = min(min_total, status["total"])
         max_damaged = max(max_damaged, status["damaged"])
-        max_checked_out = max(max_checked_out, status["checked_out"])
         max_reserved = max(max_reserved, status["reserved"])
         min_available = min(min_available, status["available"])
 
@@ -185,7 +181,6 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
     return {
         "total": min_total,
         "damaged": max_damaged,
-        "checked_out": max_checked_out,
         "reserved": max_reserved,
         "available": min_available,
     }
@@ -205,14 +200,19 @@ def check_reservation_availability(reservation):
     """
     problematic_items = {}
 
+    logger.debug(
+        f"Checking availability for reservation {reservation.pk} ({reservation.customer} sortie: {reservation.get_start_date()})"
+    )
+    real_start = reservation.get_start_date()
+    real_end = reservation.get_return_date()
+
     for item in reservation.items.all():
         availability = analyze_asset_availability(
             asset=item.asset,
-            start_date=reservation.checkout_date,
-            end_date=reservation.return_date,
+            start_date=real_start,
+            end_date=real_end,
             excluded_reservation=reservation,
         )
-
         if item.quantity_reserved > availability["available"]:
             problematic_items[item.asset.name] = {
                 "reserved_quantity": item.quantity_reserved,
