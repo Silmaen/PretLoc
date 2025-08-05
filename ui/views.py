@@ -1041,3 +1041,71 @@ def check_reservation(request):
     reservation = get_object_or_404(Reservation, pk=res_pk)
     response = check_reservation_availability(reservation)
     return JsonResponse(response, status=200)
+
+
+@login_required
+@user_type_required("manager")
+def reservation_calendar_data(request):
+    """Retourne les données des réservations pour le calendrier."""
+
+    active_only = request.GET.get("active_only", "false")
+    reservations_query = Reservation.objects.all()
+    # Initialiser les filtres de base
+    filters = {}
+
+    if active_only == "true":
+        # Pas de filtre de statut spécifique, exclure les statuts "returned" et "cancelled"
+        filters["status__in"] = ["created", "validated", "checked_out"]
+    else:
+        filters["status__in"] = ["created", "validated", "checked_out", "returned"]
+
+    reservations = reservations_query.filter(**filters)
+
+    events = []
+
+    for reservation in reservations:
+        # Récupérer les items pour affichage dans le tooltip
+        items_text = ", ".join(
+            [
+                f"{item.asset.name} ({item.quantity_reserved})"
+                for item in reservation.items.all()[:3]
+            ]
+        )
+
+        if reservation.items.count() > 3:
+            items_text += "..."
+
+        # Formatage de la description complète pour le tooltip
+        description = f"""
+                <strong>Client:</strong> {reservation.customer}<br>
+                <strong>Statut:</strong> {reservation.get_status_display()}<br>
+                <strong>Articles:</strong> {items_text}<br>
+                <strong>Don:</strong> {reservation.donation_amount} €
+            """
+
+        # Formatage du titre plus simple pour l'affichage
+        # title = f"{reservation.get_status_display()}"
+
+        # ID ressource pour grouper par client
+        resource_id = f"customer-{reservation.customer}"
+        check_result = check_reservation_availability(reservation)
+        events.append(
+            {
+                "id": reservation.id,
+                "resourceId": resource_id,
+                "title": f"{reservation.customer}",
+                "start": reservation.get_start_date().isoformat(),
+                "end": reservation.get_return_date().isoformat(),
+                "url": reverse("ui:reservation_detail", args=[reservation.id]),
+                "extendedProps": {
+                    "customer": str(reservation.customer),
+                    "status": str(reservation.get_status_display()),
+                    "status_raw": reservation.status,
+                    "items": items_text,
+                    "description": description,
+                    "is_problematic": not check_result["is_ok"],
+                },
+            }
+        )
+
+    return JsonResponse(events, safe=False)

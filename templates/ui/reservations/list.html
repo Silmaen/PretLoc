@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Utiliser la version moderne et stable de vis-timeline -->
+<link href="https://cdn.jsdelivr.net/npm/vis-timeline@7.7.2/dist/vis-timeline-graph2d.min.css" rel="stylesheet">
+<link href="{% static 'css/timeline.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <div class="auth-container" style="max-width: 1000px;">
@@ -36,7 +43,26 @@
 
         <!-- Filtres par statut -->
         <div class="filters-row">
+            <!-- Toggle pour afficher le calendrier -->
             <div class="filter-group">
+                <div class="filter-group">
+                    <a href="#" class="filter-button" id="toggle-view" onclick="toggleViewState(); return false;">
+                        <i class="fas fa-list" id="view-icon"></i>
+                        <span id="view-text">{% trans "Liste" %}</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Toggle pour n'afficher que les réservations actives -->
+            <div class="filter-group">
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort={{ sort }}&direction={{ direction }}&active_only={% if active_only == 'true' %}false{% else %}true{% endif %}"
+                   class="filter-button {% if active_only == 'true' %}active{% endif %}">
+                    <i class="fas {% if active_only == 'true' %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i>
+                    {% trans "Actives" %}
+                </a>
+            </div>
+
+            <div class="filter-group" id="status-filter-buttons" style="display: revert;">
                 <div class="filter-label">
                     <i class="fas fa-filter"></i> {% trans "Statut:" %}
                 </div>
@@ -67,20 +93,11 @@
                     </a>
                 </div>
             </div>
-
-            <!-- Toggle pour n'afficher que les réservations actives -->
-            <div class="filter-group">
-                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}sort={{ sort }}&direction={{ direction }}&active_only={% if active_only == 'true' %}false{% else %}true{% endif %}"
-                   class="filter-button {% if active_only == 'true' %}active{% endif %}">
-                    <i class="fas {% if active_only == 'true' %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i>
-                    {% trans "Actives uniquement" %}
-                </a>
-            </div>
         </div>
 
         <!-- Liste des réservations -->
         <div class="users-table">
-            <table>
+            <table id="list-view" style="display: revert;">
                 <thead>
                 <tr>
                     <th>
@@ -235,7 +252,273 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <div id="calendar-view" style="display: none;">
+                <div class="filter-buttons-container">
+                    <button class="filter-button" id="today-btn" title="{% trans 'Maintenant' %}">
+                        <i class="fas fa-calendar-day"></i>
+                    </button>
+                    <button class="filter-button" id="prev-btn" title="{% trans 'Précédent' %}">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="filter-button" id="next-btn" title="{% trans 'Suivant' %}">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="filter-button" id="zoom-in-btn" title="{% trans 'Zoom avant' %}">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="filter-button" id="zoom-out-btn" title="{% trans 'Zoom arrière' %}">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                </div>
+                <div id="timeline"></div>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Utiliser la version standalone moderne -->
+<script src="https://cdn.jsdelivr.net/npm/vis-timeline@7.7.2/standalone/umd/vis-timeline-graph2d.min.js"></script>
+<script>
+    let timeline = null;
+
+    function applyFiltersToTimeline() {
+        // Récupérer les paramètres d'URL actuels
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status') || '';
+        const activeOnly = urlParams.get('active_only') === 'true';
+        const searchQuery = urlParams.get('search') || '';
+
+        // Construire l'URL avec les paramètres
+        const filterParams = new URLSearchParams();
+        if (status) filterParams.set('status', status);
+        if (activeOnly) filterParams.set('active_only', 'true');
+        if (searchQuery) filterParams.set('search', searchQuery);
+
+        // Ajout d'un indicateur visuel de chargement
+        const timelineEl = document.getElementById('timeline');
+        if (timelineEl) {
+            timelineEl.classList.add('loading');
+        }
+
+        return fetch(`{% url "ui:reservation_calendar_data" %}?${filterParams.toString()}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (timeline) {
+                    // Créer les datasets pour la timeline
+                    const items = new vis.DataSet();
+
+                    // Traiter les événements
+                    data.forEach(event => {
+                        // Ajouter l'élément à la timeline
+                        // Vérifier si la réservation est problématique
+                        const isProblematic = event.extendedProps.is_problematic === true &&
+                            (event.extendedProps.status_raw === 'created' ||
+                                event.extendedProps.status_raw === 'validated');
+
+                        // Préparer le contenu avec indicateur si nécessaire
+                        let content = `<strong>${event.extendedProps.customer}</strong><br>${event.extendedProps.items}`;
+
+                        // Ajouter l'indicateur visuel et le message pour les réservations problématiques
+                        if (isProblematic) {
+                            content = `<div class="problematic-indicator">⚠️</div><strong>${event.extendedProps.customer}</strong><br>
+                          <span style="color: #cc0000;">{% trans "Problème détecté" %}</span><br>${event.extendedProps.items}`;
+                        }
+
+                        // Déterminer la classe à appliquer
+                        let className = `status-${event.extendedProps.status_raw}`;
+                        if (isProblematic) {
+                            className += ' status-problematic';
+                        }
+
+                        items.add({
+                            id: event.id,
+                            content: content,
+                            title: event.extendedProps.description.replace(/<br>/g, '\n').replace(/<[^>]*>/g, ''),
+                            start: new Date(event.start),
+                            end: new Date(event.end),
+                            className: className,
+                            url: event.url
+                        });
+                    });
+
+
+                    // Mettre à jour la timeline avec les nouvelles données
+                    timeline.setItems(items);
+                    return data;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement des données:', error);
+            })
+            .finally(() => {
+                // Retirer l'indicateur de chargement
+                if (timelineEl) {
+                    timelineEl.classList.remove('loading');
+                }
+            });
+    }
+
+    // Fonction pour initialiser les contrôles de la timeline
+    function initializeTimelineControls() {
+        document.getElementById('today-btn').addEventListener('click', function () {
+            const now = new Date();
+            timeline.setWindow(getMonthStartDate(now), getMonthEndDate(now));
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', function () {
+            const currentWindow = timeline.getWindow();
+            const timeRange = currentWindow.end - currentWindow.start;
+            const newStart = new Date(currentWindow.start.getTime() - timeRange * 0.5);
+            const newEnd = new Date(currentWindow.end.getTime() - timeRange * 0.5);
+            timeline.setWindow(newStart, newEnd);
+        });
+
+        document.getElementById('next-btn').addEventListener('click', function () {
+            const currentWindow = timeline.getWindow();
+            const timeRange = currentWindow.end - currentWindow.start;
+            const newStart = new Date(currentWindow.start.getTime() + timeRange * 0.5);
+            const newEnd = new Date(currentWindow.end.getTime() + timeRange * 0.5);
+            timeline.setWindow(newStart, newEnd);
+        });
+
+        document.getElementById('zoom-in-btn').addEventListener('click', function () {
+            const currentWindow = timeline.getWindow();
+            const timeRange = currentWindow.end - currentWindow.start;
+            const centerTime = currentWindow.start.getTime() + timeRange / 2;
+            const newStart = new Date(centerTime - timeRange * 0.3);
+            const newEnd = new Date(centerTime + timeRange * 0.3);
+            timeline.setWindow(newStart, newEnd);
+        });
+
+        document.getElementById('zoom-out-btn').addEventListener('click', function () {
+            const currentWindow = timeline.getWindow();
+            const timeRange = currentWindow.end - currentWindow.start;
+            const centerTime = currentWindow.start.getTime() + timeRange / 2;
+            const newStart = new Date(centerTime - timeRange * 0.8);
+            const newEnd = new Date(centerTime + timeRange * 0.8);
+            timeline.setWindow(newStart, newEnd);
+        });
+    }
+
+    // Fonctions utilitaires pour le calcul des dates
+    function getMonthStartDate(date = new Date()) {
+        const startDate = new Date(date);
+        startDate.setDate(startDate.getDate() - 15); // 15 jours avant
+        return startDate;
+    }
+
+    function getMonthEndDate(date = new Date()) {
+        const endDate = new Date(date);
+        endDate.setDate(endDate.getDate() + 15); // 15 jours après
+        return endDate;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const timelineContainer = document.getElementById('timeline');
+
+        if (timelineContainer) {
+            // Configuration de la timeline
+            const options = {
+                orientation: 'top',
+                zoomKey: 'ctrlKey',
+                stack: true,
+                verticalScroll: true,
+                maxHeight: 600,
+                margin: {
+                    item: 10,
+                    axis: 5
+                },
+                format: {
+                    minorLabels: {
+                        day: 'DD MMM',
+                        hour: 'HH:mm'
+                    },
+                    majorLabels: {
+                        day: 'MMMM YYYY',
+                        hour: 'DD MMM'
+                    }
+                },
+                zoomMin: 1000 * 60 * 60 * 24,  // Un jour minimum
+                zoomMax: 1000 * 60 * 60 * 24 * 365, // 1 an maximum
+                locale: '{{ LANGUAGE_CODE }}'
+            };
+
+            // Initialiser la timeline avec des datasets vides
+            timeline = new vis.Timeline(
+                timelineContainer,
+                new vis.DataSet([]),
+                options
+            );
+
+            // Gérer les clics sur les éléments
+            timeline.on('click', function (properties) {
+                if (properties.item) {
+                    const item = timeline.itemsData.get(properties.item);
+                    if (item && item.url) {
+                        window.location.href = item.url;
+                    }
+                }
+            });
+
+            // Initialiser les écouteurs d'événements
+            initializeTimelineControls();
+
+            // Après avoir chargé les données, régler la vue sur environ un mois
+            applyFiltersToTimeline().then(() => {
+                // Définir la fenêtre sur environ 1 mois
+                setTimeout(() => {
+                    const now = new Date();
+                    timeline.setWindow(
+                        getMonthStartDate(now),
+                        getMonthEndDate(now)
+                    );
+                }, 200);
+            });
+        }
+
+        // Initialiser la vue correcte au chargement
+        const savedViewMode = localStorage.getItem('view_mode') || 'list';
+        toggleView(savedViewMode);
+    });
+
+    function toggleViewState() {
+        const currentView = document.getElementById('list-view').style.display !== 'none' ? 'list' : 'calendar';
+        const newView = currentView === 'list' ? 'calendar' : 'list';
+        toggleView(newView);
+    }
+
+    function toggleView(view) {
+        document.getElementById('list-view').style.display = view === 'list' ? 'revert' : 'none';
+        document.getElementById('calendar-view').style.display = view === 'calendar' ? 'revert' : 'none';
+        document.getElementById('status-filter-buttons').style.display = view === 'list' ? 'revert' : 'none';
+
+        const viewIcon = document.getElementById('view-icon');
+        const viewText = document.getElementById('view-text');
+
+        if (view === 'list') {
+            viewIcon.className = 'fas fa-calendar-alt';
+            viewText.textContent = '{% trans "Calendrier" %}';
+        } else {
+            viewIcon.className = 'fas fa-list';
+            viewText.textContent = '{% trans "Liste" %}';
+
+            if (timeline) {
+                setTimeout(() => {
+                    // Redimensionner la timeline quand on passe à cette vue
+                    timeline.redraw();
+                    timeline.fit();
+                }, 100);
+            }
+        }
+
+        localStorage.setItem('view_mode', view);
+    }
+</script>
 {% endblock %}
