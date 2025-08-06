@@ -1,0 +1,116 @@
+/* Suppression du cadre extérieur de la timeline */
+.vis-timeline {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    font-family: inherit;
+}
+
+.vis-item {
+    padding: 5px;
+    border-radius: 15px !important;
+}
+
+.vis-item.status-created {
+    background-color: #6c757d;
+    border-color: #5a6268;
+    color: white;
+}
+
+.vis-item.status-validated {
+    background-color: #28a745;
+    border-color: #1e7e34;
+    color: white;
+}
+
+.vis-item.status-checked_out {
+    background-color: #007bff;
+    border-color: #0062cc;
+    color: white;
+}
+
+.vis-item.status-returned {
+    background-color: #17a2b8;
+    border-color: #138496;
+    color: white;
+}
+
+.vis-item.status-cancelled {
+    background-color: #dc3545;
+    border-color: #bd2130;
+    color: white;
+}
+
+/* Amélioration de l'apparence de la timeline */
+.vis-timeline {
+    border: none;
+    font-family: inherit;
+}
+
+.vis-item .vis-item-content {
+    padding: 5px 8px;
+}
+
+.vis-time-axis .vis-text {
+    position: absolute;
+    color: #b4b4b4 !important;
+    padding: 3px;
+    overflow: hidden;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+/* Supprimer les bordures des groupes d'axes */
+.vis-panel.vis-bottom,
+.vis-panel.vis-center,
+.vis-panel.vis-left,
+.vis-panel.vis-right,
+.vis-panel.vis-top {
+    border: none !important;
+}
+
+.vis-item-overflow {
+    overflow: visible;
+}
+
+#timeline.loading {
+    opacity: 0.6;
+    position: relative;
+}
+
+#timeline.loading::after {
+    content: '{% trans "Chargement..." %}';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+/* Style pour les réservations problématiques */
+.status-problematic {
+    background-image: repeating-linear-gradient(
+            45deg,
+            #ffcccc,
+            #ffcccc 10px,
+            #ff9999 10px,
+            #ff9999 20px
+    ) !important;
+    border-color: #cc0000 !important;
+}
+
+.status-problematic .vis-item-content {
+    color: #900 !important;
+    font-weight: bold !important;
+}
+
+/* Style pour un indicateur visuel */
+.problematic-indicator {
+    display: inline-block;
+    margin-right: 5px;
+    color: #cc0000;
+}

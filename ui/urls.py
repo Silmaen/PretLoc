@@ -48,6 +48,11 @@ urlpatterns = [
     path("reservations/search_assets/", views.search_assets, name="search_assets"),
     path("reservations/check/", views.check_reservation, name="check_reservation"),
     path("reservations/<int:pk>/pdf/", views.reservation_pdf, name="reservation_pdf"),
+    path(
+        "reservations/calendar_data/",
+        views.reservation_calendar_data,
+        name="reservation_calendar_data",
+    ),
     # Gestion des clients
     path("customers/", views.customers_view, name="customers"),
     path("customers/add/", views.customer_create, name="customer_create"),
