@@ -1087,3 +1087,111 @@ h6.mb-0 {
 .detail-value {
     width: 60%;
 }
+
+.customer-type-icon {
+    width: 60px;
+    text-align: center;
+}
+
+.customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.customer-name {
+    font-weight: bold;
+}
+
+.customer-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.customer-address {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.customer-exemption {
+    font-size: 0.8rem;
+    color: var(--accent-blue);
+    font-weight: bold;
+}
+
+.badge-exemption {
+    background-color: var(--accent-blue);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+/* Pour les types de clients */
+.type-member {
+    color: var(--accent-blue);
+}
+
+.type-physical {
+    color: #28a745;
+}
+
+.type-phys_ext {
+    color: #6c757d;
+}
+
+.type-legal {
+    color: #fd7e14;
+}
+
+.type-legal_ext {
+    color: #dc3545;
+}
+
+.type-asso {
+    color: #17a2b8;
+}
+
+.type-asso_ext {
+    color: #6610f2;
+}
+
+.email-link {
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.email-link:hover {
+    color: var(--accent-blue-hover);
+    text-decoration: underline;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-primary);
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px rgba(3, 157, 218, 0.2);
+}
+
+/* Style spécifique pour le dark textarea */
+.dark-textarea {
+    background-color: var(--bg-dark);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    width: 100%;
+}

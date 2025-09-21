@@ -42,10 +42,13 @@ class CustomerForm(forms.ModelForm):
             "email",
             "phone",
             "address",
+            "donation_exemption",
+            "notes",
         ]
         widgets = {
             "customer_type": forms.RadioSelect(),
-            "address": forms.Textarea(attrs={"rows": 3}),
+            "address": forms.TextInput(),
+            "notes": forms.Textarea(attrs={"rows": 4, "class": "dark-textarea"}),
         }
         help_texts = {
             "rental_value": _("Don minimum demandé pour l'emprunt de cet article."),
@@ -58,17 +61,22 @@ class CustomerForm(forms.ModelForm):
         cleaned_data = super().clean()
         customer_type = cleaned_data.get("customer_type")
 
-        if customer_type == "physical":
+        if customer_type in ["physical", "phys_ext", "member"]:
             if not cleaned_data.get("last_name"):
                 self.add_error(
                     "last_name",
-                    _("Ce champ est obligatoire pour une personne physique"),
+                    _("Ce champ est obligatoire."),
                 )
-        elif customer_type == "legal":
+        elif customer_type == [
+            "legal",
+            "legal_ext",
+            "asso",
+            "asso_ext",
+        ]:
             if not cleaned_data.get("company_name"):
                 self.add_error(
                     "company_name",
-                    _("Ce champ est obligatoire pour une personne morale"),
+                    _("Ce champ est obligatoire."),
                 )
             if not cleaned_data.get("legal_rep_last_name"):
                 self.add_error(
