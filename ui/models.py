@@ -48,8 +48,13 @@ class Asset(models.Model):
 
 class Customer(models.Model):
     TYPE_CHOICES = (
-        ("physical", _("Personne physique")),
-        ("legal", _("Personne morale")),
+        ("member", _("Membre du CA")),
+        ("physical", _("Personne physique de Genay")),
+        ("phys_ext", _("Personne physique extérieure")),
+        ("legal", _("Personne morale de Genay")),
+        ("legal_ext", _("Personne morale extérieure")),
+        ("asso", _("Association de Genay")),
+        ("asso_ext", _("Association extérieure")),
     )
 
     customer_type = models.CharField(
@@ -77,6 +82,10 @@ class Customer(models.Model):
     email = models.EmailField(verbose_name=_("Email"))
     phone = models.CharField(max_length=20, verbose_name=_("Téléphone"), blank=True)
     address = models.TextField(verbose_name=_("Adresse"))
+    donation_exemption = models.BooleanField(
+        default=False, verbose_name=_("Exonération de don")
+    )
+    notes = models.TextField(blank=True, verbose_name=_("Notes"))
 
     class Meta:
         verbose_name = _("Client")
@@ -84,7 +93,12 @@ class Customer(models.Model):
         ordering = ["last_name", "company_name"]
 
     def __str__(self):
-        if self.customer_type == "legal":
+        if self.customer_type in [
+            "legal",
+            "legal_ext",
+            "asso",
+            "asso_ext",
+        ]:
             return self.company_name
         return f"{self.last_name} {self.first_name}"
 
