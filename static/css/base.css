@@ -1130,35 +1130,6 @@ h6.mb-0 {
     display: inline-block;
 }
 
-/* Pour les types de clients */
-.type-member {
-    color: var(--accent-blue);
-}
-
-.type-physical {
-    color: #28a745;
-}
-
-.type-phys_ext {
-    color: #6c757d;
-}
-
-.type-legal {
-    color: #fd7e14;
-}
-
-.type-legal_ext {
-    color: #dc3545;
-}
-
-.type-asso {
-    color: #17a2b8;
-}
-
-.type-asso_ext {
-    color: #6610f2;
-}
-
 .email-link {
     color: var(--text-primary);
     text-decoration: none;

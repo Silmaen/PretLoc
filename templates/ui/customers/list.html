@@ -96,31 +96,19 @@
                                             <i class="fas fa-hand-holding-usd"></i>
                                         </span>
                                     {% endif %}
-                                    {% if customer.customer_type == "member" %}
-                                        <i class="fas fa-user-tie type-member" title="{% trans 'Membre du CA' %}"></i>
-                                    {% elif customer.customer_type == "physical" %}
-                                        <i class="fas fa-user type-physical"
-                                           title="{% trans 'Personne physique de Genay' %}"></i>
-                                    {% elif customer.customer_type == "phys_ext" %}
-                                        <i class="fas fa-user-friends type-phys_ext"
-                                           title="{% trans 'Personne physique extérieure' %}"></i>
-                                    {% elif customer.customer_type == "legal" %}
-                                        <i class="fas fa-building type-legal"
-                                           title="{% trans 'Personne morale de Genay' %}"></i>
-                                    {% elif customer.customer_type == "legal_ext" %}
-                                        <i class="fas fa-city type-legal_ext"
-                                           title="{% trans 'Personne morale extérieure' %}"></i>
-                                    {% elif customer.customer_type == "asso" %}
-                                        <i class="fas fa-hands-helping type-asso"
-                                           title="{% trans 'Association de Genay' %}"></i>
-                                    {% elif customer.customer_type == "asso_ext" %}
-                                        <i class="fas fa-handshake type-asso_ext"
-                                           title="{% trans 'Association extérieure' %}"></i>
-                                    {% endif %}
+                                    <i class=
+                                               {% if customer.customer_type.entity_type == "physical" %}
+                                                   "fas fa-user"
+                                               {% else %}
+                                                   "fas fa-building"
+                                               {% endif %}
+                                       style="color: {{ customer.customer_type.color }}"
+                                       title="{{ customer.customer_type.name }}"></i>
+
                                 </td>
                                 <td>
                                     <div class="customer-info">
-                                        {% if customer.customer_type == "physical" or customer.customer_type == "phys_ext" or customer.customer_type == "member" %}
+                                        {% if customer.customer_type.entity_type == "physical" %}
                                             <span class="customer-name">{{ customer.last_name }} {{ customer.first_name }}</span>
                                         {% else %}
                                             <span class="customer-name">{{ customer.company_name }}</span>

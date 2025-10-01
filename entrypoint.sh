@@ -61,10 +61,17 @@ echo "PostgreSQL now available !"
 
 # Appliquer les migrations
 
+echo "Saving clients informations..."
+run_cmd python -m ui.custom_migrations.migrate_customertype
+
 echo "Generating migrations"
 run_cmd python manage.py makemigrations
 echo "Applying migrations"
 run_cmd python manage.py migrate
+
+echo "Restore client informations..."
+run_cmd python -m ui.custom_migrations.migrate_customertype restore
+
 echo "Compile messages"
 chmod -R 777 /app/locale
 run_cmd django-admin compilemessages
