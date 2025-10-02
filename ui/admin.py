@@ -1,7 +1,15 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .models import Category, Asset, Customer, Reservation, ReservationItem, StockEvent
+from .models import (
+    Category,
+    Asset,
+    Customer,
+    CustomerType,
+    Reservation,
+    ReservationItem,
+    StockEvent,
+)
 
 
 @admin.register(Category)
@@ -41,10 +49,26 @@ class AssetAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(CustomerType)
+class CustomerTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "code", "entity_type", "color")
+    list_filter = ("entity_type",)
+    search_fields = ("name", "code", "description")
+    ordering = ("name",)
+
+    fieldsets = (
+        (_("Informations"), {"fields": ("name", "code", "description")}),
+        (_("Classification"), {"fields": ("entity_type", "color")}),
+    )
+
+
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("get_full_name", "customer_type", "email", "phone")
-    list_filter = ("customer_type",)
+    list_display = ("get_name", "customer_type", "email", "phone")
+    list_filter = (
+        "customer_type__entity_type",
+        "customer_type",
+    )
     search_fields = (
         "last_name",
         "first_name",
@@ -52,6 +76,7 @@ class CustomerAdmin(admin.ModelAdmin):
         "email",
         "phone",
         "address",
+        "customer_type__name",
     )
     ordering = ("last_name", "company_name")
 
@@ -78,15 +103,18 @@ class CustomerAdmin(admin.ModelAdmin):
             },
         ),
         (_("Coordonnées"), {"fields": ("email", "phone", "address")}),
+        (_("Options"), {"fields": ("donation_exemption", "notes")}),
     )
 
-    def get_full_name(self, obj):
-        if obj.customer_type == "physical":
-            return f"{obj.last_name} {obj.first_name}"
-        else:
-            return obj.company_name
+    def get_name(self, obj):
+        return str(obj)
 
-    get_full_name.short_description = _("Nom")
+    get_name.short_description = _("Nom")
+
+    def get_entity_type(self, obj):
+        return obj.customer_type.det_entity_type_display() if obj.customer_type else ""
+
+    get_entity_type.short_description = _("Type d'entité")
 
 
 class ReservationItemInline(admin.TabularInline):

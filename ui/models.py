@@ -46,21 +46,39 @@ class Asset(models.Model):
         return self.name
 
 
-class Customer(models.Model):
-    TYPE_CHOICES = (
-        ("member", _("Membre du CA")),
-        ("physical", _("Personne physique de Genay")),
-        ("phys_ext", _("Personne physique extérieure")),
-        ("legal", _("Personne morale de Genay")),
-        ("legal_ext", _("Personne morale extérieure")),
-        ("asso", _("Association de Genay")),
-        ("asso_ext", _("Association extérieure")),
+class CustomerType(models.Model):
+    ENTITY_TYPE_CHOICES = (
+        ("physical", _("Personne physique")),
+        ("legal", _("Personne morale")),
     )
 
-    customer_type = models.CharField(
-        max_length=10,
-        choices=TYPE_CHOICES,
-        default="physical",
+    name = models.CharField(max_length=100, verbose_name=_("Nom"))
+    code = models.CharField(max_length=20, unique=True, verbose_name=_("Code"))
+    description = models.TextField(blank=True, verbose_name=_("Description"))
+    entity_type = models.CharField(
+        max_length=10, choices=ENTITY_TYPE_CHOICES, verbose_name=_("Type d'entité")
+    )
+    color = models.CharField(
+        max_length=20, default="#3498db", verbose_name=_("Couleur")
+    )
+
+    class Meta:
+        verbose_name = _("Type de client")
+        verbose_name_plural = _("Types de clients")
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Customer(models.Model):
+
+    customer_type = models.ForeignKey(
+        CustomerType,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="customers",
         verbose_name=_("Type de client"),
     )
     # Personne physique
@@ -93,12 +111,7 @@ class Customer(models.Model):
         ordering = ["last_name", "company_name"]
 
     def __str__(self):
-        if self.customer_type in [
-            "legal",
-            "legal_ext",
-            "asso",
-            "asso_ext",
-        ]:
+        if self.customer_type.entity_type in ["legal"]:
             return self.company_name
         return f"{self.last_name} {self.first_name}"
 

@@ -1130,35 +1130,6 @@ h6.mb-0 {
     display: inline-block;
 }
 
-/* Pour les types de clients */
-.type-member {
-    color: var(--accent-blue);
-}
-
-.type-physical {
-    color: #28a745;
-}
-
-.type-phys_ext {
-    color: #6c757d;
-}
-
-.type-legal {
-    color: #fd7e14;
-}
-
-.type-legal_ext {
-    color: #dc3545;
-}
-
-.type-asso {
-    color: #17a2b8;
-}
-
-.type-asso_ext {
-    color: #6610f2;
-}
-
 .email-link {
     color: var(--text-primary);
     text-decoration: none;
@@ -1194,4 +1165,14 @@ h6.mb-0 {
     border-color: var(--border-color);
     color: var(--text-primary);
     width: 100%;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-element);
+    color: var(--text-primary);
+    cursor: pointer;
+    min-width: 180px;
 }

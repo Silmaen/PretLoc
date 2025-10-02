@@ -1,7 +1,15 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import Category, Asset, Customer, Reservation, ReservationItem, StockEvent
+from .models import (
+    Category,
+    Asset,
+    Customer,
+    CustomerType,
+    Reservation,
+    ReservationItem,
+    StockEvent,
+)
 
 
 class CategoryForm(forms.ModelForm):
@@ -26,6 +34,15 @@ class AssetForm(forms.ModelForm):
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
+        }
+
+
+class CustomerTypeForm(forms.ModelForm):
+    class Meta:
+        model = CustomerType
+        fields = ["name", "code", "description", "entity_type", "color"]
+        widgets = {
+            "color": forms.TextInput(attrs={"type": "color"}),
         }
 
 
