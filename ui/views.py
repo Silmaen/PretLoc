@@ -39,7 +39,14 @@ from .forms import (
     ReservationItemForm,
     StockEventForm,
 )
-from .models import Category, Asset, Customer, Reservation, ReservationItem
+from .models import (
+    Category,
+    Asset,
+    Customer,
+    Reservation,
+    ReservationItem,
+    CustomerType,
+)
 
 
 def health_check(request):
@@ -338,7 +345,9 @@ def item_detail(request, pk):
 def customers_view(request):
     """Vue principale pour la page de gestion des clients"""
     search_query = request.GET.get("search", "")
-    customer_type = request.GET.get("type", "")  # Nouveau paramètre de type
+    customer_type_id = request.GET.get("customer_type", "")
+    entity_type = request.GET.get("entity_type", "")
+    donation_exemption = request.GET.get("donation_exemption", "")
     sort = request.GET.get("sort", "last_name")  # Par défaut, tri par nom
     direction = request.GET.get("direction", "asc")  # Par défaut, ordre ascendant
 
@@ -353,14 +362,20 @@ def customers_view(request):
     filters = {}
 
     # Ajouter le filtre par type si spécifié
-    if customer_type in ["physical", "legal"]:
-        filters["customer_type"] = customer_type
-
+    if customer_type_id not in ["", None]:
+        filters["customer_type_id"] = customer_type_id
+    if entity_type in ["physical", "legal"]:
+        filters["customer_type__entity_type"] = entity_type
+    # Filtrage par exonération de don
+    if donation_exemption == "true":
+        filters["donation_exemption"] = True
+    elif donation_exemption == "false":
+        filters["donation_exemption"] = False
     # Filtrer par recherche si spécifiée
     if search_query:
         customers = Customer.objects.filter(
-            Q(last_name__icontains=search_query)
-            | Q(first_name__icontains=search_query)
+            Q(first_name__icontains=search_query)
+            | Q(last_name__icontains=search_query)
             | Q(company_name__icontains=search_query)
             | Q(email__icontains=search_query)
             | Q(phone__icontains=search_query),
@@ -369,10 +384,15 @@ def customers_view(request):
     else:
         customers = Customer.objects.filter(**filters).order_by(order_by)
 
+    customer_types = CustomerType.objects.all().order_by("name")
+
     context = {
         "customers": customers,
+        "customer_types": customer_types,
         "search_query": search_query,
-        "customer_type": customer_type,
+        "customer_type_id": customer_type_id,
+        "entity_type": entity_type,
+        "donation_exemption": donation_exemption,
         "sort": sort,
         "direction": direction,
         "capability": get_capability(request.user),

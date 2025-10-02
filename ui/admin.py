@@ -64,7 +64,7 @@ class CustomerTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("get_full_name", "customer_type", "email", "phone")
+    list_display = ("get_name", "customer_type", "email", "phone")
     list_filter = (
         "customer_type__entity_type",
         "customer_type",
@@ -106,13 +106,15 @@ class CustomerAdmin(admin.ModelAdmin):
         (_("Options"), {"fields": ("donation_exemption", "notes")}),
     )
 
-    def get_full_name(self, obj):
-        if obj.customer_type and obj.customer_type.entity_type == "physical":
-            return f"{obj.last_name} {obj.first_name}"
-        else:
-            return obj.company_name
+    def get_name(self, obj):
+        return str(obj)
 
-    get_full_name.short_description = _("Nom")
+    get_name.short_description = _("Nom")
+
+    def get_entity_type(self, obj):
+        return obj.customer_type.det_entity_type_display() if obj.customer_type else ""
+
+    get_entity_type.short_description = _("Type d'entité")
 
 
 class ReservationItemInline(admin.TabularInline):

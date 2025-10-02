@@ -1166,3 +1166,13 @@ h6.mb-0 {
     color: var(--text-primary);
     width: 100%;
 }
+
+.filter-select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-element);
+    color: var(--text-primary);
+    cursor: pointer;
+    min-width: 180px;
+}

@@ -19,15 +19,18 @@
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                    <input type="hidden" name="type" value="{{ customer_type }}">
+                    <input type="hidden" name="customer_type" value="{{ customer_type_id }}">
+                    <input type="hidden" name="entity_type" value="{{ entity_type }}">
+                    <input type="hidden" name="donation_exemption" value="{{ donation_exemption }}">
                     <input type="hidden" name="sort" value="{{ sort }}">
                     <input type="hidden" name="direction" value="{{ direction }}">
                 </form>
 
                 <div class="actions-buttons">
                     {% if capability.can_add_customers %}
-                        <a href="{% url 'ui:customer_create' %}" class="auth-button">
-                            <i class="fas fa-plus"></i> {% trans "Ajouter un client" %}
+                        <a href="{% url 'ui:customer_create' %}" class="auth-button"
+                           title="{% trans "Ajouter un client" %}">
+                            <i class="fas fa-plus"></i>
                         </a>
                     {% endif %}
                 </div>
@@ -35,54 +38,94 @@
 
             <!-- Ligne de filtres -->
             <div class="filters-row">
+
+                <!-- Filtre par type de client -->
                 <div class="filter-group">
                     <div class="filter-label">
-                        <i class="fas fa-filter"></i> {% trans "Type:" %}
+                        <i class="fas fa-users"></i> {% trans "Type de client" %}:
+                    </div>
+                    <div class="filter-options">
+                        <select id="customer-type-select" class="filter-select">
+                            <option value=""
+                                    {% if not customer_type_id %}selected{% endif %}>{% trans "Tous" %}</option>
+                            {% for type in customer_types %}
+                                <option value="{{ type.id }}"
+                                        {% if customer_type_id|stringformat:'s' == type.id|stringformat:'s' %}selected{% endif %}>
+                                    {{ type.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Filtre par type d'entité -->
+                    <div class="filter-buttons-container">
+                        <a href="{% url 'ui:customers' %}"
+                           class="filter-button {% if not entity_type %}active{% endif %}">
+                            <i class="fas fa-users"></i> {% trans "Tous" %}
+                        </a>
+                        <a href="{% url 'ui:customers' %}?entity_type=physical{% if search_query %}&search={{ search_query }}{% endif %}{% if customer_type_id %}&customer_type={{ customer_type_id }}{% endif %}{% if donation_exemption %}&donation_exemption={{ donation_exemption }}{% endif %}"
+                           class="filter-button {% if entity_type == 'physical' %}active{% endif %}">
+                            <i class="fas fa-user"></i> {% trans "Particuliers" %}
+                        </a>
+                        <a href="{% url 'ui:customers' %}?entity_type=legal{% if search_query %}&search={{ search_query }}{% endif %}{% if customer_type_id %}&customer_type={{ customer_type_id }}{% endif %}{% if donation_exemption %}&donation_exemption={{ donation_exemption }}{% endif %}"
+                           class="filter-button {% if entity_type == 'legal' %}active{% endif %}">
+                            <i class="fas fa-building"></i> {% trans "Structures" %}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Filtre par exonération -->
+                <div class="filter-group">
+                    <div class="filter-label">
+                        <i class="fas fa-hand-holding-usd"></i> {% trans "Donateur" %}:
                     </div>
                     <div class="filter-buttons-container">
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}sort={{ sort }}&direction={{ direction }}"
-                           class="filter-button {% if not customer_type %}active{% endif %}">
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}sort={{ sort }}&direction={{ direction }}"
+                           class="filter-button {% if not donation_exemption %}active{% endif %}">
                             {% trans "Tous" %}
                         </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=member&sort={{ sort }}&direction={{ direction }}"
-                           class="filter-button {% if customer_type == 'member' %}active{% endif %}">
-                            <i class="fas fa-user-tie"></i> {% trans "Membres" %}
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}donation_exemption=false&sort={{ sort }}&direction={{ direction }}"
+                           class="filter-button {% if donation_exemption == 'false' %}active{% endif %}">
+                            <i class="fas fa-coins"></i> {% trans "Avec don" %}
                         </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=physical&sort={{ sort }}&direction={{ direction }}"
-                           class="filter-button {% if customer_type == 'physical' %}active{% endif %}">
-                            <i class="fas fa-user"></i> {% trans "Pers. Genay" %}
-                        </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=phys_ext&sort={{ sort }}&direction={{ direction }}"
-                           class="filter-button {% if customer_type == 'phys_ext' %}active{% endif %}">
-                            <i class="fas fa-user-friends"></i> {% trans "Pers. extérieures" %}
-                        </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=legal&sort={{ sort }}&direction={{ direction }}"
-                           class="filter-button {% if customer_type == 'legal' %}active{% endif %}">
-                            <i class="fas fa-building"></i> {% trans "Sociétés Genay" %}
-                        </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=legal_ext&sort={{ sort }}&direction={{ direction }}"
-                           class="filter-button {% if customer_type == 'legal_ext' %}active{% endif %}">
-                            <i class="fas fa-city"></i> {% trans "Sociétés ext." %}
-                        </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=asso&sort={{ sort }}&direction={{ direction }}"
-                           class="filter-button {% if customer_type == 'asso' %}active{% endif %}">
-                            <i class="fas fa-hands-helping"></i> {% trans "Assos Genay" %}
-                        </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}type=asso_ext&sort={{ sort }}&direction={{ direction }}"
-                           class="filter-button {% if customer_type == 'asso_ext' %}active{% endif %}">
-                            <i class="fas fa-handshake"></i> {% trans "Assos ext." %}
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}donation_exemption=true&sort={{ sort }}&direction={{ direction }}"
+                           class="filter-button {% if donation_exemption == 'true' %}active{% endif %}">
+                            <i class="fas fa-hand-holding-usd"></i> {% trans "Exonéré" %}
                         </a>
                     </div>
                 </div>
             </div>
+
 
             <!-- Liste des clients -->
             <div class="users-table">
                 <table>
                     <thead>
                         <tr>
-                            <th>{% trans "Type" %}</th>
-                            <th>{% trans "Informations client" %}</th>
+                            <th>{% trans "Type" %}
+                                <div class="sort-buttons">
+                                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=type&direction=asc"
+                                       class="sort-btn {% if sort == 'type' and direction == 'asc' %}active{% endif %}">
+                                        <i class="fas fa-sort-alpha-down"></i>
+                                    </a>
+                                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=type&direction=desc"
+                                       class="sort-btn {% if sort == 'type' and direction == 'desc' %}active{% endif %}">
+                                        <i class="fas fa-sort-alpha-down-alt"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                {% trans "Informations client" %}
+                                <div class="sort-buttons">
+                                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=name&direction=asc"
+                                       class="sort-btn {% if sort == 'name' and direction == 'asc' %}active{% endif %}">
+                                        <i class="fas fa-sort-alpha-down"></i>
+                                    </a>
+                                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=name&direction=desc"
+                                       class="sort-btn {% if sort == 'name' and direction == 'desc' %}active{% endif %}">
+                                        <i class="fas fa-sort-alpha-down-alt"></i>
+                                    </a>
+                                </div>
+                            </th>
                             <th>{% trans "Contact" %}</th>
                             <th>{% trans "Actions" %}</th>
                         </tr>
@@ -167,4 +210,45 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const customerTypeSelect = document.getElementById('customer-type-select');
+        const entityTypeFilter = document.querySelector('.filter-buttons-container');
+
+        // Fonction pour gérer l'affichage du filtre par type d'entité
+        function toggleEntityTypeFilter() {
+            if (customerTypeSelect.value === '') {
+                // Afficher le filtre d'entité si "Tous" est sélectionné
+                entityTypeFilter.style.display = 'flex';
+            } else {
+                // Masquer le filtre d'entité si un type spécifique est sélectionné
+                entityTypeFilter.style.display = 'none';
+            }
+        }
+
+        // Appliquer immédiatement pour l'état initial
+        toggleEntityTypeFilter();
+
+        // Rediriger vers la bonne URL lorsqu'une option est sélectionnée
+        customerTypeSelect.addEventListener('change', function () {
+            let url = new URL(window.location);
+
+            // Mettre à jour le paramètre customer_type
+            if (this.value) {
+                url.searchParams.set('customer_type', this.value);
+                // Réinitialiser le filtre d'entité si un type spécifique est sélectionné
+                url.searchParams.delete('entity_type');
+            } else {
+                url.searchParams.delete('customer_type');
+                // Conserver le filtre d'entité actuel
+            }
+
+            // Rediriger vers la nouvelle URL
+            window.location.href = url.toString();
+        });
+    });
+    </script>
 {% endblock %}
