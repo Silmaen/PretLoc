@@ -15,6 +15,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import IntegerField, Value, Q
+from django.db.models.deletion import ProtectedError
 from django.db.models.expressions import Case, When
 from django.forms import inlineformset_factory
 from django.http import HttpResponse, JsonResponse
@@ -35,6 +36,7 @@ from .forms import (
     CategoryForm,
     AssetForm,
     CustomerForm,
+    CustomerTypeForm,
     ReservationForm,
     ReservationItemForm,
     StockEventForm,
@@ -338,6 +340,84 @@ def item_detail(request, pk):
         "capability": get_capability(request.user),
     }
     return render(request, "ui/stock/item_detail.html", context)
+
+
+@login_required
+@user_type_required("admin")
+def customer_type_list(request):
+    customer_types = CustomerType.objects.all().order_by("name")
+    context = {
+        "customer_types": customer_types,
+        "capability": get_capability(request.user),
+    }
+    return render(request, "ui/customers/customer_type_list.html", context)
+
+
+@login_required
+@user_type_required("admin")
+def customer_type_create(request):
+    if request.method == "POST":
+        form = CustomerTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Type de client créé avec succès"))
+            return redirect("ui:customer_type_list")
+    else:
+        form = CustomerTypeForm()
+    return render(
+        request,
+        "ui/customers/customer_type_form.html",
+        {
+            "form": form,
+            "capability": get_capability(request.user),
+        },
+    )
+
+
+@login_required
+@user_type_required("admin")
+def customer_type_update(request, pk):
+    customer_type = get_object_or_404(CustomerType, pk=pk)
+    if request.method == "POST":
+        form = CustomerTypeForm(request.POST, instance=customer_type)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Type de client modifié avec succès"))
+            return redirect("ui:customer_type_list")
+    else:
+        form = CustomerTypeForm(instance=customer_type)
+    return render(
+        request,
+        "ui/customers/customer_type_form.html",
+        {
+            "form": form,
+            "customer_type": customer_type,
+            "capability": get_capability(request.user),
+        },
+    )
+
+
+@login_required
+@user_type_required("admin")
+def customer_type_delete(request, pk):
+    customer_type = get_object_or_404(CustomerType, pk=pk)
+    if request.method == "POST":
+        try:
+            customer_type.delete()
+            messages.success(request, _("Type de client supprimé avec succès"))
+        except ProtectedError:
+            messages.error(
+                request, _("Ce type de client est utilisé par des clients existants")
+            )
+        return redirect("ui:customer_type_list")
+    return render(
+        request,
+        "ui/customers/customer_type_confirm_delete.html",
+        {
+            "customer_type": customer_type,
+            "capability": get_capability(request.user),
+        },
+    )
 
 
 @login_required

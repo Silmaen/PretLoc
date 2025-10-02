@@ -28,6 +28,10 @@
 
                 <div class="actions-buttons">
                     {% if capability.can_add_customers %}
+                        <a href="{% url 'ui:customer_type_list' %}" class="auth-button"
+                           title="{% trans 'Types de clients' %}">
+                            <i class="fas fa-users-cog"></i>
+                        </a>
                         <a href="{% url 'ui:customer_create' %}" class="auth-button"
                            title="{% trans "Ajouter un client" %}">
                             <i class="fas fa-plus"></i>

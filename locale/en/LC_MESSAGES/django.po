@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-02 13:46+0000\n"
+"POT-Creation-Date: 2025-10-02 15:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -179,6 +179,7 @@ msgstr ""
 "To modify your own password, use the dedicated feature in your profile."
 
 #: templates/accounts/edit_user.html:84 templates/accounts/profile.html:71
+#: templates/ui/customers/customer_type_form.html:46
 #: templates/ui/stock/category_form.html:46
 #: templates/ui/stock/item_form.html:46
 msgid "Enregistrer les modifications"
@@ -210,8 +211,9 @@ msgstr "Forgot your password?"
 msgid "Gestion des utilisateurs"
 msgstr "User management"
 
-#: templates/accounts/manage_users.html:21 templates/ui/customers/list.html:130
-#: templates/ui/reservations/list.html:143
+#: templates/accounts/manage_users.html:21
+#: templates/ui/customers/customer_type_list.html:26
+#: templates/ui/customers/list.html:134 templates/ui/reservations/list.html:143
 #: templates/ui/stock/category_list.html:24 templates/ui/stock/list.html:110
 msgid "Actions"
 msgstr "Actions"
@@ -340,6 +342,7 @@ msgstr "Are you sure you want to delete this customer?"
 
 #: templates/ui/customers/customer_confirm_delete.html:30
 #: templates/ui/customers/customer_form.html:211
+#: templates/ui/customers/customer_type_confirm_delete.html:31
 #: templates/ui/reservations/reservation_checkout.html:129
 #: templates/ui/reservations/reservation_confirm_cancel.html:21
 #: templates/ui/reservations/reservation_confirm_validate.html:23
@@ -360,12 +363,12 @@ msgid "Modifier le client"
 msgstr "Modify customer"
 
 #: templates/ui/customers/customer_form.html:13
-#: templates/ui/customers/list.html:32
+#: templates/ui/customers/list.html:36
 msgid "Ajouter un client"
 msgstr "Add customer"
 
 #: templates/ui/customers/customer_form.html:24
-#: templates/ui/customers/list.html:45 ui/admin.py:84 ui/models.py:66
+#: templates/ui/customers/list.html:49 ui/admin.py:84 ui/models.py:66
 #: ui/models.py:82
 msgid "Type de client"
 msgstr "Customer type"
@@ -383,6 +386,98 @@ msgstr "Additional information about the customer"
 msgid "Enregistrer"
 msgstr "Save"
 
+#: templates/ui/customers/customer_type_confirm_delete.html:9
+msgid "Supprimer le type de client"
+msgstr "Delete customer type"
+
+#: templates/ui/customers/customer_type_confirm_delete.html:15
+#, fuzzy, python-format
+#| msgid "Êtes-vous sûr de vouloir supprimer ce client ?"
+msgid ""
+"\n"
+"                    Êtes-vous sûr de vouloir supprimer le type de client "
+"\"%(name)s\" ?\n"
+"                "
+msgstr ""
+"\n"
+"                    Are you sure you want to delete the customer type "
+"\"%(name)s\"?\n"
+"                "
+
+#: templates/ui/customers/customer_type_confirm_delete.html:20
+msgid ""
+"Cette action est irréversible et supprimera définitivement ce type de client."
+msgstr ""
+"This action is irreversible and will permanently delete this customer type."
+
+#: templates/ui/customers/customer_type_confirm_delete.html:23
+msgid ""
+"Note : Si des clients utilisent ce type, la suppression sera impossible."
+msgstr ""
+"Note: If customers use this type, deletion will be impossible."
+
+#: templates/ui/customers/customer_type_confirm_delete.html:34
+msgid "Confirmer la suppression"
+msgstr "Confirm suppression"
+
+#: templates/ui/customers/customer_type_form.html:11
+msgid "Modifier le type de client"
+msgstr "Modify customer type"
+
+#: templates/ui/customers/customer_type_form.html:13
+#: templates/ui/customers/customer_type_list.html:14
+msgid "Ajouter un type de client"
+msgstr "Add customer type"
+
+#: templates/ui/customers/customer_type_form.html:48
+msgid "Créer le type de client"
+msgstr "Create customer type"
+
+#: templates/ui/customers/customer_type_form.html:55
+msgid "Retour à la liste des types de clients"
+msgstr "Return to customer types list"
+
+#: templates/ui/customers/customer_type_list.html:9
+msgid "Gestion des types de clients"
+msgstr "Customer types management"
+
+#: templates/ui/customers/customer_type_list.html:22
+#: templates/ui/stock/category_list.html:22 templates/ui/stock/list.html:83
+#: ui/admin.py:112 ui/models.py:8 ui/models.py:21 ui/models.py:55
+msgid "Nom"
+msgstr "Name"
+
+#: templates/ui/customers/customer_type_list.html:23 ui/models.py:56
+msgid "Code"
+msgstr "Code"
+
+#: templates/ui/customers/customer_type_list.html:24 ui/admin.py:117
+#: ui/models.py:59
+msgid "Type d'entité"
+msgstr "Entity type"
+
+#: templates/ui/customers/customer_type_list.html:25 ui/models.py:62
+msgid "Couleur"
+msgstr "Color"
+
+#: templates/ui/customers/customer_type_list.html:37 ui/admin.py:86
+#: ui/models.py:51
+msgid "Personne physique"
+msgstr "Physical person"
+
+#: templates/ui/customers/customer_type_list.html:40 ui/admin.py:94
+#: ui/models.py:52
+msgid "Personne morale"
+msgstr "Legal entity"
+
+#: templates/ui/customers/customer_type_list.html:61
+msgid "Aucun type de client trouvé"
+msgstr "No customer type found"
+
+#: templates/ui/customers/customer_type_list.html:71
+msgid "Retour aux clients"
+msgstr "Return to customers"
+
 #: templates/ui/customers/list.html:9
 msgid "Gestion des Clients"
 msgstr "Customer management"
@@ -392,62 +487,66 @@ msgstr "Customer management"
 msgid "Rechercher un client..."
 msgstr "Search for a customer..."
 
-#: templates/ui/customers/list.html:50 templates/ui/customers/list.html:63
-#: templates/ui/customers/list.html:84 templates/ui/reservations/list.html:72
+#: templates/ui/customers/list.html:32 ui/models.py:67
+msgid "Types de clients"
+msgstr "Customer types"
+
+#: templates/ui/customers/list.html:54 templates/ui/customers/list.html:67
+#: templates/ui/customers/list.html:88 templates/ui/reservations/list.html:72
 msgid "Tous"
 msgstr "All"
 
-#: templates/ui/customers/list.html:67
+#: templates/ui/customers/list.html:71
 msgid "Particuliers"
 msgstr "Individuals"
 
-#: templates/ui/customers/list.html:71
+#: templates/ui/customers/list.html:75
 msgid "Structures"
 msgstr "Structures"
 
-#: templates/ui/customers/list.html:79
+#: templates/ui/customers/list.html:83
 msgid "Donateur"
 msgstr "Donor"
 
-#: templates/ui/customers/list.html:88
+#: templates/ui/customers/list.html:92
 msgid "Avec don"
 msgstr "With donation"
 
-#: templates/ui/customers/list.html:92
+#: templates/ui/customers/list.html:96
 msgid "Exonéré"
 msgstr "Exempted"
 
-#: templates/ui/customers/list.html:104
+#: templates/ui/customers/list.html:108
 msgid "Type"
 msgstr "Type"
 
-#: templates/ui/customers/list.html:117
+#: templates/ui/customers/list.html:121
 msgid "Informations client"
 msgstr "Customer information"
 
-#: templates/ui/customers/list.html:129
+#: templates/ui/customers/list.html:133
 msgid "Contact"
 msgstr "Contact"
 
-#: templates/ui/customers/list.html:138 ui/models.py:104
+#: templates/ui/customers/list.html:142 ui/models.py:104
 msgid "Exonération de don"
 msgstr "Donation exemption"
 
-#: templates/ui/customers/list.html:170
+#: templates/ui/customers/list.html:174
 msgid "Envoyer un mail"
 msgstr "Send an email"
 
-#: templates/ui/customers/list.html:186
+#: templates/ui/customers/list.html:190
 #: templates/ui/reservations/detail.html:96
 #: templates/ui/stock/item_detail.html:85
 msgid "Modifier"
 msgstr "Modify"
 
-#: templates/ui/customers/list.html:192
+#: templates/ui/customers/list.html:196
 msgid "Supprimer"
 msgstr "Delete"
 
-#: templates/ui/customers/list.html:204
+#: templates/ui/customers/list.html:208
 msgid "Aucun client trouvé"
 msgstr "No customer found"
 
@@ -1051,11 +1150,6 @@ msgstr "Return to category list"
 msgid "Gestion des catégories"
 msgstr "Manage categories"
 
-#: templates/ui/stock/category_list.html:22 templates/ui/stock/list.html:83
-#: ui/admin.py:112 ui/models.py:8 ui/models.py:21 ui/models.py:55
-msgid "Nom"
-msgstr "Name"
-
 #: templates/ui/stock/category_list.html:23
 #: templates/ui/stock/item_detail.html:23 ui/admin.py:27 ui/models.py:9
 #: ui/models.py:22 ui/models.py:57 ui/models.py:290
@@ -1216,17 +1310,9 @@ msgstr "Informations"
 msgid "Classification"
 msgstr "Classification"
 
-#: ui/admin.py:86 ui/models.py:51
-msgid "Personne physique"
-msgstr "Physical person"
-
 #: ui/admin.py:90
 msgid "Informations pour une personne physique"
 msgstr "Informations for a physical person"
-
-#: ui/admin.py:94 ui/models.py:52
-msgid "Personne morale"
-msgstr "Legal entity"
 
 #: ui/admin.py:102
 msgid "Informations pour une personne morale"
@@ -1240,19 +1326,15 @@ msgstr "Contact details"
 msgid "Options"
 msgstr "Options"
 
-#: ui/admin.py:117 ui/models.py:59
-msgid "Type d'entité"
-msgstr "Entity type"
-
 #: ui/admin.py:171
 msgid "Statut et don"
 msgstr "Status and donation"
 
-#: ui/forms.py:54
+#: ui/forms.py:71
 msgid "Don minimum demandé pour l'emprunt de cet article."
 msgstr "Minimum donation requested for borrowing this asset."
 
-#: ui/forms.py:56
+#: ui/forms.py:73
 msgid ""
 "Valeur exigée si l'article n'est pas rendu ou est rendu dans un état "
 "irréparable."
@@ -1260,11 +1342,11 @@ msgstr ""
 "Value required if the asset is not returned or is returned in an irreparable "
 "state."
 
-#: ui/forms.py:68 ui/forms.py:79
+#: ui/forms.py:85 ui/forms.py:96
 msgid "Ce champ est obligatoire."
 msgstr "This field is mandatory."
 
-#: ui/forms.py:84
+#: ui/forms.py:101
 msgid "Le nom du représentant légal est obligatoire"
 msgstr "Name of the legal representative is mandatory"
 
@@ -1275,18 +1357,6 @@ msgstr "Total stock"
 #: ui/models.py:36
 msgid "Don minimum exigé"
 msgstr "Minimum donation required"
-
-#: ui/models.py:56
-msgid "Code"
-msgstr "Code"
-
-#: ui/models.py:62
-msgid "Couleur"
-msgstr "Color"
-
-#: ui/models.py:67
-msgid "Types de clients"
-msgstr "Customer types"
 
 #: ui/models.py:91
 msgid "Raison sociale"
@@ -1396,80 +1466,102 @@ msgstr "Stock event"
 msgid "Événements de stock"
 msgstr "Stock events"
 
-#: ui/views.py:152
+#: ui/views.py:153
 msgid "Catégorie créée avec succès"
 msgstr "Successfully created category"
 
-#: ui/views.py:174
+#: ui/views.py:175
 msgid "Catégorie modifiée avec succès"
 msgstr "Successfully modified category"
 
-#: ui/views.py:195
+#: ui/views.py:196
 msgid "Catégorie supprimée avec succès"
 msgstr "Successfully deleted category"
 
-#: ui/views.py:214
+#: ui/views.py:215
 msgid "Article créé avec succès"
 msgstr "Successfully created asset"
 
-#: ui/views.py:236
+#: ui/views.py:237
 msgid "Article modifié avec succès"
 msgstr "Successfully modified asset"
 
-#: ui/views.py:257
+#: ui/views.py:258
 msgid "Article supprimé avec succès"
 msgstr "Successfully deleted asset"
 
-#: ui/views.py:410
+#: ui/views.py:362
+#, fuzzy
+#| msgid "Client créé avec succès"
+msgid "Type de client créé avec succès"
+msgstr "Successfully created customer"
+
+#: ui/views.py:384
+#, fuzzy
+#| msgid "Client modifié avec succès"
+msgid "Type de client modifié avec succès"
+msgstr "Successfully modified customer"
+
+#: ui/views.py:406
+#, fuzzy
+#| msgid "Client supprimé avec succès"
+msgid "Type de client supprimé avec succès"
+msgstr "Successfully deleted customer"
+
+#: ui/views.py:409
+msgid "Ce type de client est utilisé par des clients existants"
+msgstr ""
+
+#: ui/views.py:489
 msgid "Client créé avec succès"
 msgstr "Successfully created customer"
 
-#: ui/views.py:432
+#: ui/views.py:511
 msgid "Client modifié avec succès"
 msgstr "Successfully modified customer"
 
-#: ui/views.py:453
+#: ui/views.py:532
 msgid "Client supprimé avec succès"
 msgstr "Successfully deleted customer"
 
-#: ui/views.py:609 ui/views.py:690
+#: ui/views.py:688 ui/views.py:769
 msgid "Veuillez ajouter au moins un article à la réservation."
 msgstr "Please add at least one asset to the reservation."
 
-#: ui/views.py:623
+#: ui/views.py:702
 msgid "Réservation créée avec succès"
 msgstr "Successfully created reservation"
 
-#: ui/views.py:648
+#: ui/views.py:727
 msgid "Cette réservation ne peut pas être validée"
 msgstr "This reservation cannot be validated"
 
-#: ui/views.py:656
+#: ui/views.py:735
 msgid "Réservation validée avec succès"
 msgstr "Successfully validated reservation"
 
-#: ui/views.py:675
+#: ui/views.py:754
 msgid "Impossible de modifier une réservation sortie ou rendue"
 msgstr "Impossible to modify a checkout or returned reservation"
 
-#: ui/views.py:714
+#: ui/views.py:793
 msgid "Réservation modifiée avec succès"
 msgstr "Successfully modified reservation"
 
-#: ui/views.py:741
+#: ui/views.py:820
 msgid ""
 "Seules les réservations à l'état 'créée' ou 'validée' peuvent être annulées"
 msgstr "Only reservations in 'created' or 'validated' state can be canceled"
 
-#: ui/views.py:751
+#: ui/views.py:830
 msgid "Réservation annulée avec succès"
 msgstr "Successfully canceled reservation"
 
-#: ui/views.py:769
+#: ui/views.py:848
 msgid "Cette réservation ne peut pas être sortie"
 msgstr "This reservation cannot be checked out"
 
-#: ui/views.py:786
+#: ui/views.py:865
 #, python-brace-format
 msgid ""
 "Quantité insuffisante pour {item.asset.name} (disponible: {item.asset."
@@ -1478,23 +1570,23 @@ msgstr ""
 "Insufficient quantity for {item.asset.name} (available: {item.asset."
 "stock_quantity})"
 
-#: ui/views.py:812
+#: ui/views.py:891
 msgid "Sortie de matériel effectuée avec succès"
 msgstr "Successfully created assets checkout"
 
-#: ui/views.py:832
+#: ui/views.py:911
 msgid "Cette réservation ne peut pas être retournée"
 msgstr "This reservation cannot be returned"
 
-#: ui/views.py:859
+#: ui/views.py:938
 #, python-brace-format
 msgid "Quantités invalides pour {item.asset.name}"
 msgstr "Invalid quantities for {item.asset.name}"
 
-#: ui/views.py:893
+#: ui/views.py:972
 msgid "Retour de matériel enregistré avec succès"
 msgstr "Successfully registered assets return"
 
-#: ui/views.py:958
+#: ui/views.py:1037
 msgid "Événement de stock enregistré avec succès"
 msgstr "Stock event successfully registered"
