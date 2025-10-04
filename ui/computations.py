@@ -7,7 +7,8 @@ import logging
 from django.db.models import Q
 from django.utils import timezone
 
-from .models import StockEvent, ReservationItem
+from ui.reservation.models import ReservationItem
+from ui.stock.models import StockEvent
 
 logger = logging.getLogger(__name__)
 
