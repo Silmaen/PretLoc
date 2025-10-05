@@ -22,7 +22,16 @@ class CustomerTypeForm(forms.ModelForm):
         """
 
         model = CustomerType
-        fields = ["name", "code", "description", "entity_type", "color"]
+        fields = [
+            "name",
+            "code",
+            "description",
+            "entity_type",
+            "color",
+            "donation_exemption",
+            "donation_coefficient",
+            "reservation_period_days",
+        ]
         widgets = {
             "color": forms.TextInput(attrs={"type": "color"}),
         }
@@ -50,6 +59,7 @@ class CustomerForm(forms.ModelForm):
             "phone",
             "address",
             "donation_exemption",
+            "donation_coefficient",
             "notes",
         ]
         widgets = {
@@ -71,28 +81,31 @@ class CustomerForm(forms.ModelForm):
         """
         cleaned_data = super().clean()
         customer_type = cleaned_data.get("customer_type")
+        email = cleaned_data.get("email")
+        address = cleaned_data.get("address")
 
-        if customer_type in ["physical", "phys_ext", "member"]:
+        if not email:
+            self.add_error("email", _("Ce champ est obligatoire."))
+        if not address:
+            self.add_error("address", _("Ce champ est obligatoire."))
+
+        entity = getattr(customer_type, "entity_type", None)
+        if entity == "physical":
             if not cleaned_data.get("last_name"):
                 self.add_error(
                     "last_name",
-                    _("Ce champ est obligatoire."),
+                    _("Ce champ est obligatoire pour une personne physique."),
                 )
-        elif customer_type == [
-            "legal",
-            "legal_ext",
-            "asso",
-            "asso_ext",
-        ]:
+        elif entity == "legal":
             if not cleaned_data.get("company_name"):
                 self.add_error(
                     "company_name",
-                    _("Ce champ est obligatoire."),
+                    _("Ce champ est obligatoire pour une personne morale."),
                 )
             if not cleaned_data.get("legal_rep_last_name"):
                 self.add_error(
                     "legal_rep_last_name",
-                    _("Le nom du représentant légal est obligatoire"),
+                    _("Le nom du représentant légal est obligatoire."),
                 )
 
         return cleaned_data

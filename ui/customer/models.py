@@ -25,6 +25,16 @@ class CustomerType(models.Model):
     color = models.CharField(
         max_length=20, default="#3498db", verbose_name=_("Couleur")
     )
+    donation_exemption = models.BooleanField(
+        default=False, verbose_name=_("Exonération de don")
+    )
+    donation_coefficient = models.FloatField(
+        default=1.0, verbose_name=_("Coefficient de don")
+    )
+    reservation_period_days = models.IntegerField(
+        default=360,
+        verbose_name=_("Période de réservation (jours avant manifestation)"),
+    )
 
     class Meta:
         """
@@ -79,6 +89,13 @@ class Customer(models.Model):
         default=False, verbose_name=_("Exonération de don")
     )
     notes = models.TextField(blank=True, verbose_name=_("Notes"))
+    donation_coefficient = models.FloatField(
+        default=0.0,
+        verbose_name=_("Coefficient de don"),
+        help_text=_(
+            "Coefficient appliqué aux dons effectués par ce client, 0 applique le coefficient pour son type."
+        ),
+    )
 
     class Meta:
         """
@@ -97,3 +114,29 @@ class Customer(models.Model):
         if self.customer_type.entity_type in ["legal"]:
             return self.company_name
         return f"{self.last_name} {self.first_name}"
+
+    def is_exempted_from_donation(self):
+        """
+        Check if the customer is exempted from donation.
+        :return: True if exempted, False otherwise
+        """
+        if (
+            self.donation_exemption
+            or self.customer_type
+            and self.customer_type.donation_exemption
+        ):
+            return True
+        return False
+
+    def get_donation_coefficient(self):
+        """
+        Get the donation coefficient for the customer.
+        :return: Donation coefficient
+        """
+        if self.is_exempted_from_donation():
+            return 0.0
+        if self.donation_coefficient and self.donation_coefficient > 0:
+            return self.donation_coefficient
+        if self.customer_type:
+            return self.customer_type.donation_coefficient
+        return 1.0

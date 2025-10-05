@@ -104,111 +104,111 @@
             <div class="users-table">
                 <table>
                     <thead>
-                        <tr>
-                            <th>{% trans "Type" %}
-                                <div class="sort-buttons">
-                                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=type&direction=asc"
-                                       class="sort-btn {% if sort == 'type' and direction == 'asc' %}active{% endif %}">
-                                        <i class="fas fa-sort-alpha-down"></i>
-                                    </a>
-                                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=type&direction=desc"
-                                       class="sort-btn {% if sort == 'type' and direction == 'desc' %}active{% endif %}">
-                                        <i class="fas fa-sort-alpha-down-alt"></i>
-                                    </a>
-                                </div>
-                            </th>
-                            <th>
-                                {% trans "Informations client" %}
-                                <div class="sort-buttons">
-                                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=name&direction=asc"
-                                       class="sort-btn {% if sort == 'name' and direction == 'asc' %}active{% endif %}">
-                                        <i class="fas fa-sort-alpha-down"></i>
-                                    </a>
-                                    <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=name&direction=desc"
-                                       class="sort-btn {% if sort == 'name' and direction == 'desc' %}active{% endif %}">
-                                        <i class="fas fa-sort-alpha-down-alt"></i>
-                                    </a>
-                                </div>
-                            </th>
-                            <th>{% trans "Contact" %}</th>
-                            <th>{% trans "Actions" %}</th>
-                        </tr>
+                    <tr>
+                        <th>{% trans "Type" %}
+                            <div class="sort-buttons">
+                                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=type&direction=asc"
+                                   class="sort-btn {% if sort == 'type' and direction == 'asc' %}active{% endif %}">
+                                    <i class="fas fa-sort-alpha-down"></i>
+                                </a>
+                                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=type&direction=desc"
+                                   class="sort-btn {% if sort == 'type' and direction == 'desc' %}active{% endif %}">
+                                    <i class="fas fa-sort-alpha-down-alt"></i>
+                                </a>
+                            </div>
+                        </th>
+                        <th>
+                            {% trans "Informations client" %}
+                            <div class="sort-buttons">
+                                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=name&direction=asc"
+                                   class="sort-btn {% if sort == 'name' and direction == 'asc' %}active{% endif %}">
+                                    <i class="fas fa-sort-alpha-down"></i>
+                                </a>
+                                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if entity_type %}entity_type={{ entity_type }}&{% endif %}{% if customer_type_id %}customer_type_id={{ customer_type_id }}&{% endif %}{% if donation_exemption %}donation_exemption={{ donation_exemption }}&{% endif %}sort=name&direction=desc"
+                                   class="sort-btn {% if sort == 'name' and direction == 'desc' %}active{% endif %}">
+                                    <i class="fas fa-sort-alpha-down-alt"></i>
+                                </a>
+                            </div>
+                        </th>
+                        <th>{% trans "Contact" %}</th>
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for customer in customers %}
-                            <tr>
-                                <td class="customer-type-icon">
-                                    {% if customer.donation_exemption %}
-                                        <span class="badge-exemption" title="{% trans 'Exonération de don' %}">
+                    {% for customer in customers %}
+                        <tr>
+                            <td class="customer-type-icon">
+                                {% if customer.is_exempted_from_donation %}
+                                    <span class="badge-exemption" title="{% trans 'Exonération de don' %}">
                                             <i class="fas fa-hand-holding-usd"></i>
                                         </span>
-                                    {% endif %}
-                                    <i class=
-                                               {% if customer.customer_type.entity_type == "physical" %}
-                                                   "fas fa-user"
-                                               {% else %}
-                                                   "fas fa-building"
-                                               {% endif %}
-                                       style="color: {{ customer.customer_type.color }}"
-                                       title="{{ customer.customer_type.name }}"></i>
+                                {% endif %}
+                                <i class=
+                                           {% if customer.customer_type.entity_type == "physical" %}
+                                               "fas fa-user"
+                                           {% else %}
+                                               "fas fa-building"
+                                           {% endif %}
+                                style="color: {{ customer.customer_type.color }}"
+                                title="{{ customer.customer_type.name }}"></i>
 
-                                </td>
-                                <td>
-                                    <div class="customer-info">
-                                        {% if customer.customer_type.entity_type == "physical" %}
-                                            <span class="customer-name">{{ customer.last_name }} {{ customer.first_name }}</span>
-                                        {% else %}
-                                            <span class="customer-name">{{ customer.company_name }}</span>
-                                            <span class="customer-subtitle">
+                            </td>
+                            <td>
+                                <div class="customer-info">
+                                    {% if customer.customer_type.entity_type == "physical" %}
+                                        <span class="customer-name">{{ customer.last_name }} {{ customer.first_name }}</span>
+                                    {% else %}
+                                        <span class="customer-name">{{ customer.company_name }}</span>
+                                        <span class="customer-subtitle">
                                                 <i class="fas fa-user-tie"></i> {{ customer.legal_rep_last_name }} {{ customer.legal_rep_first_name }}
                                             </span>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        <span class="customer-address">
+                                    <span class="customer-address">
                                             <i class="fas fa-map-marker-alt"></i> {{ customer.address|truncatewords:6 }}
                                         </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="contact-info">
+                                    <div title="{% trans 'Envoyer un mail' %}">
+                                        <i class="fas fa-envelope"></i>
+                                        <a href="mailto:{{ customer.email }}"
+                                           class="email-link">{{ customer.email }}</a>
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="contact-info">
-                                        <div title="{% trans 'Envoyer un mail' %}">
-                                            <i class="fas fa-envelope"></i>
-                                            <a href="mailto:{{ customer.email }}"
-                                               class="email-link">{{ customer.email }}</a>
+                                    {% if customer.phone %}
+                                        <div>
+                                            <i class="fas fa-phone"></i> {{ customer.phone }}
                                         </div>
-                                        {% if customer.phone %}
-                                            <div>
-                                                <i class="fas fa-phone"></i> {{ customer.phone }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="actions-buttons">
-                                        {% if capability.can_edit_customers %}
-                                            <a href="{% url 'ui:customer_update' customer.id %}" class="action-button"
-                                               title="{% trans 'Modifier' %}">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                        {% endif %}
-                                        {% if capability.can_delete_customers %}
-                                            <a href="{% url 'ui:customer_delete' customer.id %}"
-                                               class="action-button danger" title="{% trans 'Supprimer' %}">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 20px;">
-                                    <i class="fas fa-search"
-                                       style="font-size: 2rem; margin-bottom: 15px; color: var(--text-secondary);"></i>
-                                    <p>{% trans "Aucun client trouvé" %}</p>
-                                </td>
-                            </tr>
-                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="actions-buttons">
+                                    {% if capability.can_edit_customers %}
+                                        <a href="{% url 'ui:customer_update' customer.id %}" class="action-button"
+                                           title="{% trans 'Modifier' %}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    {% endif %}
+                                    {% if capability.can_delete_customers %}
+                                        <a href="{% url 'ui:customer_delete' customer.id %}"
+                                           class="action-button danger" title="{% trans 'Supprimer' %}">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 20px;">
+                                <i class="fas fa-search"
+                                   style="font-size: 2rem; margin-bottom: 15px; color: var(--text-secondary);"></i>
+                                <p>{% trans "Aucun client trouvé" %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -218,41 +218,41 @@
 
 {% block extra_js %}
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const customerTypeSelect = document.getElementById('customer-type-select');
-        const entityTypeFilter = document.querySelector('.filter-buttons-container');
+        document.addEventListener('DOMContentLoaded', function () {
+            const customerTypeSelect = document.getElementById('customer-type-select');
+            const entityTypeFilter = document.querySelector('.filter-buttons-container');
 
-        // Fonction pour gérer l'affichage du filtre par type d'entité
-        function toggleEntityTypeFilter() {
-            if (customerTypeSelect.value === '') {
-                // Afficher le filtre d'entité si "Tous" est sélectionné
-                entityTypeFilter.style.display = 'flex';
-            } else {
-                // Masquer le filtre d'entité si un type spécifique est sélectionné
-                entityTypeFilter.style.display = 'none';
-            }
-        }
-
-        // Appliquer immédiatement pour l'état initial
-        toggleEntityTypeFilter();
-
-        // Rediriger vers la bonne URL lorsqu'une option est sélectionnée
-        customerTypeSelect.addEventListener('change', function () {
-            let url = new URL(window.location);
-
-            // Mettre à jour le paramètre customer_type
-            if (this.value) {
-                url.searchParams.set('customer_type', this.value);
-                // Réinitialiser le filtre d'entité si un type spécifique est sélectionné
-                url.searchParams.delete('entity_type');
-            } else {
-                url.searchParams.delete('customer_type');
-                // Conserver le filtre d'entité actuel
+            // Fonction pour gérer l'affichage du filtre par type d'entité
+            function toggleEntityTypeFilter() {
+                if (customerTypeSelect.value === '') {
+                    // Afficher le filtre d'entité si "Tous" est sélectionné
+                    entityTypeFilter.style.display = 'flex';
+                } else {
+                    // Masquer le filtre d'entité si un type spécifique est sélectionné
+                    entityTypeFilter.style.display = 'none';
+                }
             }
 
-            // Rediriger vers la nouvelle URL
-            window.location.href = url.toString();
+            // Appliquer immédiatement pour l'état initial
+            toggleEntityTypeFilter();
+
+            // Rediriger vers la bonne URL lorsqu'une option est sélectionnée
+            customerTypeSelect.addEventListener('change', function () {
+                let url = new URL(window.location);
+
+                // Mettre à jour le paramètre customer_type
+                if (this.value) {
+                    url.searchParams.set('customer_type', this.value);
+                    // Réinitialiser le filtre d'entité si un type spécifique est sélectionné
+                    url.searchParams.delete('entity_type');
+                } else {
+                    url.searchParams.delete('customer_type');
+                    // Conserver le filtre d'entité actuel
+                }
+
+                // Rediriger vers la nouvelle URL
+                window.location.href = url.toString();
+            });
         });
-    });
     </script>
 {% endblock %}

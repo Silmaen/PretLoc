@@ -15,27 +15,25 @@ logger = logging.getLogger(__name__)
 
 def get_asset_status_at_date(asset, date=None, excluded_reservation=None):
     """
-    Calcule les quantités d'un article en tenant compte de l'historique complet
-    des réservations et événements de stock à une date donnée.
+    Compute amounts of an asset considering the full history
+    of reservations and stock events at a given date.
 
-    Args:
-        asset: L'article (Asset)
-        date: La date pour laquelle calculer l'état (par défaut: maintenant)
-        excluded_reservation: Réservation à exclure des calculs (optionnel)
+    :param asset: The asset (Asset)
+    :param date: Date for which to compute the status (defaults to now if None)
+    :param excluded_reservation: Reservation to exclude from calculations (optional)
 
-    Returns:
-        dict: État de l'article avec les quantités:
-            - damaged: nombre en panne
-            - checked_out: nombre sorti en prêt
-            - reserved: nombre réservé mais pas encore sorti
-            - available: nombre disponible
-            - total: stock total à cette date
+    :return:
+        dict: Status at the given date:
+            - damaged: number of damaged items
+            - checked_out: number of checked out items
+            - reserved: number of reserved items
+            - available: number of available items
+            - total: total stock
     """
 
     if date is None:
         date = timezone.now()
 
-    # 1. Calculer le stock total à la date spécifiée via les événements de stock
     stock_events = StockEvent.objects.filter(asset=asset, date__lte=date).order_by(
         "date"
     )
@@ -71,13 +69,11 @@ def get_asset_status_at_date(asset, date=None, excluded_reservation=None):
             <= reservation.reservation.get_return_date()
         )
     ]
-    logger.debug(f"reservations for asset {asset.pk} at {date}: {reservations}")
 
     # for each reservation, determine its status at the given date
     for reservation in reservations:
         reserved_count += reservation.quantity_reserved
 
-    # 5. Calculer les disponibles
     available_count = max(
         0, total_stock - (damaged_count + checked_out_count + reserved_count)
     )
@@ -93,24 +89,22 @@ def get_asset_status_at_date(asset, date=None, excluded_reservation=None):
 
 def analyze_asset_availability(asset, start_date, end_date, excluded_reservation=None):
     """
-    Analyse la disponibilité d'un article sur une période donnée.
-    Calcule les valeurs critiques: stock minimal, maximum de produits endommagés,
-    maximum de produits sortis ou réservés et minimum de produits disponibles.
+    Analyze the availability of an asset over a given period.
+    Calculate critical values: minimum stock, maximum damaged products,
+    maximum checked out or reserved products, and minimum available products.
 
-    Args:
-        asset: L'article (Asset)
-        start_date: Date de début de la période
-        end_date: Date de fin de la période (doit être postérieure à start_date)
-        excluded_reservation: Réservation à exclure des calculs (optionnel)
+    :param asset: The asset (Asset)
+    :param start_date: Start date of the period
+    :param end_date: End date of the period (end date is exclusive).
+    :param excluded_reservation: Reservation to exclude from calculations (optional)
 
-    Returns:
-        dict: Valeurs critiques sur la période:
-            - min_total: stock total minimum
-            - max_damaged: nombre maximum en panne
-            - max_reserved: nombre maximum réservé
-            - min_available: nombre minimum disponible
+    :return:
+        dict: Analysis results:
+            - total: stock total at the worst moment
+            - damaged: nombre maximum en panne
+            - reserved: nombre maximum réservé
+            - available: nombre minimum disponible
     """
-    # Validation des dates
     if start_date > end_date:
         raise {
             "total": 0,
@@ -119,10 +113,8 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
             "available": 0,
         }
 
-    # 1. Collecter toutes les dates critiques (points de changement potentiels)
     critical_dates = {start_date, end_date}
 
-    # Ajouter les dates des événements de stock
     stock_events = StockEvent.objects.filter(
         asset=asset, date__gte=start_date, date__lte=end_date
     ).order_by("date")
@@ -130,7 +122,6 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
     for event in stock_events:
         critical_dates.add(event.date)
 
-    # Ajouter les dates de début et fin des réservations qui intersectent la période
     reservations = asset.reservation_items.filter(
         ~Q(reservation__status__in=["returned", "cancelled"])
     ).select_related("reservation")
@@ -147,33 +138,25 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
     ]
 
     for item in reservations:
-        logger.debug(
-            f"Potential critical res: {item.reservation.pk} ({item.reservation.customer} - {item.reservation.status}): "
-        )
         if start_date <= item.reservation.get_start_date() <= end_date:
             critical_dates.add(item.reservation.get_start_date())
         if start_date <= item.reservation.get_return_date() <= end_date:
             critical_dates.add(item.reservation.get_return_date())
 
-    # 2. Calculer l'état à chaque date critique et garder les valeurs extrêmes
     min_total = float("inf")
     max_damaged = 0
     max_reserved = 0
     min_available = float("inf")
 
-    # Ordonner les dates
     critical_dates = sorted(list(critical_dates))
 
     for date in critical_dates:
         status = get_asset_status_at_date(asset, date, excluded_reservation)
-        logger.debug(f"availability at {date}: {status}")
-        # Mettre à jour les valeurs extrêmes
         min_total = min(min_total, status["total"])
         max_damaged = max(max_damaged, status["damaged"])
         max_reserved = max(max_reserved, status["reserved"])
         min_available = min(min_available, status["available"])
 
-    # Si aucune donnée n'a été trouvée, min_total sera toujours à l'infini
     if min_total == float("inf"):
         min_total = 0
     if min_available == float("inf"):
@@ -189,21 +172,14 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
 
 def check_reservation_availability(reservation):
     """
-    Vérifie la disponibilité des articles pour une réservation donnée.
-
-    Args:
-        reservation: Instance de la réservation (Reservation)
-
-    Returns:
-        dict: Résultat de la vérification:
-            - is_ok: booléen indiquant si la réservation est valide
-            - problematic_items: liste des articles problématiques
+    Verify the availability of items for a given reservation.
+    :parm reservation: The reservation to check (Reservation)
+    :return:
+        dict: Check results:
+            - is_ok: True if all items are available in the requested quantities
+            - problematic_items: dict of items with insufficient availability
     """
     problematic_items = {}
-
-    logger.debug(
-        f"Checking availability for reservation {reservation.pk} ({reservation.customer} sortie: {reservation.get_start_date()})"
-    )
     real_start = reservation.get_start_date()
     real_end = reservation.get_return_date()
 
