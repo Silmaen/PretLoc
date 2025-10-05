@@ -148,9 +148,15 @@ def customers_view(request):
     if entity_type in ["physical", "legal"]:
         filters["customer_type__entity_type"] = entity_type
     if donation_exemption == "true":
-        filters["donation_exemption"] = True
+        filters_q = Q(donation_exemption=True) | Q(
+            customer_type__donation_exemption=True
+        )
     elif donation_exemption == "false":
-        filters["donation_exemption"] = False
+        filters_q = Q(donation_exemption=False) & Q(
+            customer_type__donation_exemption=False
+        )
+    else:
+        filters_q = None
     if search_query:
         customers = Customer.objects.filter(
             Q(first_name__icontains=search_query)
@@ -162,6 +168,8 @@ def customers_view(request):
         ).order_by(order_by)
     else:
         customers = Customer.objects.filter(**filters).order_by(order_by)
+    if filters_q is not None:
+        customers = customers.filter(filters_q)
 
     customer_types = CustomerType.objects.all().order_by("name")
 
@@ -201,6 +209,7 @@ def customer_create(request):
         {
             "form": form,
             "capability": get_capability(request.user),
+            "customer_types": CustomerType.objects.all().order_by("name"),
         },
     )
 
@@ -230,6 +239,7 @@ def customer_update(request, pk):
             "form": form,
             "customer": customer,
             "capability": get_capability(request.user),
+            "customer_types": CustomerType.objects.all().order_by("name"),
         },
     )
 

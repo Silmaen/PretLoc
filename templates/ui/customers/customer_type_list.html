@@ -3,84 +3,77 @@
 
 {% block content %}
     <div class="auth-container" style="max-width: 800px;">
-    <div class="auth-card">
-        <div class="auth-header">
-            <i class="fas fa-users-cog auth-icon"></i>
-            <h2>{% trans "Gestion des types de clients" %}</h2>
-        </div>
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-users-cog auth-icon"></i>
+                <h2>{% trans "Gestion des types de clients" %}</h2>
+            </div>
 
-        <div class="d-flex justify-content-end mb-4">
-            <a href="{% url 'ui:customer_type_create' %}" class="auth-button" style="width: auto;">
-                <i class="fas fa-plus"></i> {% trans "Ajouter un type de client" %}
+            <div class="d-flex justify-content-end mb-4">
+                <a href="{% url 'ui:customer_type_create' %}" class="auth-button" style="width: auto;">
+                    <i class="fas fa-plus"></i> {% trans "Ajouter un type de client" %}
+                </a>
+            </div>
+
+            <div class="users-table">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>{% trans "Nom" %}</th>
+                        <th>{% trans "Type et couleur" %}</th>
+                        <th>{% trans "Coefficient" %}</th>
+                        <th>{% trans "Délai (jours)" %}</th>
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for customer_type in customer_types %}
+                        <tr>
+                            <td>{{ customer_type.name }}</td>
+                            <td>
+                                {% if customer_type.entity_type == "physical" %}
+                                    <i class="fas fa-user" style="color: {{ customer_type.color }}"></i>
+                                    {% trans "Personne physique" %}
+                                {% else %}
+                                    <i class="fas fa-building" style="color: {{ customer_type.color }}"></i>
+                                    {% trans "Personne morale" %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if customer_type.donation_exemption %}
+                                    {{ 0.0|floatformat:2 }} <span class="badge-exemption">({% trans "Exonéré" %})</span>
+                                {% else %}
+                                    {{ customer_type.donation_coefficient|floatformat:2 }}
+                                {% endif %}
+                            </td>
+                            <td>{{ customer_type.reservation_period_days }}</td>
+                            <td>
+                                <a href="{% url 'ui:customer_type_update' customer_type.id %}" class="action-button">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'ui:customer_type_delete' customer_type.id %}"
+                                   class="action-button danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px;">
+                                <i class="fas fa-search"
+                                   style="font-size: 2rem; margin-bottom: 15px; color: var(--text-secondary);"></i>
+                                <p>{% trans "Aucun type de client trouvé" %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 20px;"></div>
+
+            <a href="{% url 'ui:customers' %}" class="auth-button">
+                <i class="fas fa-arrow-left"></i> {% trans "Retour aux clients" %}
             </a>
         </div>
-
-        <div class="users-table">
-            <table>
-                <thead>
-                <tr>
-                    <th>{% trans "Nom" %}</th>
-                    <th>{% trans "Code" %}</th>
-                    <th>{% trans "Type d'entité" %}</th>
-                    <th>{% trans "Couleur" %}</th>
-                    <th>{% trans "Actions" %}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for customer_type in customer_types %}
-                    <tr>
-                    <td>{{ customer_type.name }}</td>
-                    <td>{{ customer_type.code }}</td>
-                    <td>
-                        {% if customer_type.entity_type == "physical" %}
-                            <i class="fas fa-user" style="color: {{ customer_type.color }}"></i>
-                            {% trans "Personne physique" %}
-                        {% else %}
-                            <i class="fas fa-building" style="color: {{ customer_type.color }}"></i>
-                            {% trans "Personne morale" %}
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="color-sample" style="background-color: {{ customer_type.color }}"></span>
-                        {{ customer_type.color }}
-                    </td>
-                    <td>
-                        <a href="{% url 'ui:customer_type_update' customer_type.id %}" class="action-button">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="{% url 'ui:customer_type_delete' customer_type.id %}" class="action-button danger">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                    <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px;">
-                        <i class="fas fa-search"
-                           style="font-size: 2rem; margin-bottom: 15px; color: var(--text-secondary);"></i>
-                        <p>{% trans "Aucun type de client trouvé" %}</p>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div style="margin-top: 20px;"></div>
-
-        <a href="{% url 'ui:customers' %}" class="auth-button">
-            <i class="fas fa-arrow-left"></i> {% trans "Retour aux clients" %}
-        </a>
     </div>
-</div>
-
-    <style>
-    .color-sample {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border-radius: 4px;
-        margin-right: 10px;
-        vertical-align: middle;
-    }
-</style>
 {% endblock %}

@@ -2,6 +2,8 @@
 model for managing reservations and reservation items.
 """
 
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
@@ -115,7 +117,19 @@ class Reservation(models.Model):
         Compute the total expected donation for the reservation based on reserved items.
         :return: Total expected donation amount
         """
-        return sum(item.expected_donation for item in self.items.all())
+        if self.customer.is_exempted_from_donation():
+            return 0
+        return Decimal(str(self.customer.get_donation_coefficient())) * sum(
+            item.expected_donation for item in self.items.all()
+        )
+
+    @property
+    def customer_type(self):
+        """
+        Return the customer type of the reservation's customer.
+        :return: CustomerType instance or None
+        """
+        return self.customer.customer_type
 
     def get_start_date(self):
         """

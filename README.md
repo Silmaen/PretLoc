@@ -99,29 +99,30 @@ PretLoc can be configured through environment variables or by editing the `.env`
 * Customer management
     * Customer types
         * [X] Allow defining customer types (member, non-member, external)
-        * [ ] Allow defining benefits for each customer type
+        * [X] Allow defining benefits for each customer type
             * [X] Exemption from donation
-            * [ ] Extended reservation period
-            * [ ] Donation calculation (e.g., double donation for external customers)
+            * [X] Extended reservation period
+            * [x] Donation calculation coefficient (e.g., double donation for external customers)
     * Customer
         * [ ] Allow archiving customers (no longer suggest them in searches)
-        * [ ] Dans la vue client, permettre l'affichage des réservations passées
-            * [ ] Dans la vue client, permettre l'affichage des réservations à venir/encours
-            * [ ] Dans la vue client, permettre l'affichage des dons
-        * [ ] Ajouter un champ dans les clients pour savoir s'il a déjà fait un don cette année (cotisation)
+        * [X] In Customer view, display customer type
+            * [X] In Customer view, display if the customer has a donation exemption
+        * [ ] Add a field in customers to know if they have already made a donation this year (membership fee)
 * Reservation management
-    * [ ] Display customer type in reservation view
-        * [ ] Display if the customer has a donation exemption
+    * [X] Display customer type in reservation view
+        * [X] Display if the customer has a donation exemption
         * [ ] Display if the customer has already made a donation this year
             * [ ] Display suggested donation amount deducing the membership fee if already paid this year
-            * [ ] External customers have a suggested donation amount doubled
     * [ ] Display asset availability in reservation view line
         * [ ] (optional) deduce of the availability the current reservation
             * [ ] Have the same search for customer in reservation and customer list
         * [ ] (optional) display customer type icon in search bar
     * [ ] Allow generating PDFs of all reservations due next Friday or Monday.
     * [ ] Allow customers to renew their reservation (same items, different date)
-    * [ ] Dans la vue de réservation, afficher le type de client
+    * [ ] In return view, display the articles
+        * [ ] Allow inputs of how many items are returned (in case of partial return or damaged)
+            * [ ] Compute donation based on the number of items returned (even exempt customers must pay for
+              non-returned items)
 * Donation management
     * [ ] Allow recording a donation for a customer
     * [ ] Allow indicating if the donation is for the annual membership (exemption)

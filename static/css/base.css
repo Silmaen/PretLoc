@@ -10,10 +10,9 @@
     --border-color: #444;
     --fr-blue: #002395;
     --fr-red: #ED2939;
-    --gb-blue: #012169;
+    --bg-error: #dc354533;
 }
 
-/* Base */
 html, body {
     height: 100%;
     margin: 0;
@@ -49,7 +48,6 @@ a:hover i {
     transform: scale(1.2);
 }
 
-/* Layout principal */
 header {
     position: sticky;
     top: 0;
@@ -83,7 +81,6 @@ footer {
     margin-top: auto;
 }
 
-/* Conteneurs flexibles */
 .header-container, .footer-container {
     display: flex;
     justify-content: space-between;
@@ -116,7 +113,6 @@ footer {
     gap: 10px;
 }
 
-/* Éléments de contenu */
 .container {
     max-width: 800px;
     width: 90%;
@@ -147,7 +143,6 @@ footer {
     color: var(--text-secondary);
 }
 
-/* Styles des boutons et liens */
 .header-right a,
 .user-profile-link,
 .logout-button,
@@ -192,7 +187,6 @@ footer {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Sélecteur de langue */
 .language-selector {
     position: relative;
     display: inline-block;
@@ -227,7 +221,6 @@ footer {
     transform: translateY(-2px);
 }
 
-/* Styles pour l'authentification */
 .auth-container {
     max-width: 1000px;
     width: 95%;
@@ -276,7 +269,6 @@ footer {
     margin-bottom: 15px;
 }
 
-/* Formulaires */
 .form-group {
     margin-bottom: 20px;
     position: relative;
@@ -348,7 +340,6 @@ select[disabled], input[disabled] {
     margin-top: 5px;
 }
 
-/* Boutons d'authentification */
 .auth-button {
     width: 100%;
     background-color: var(--accent-blue);
@@ -409,7 +400,6 @@ a.auth-button:hover {
     text-decoration: underline;
 }
 
-/* Styles pour les tables de données */
 .users-table {
     margin-top: 20px;
     overflow-x: auto;
@@ -482,7 +472,6 @@ tr:hover {
     color: white;
 }
 
-/* Styles pour les messages */
 .messages-container {
     width: 100%;
     max-width: 800px;
@@ -544,7 +533,6 @@ tr:hover {
     opacity: 1;
 }
 
-/* Animations */
 @keyframes slide-down {
     0% {
         opacity: 0;
@@ -567,7 +555,6 @@ tr:hover {
     }
 }
 
-/* Media queries pour écrans ≤ 800px - icônes seulement */
 @media (max-width: 800px) {
     .header-right a span,
     .user-profile-link span,
@@ -636,7 +623,6 @@ tr:hover {
     }
 }
 
-/* Pour les très petits écrans */
 @media (max-width: 576px) {
     .copyright {
         display: none;
@@ -689,13 +675,11 @@ tr:hover {
     }
 }
 
-/* Garantir que les images et médias sont responsives */
 img, svg, video, canvas, object {
     max-width: 100%;
     height: auto;
 }
 
-/* Styles pour les boutons de tri */
 .sort-buttons {
     display: inline-flex;
     margin-left: 5px;
@@ -713,26 +697,22 @@ img, svg, video, canvas, object {
     transform: scale(1.2);
 }
 
-/* Style pour les en-têtes de colonne */
 th {
     position: relative;
     white-space: nowrap;
 }
 
-/* Style pour la taille du titre de l'article */
 h6.mb-0 {
     font-size: 1.1rem !important;
     font-weight: bold !important;
 }
 
-/* Style pour les boutons de catégories actifs */
 .auth-button.active {
     background-color: var(--accent-blue-hover);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Styles pour la barre de recherche */
 .search-container {
     display: flex;
     width: 100%;
@@ -743,7 +723,6 @@ h6.mb-0 {
     width: 100%;
     display: flex;
 }
-
 
 .search-input-round {
     flex-grow: 1;
@@ -832,25 +811,21 @@ h6.mb-0 {
     color: white;
 }
 
-/* Style pour les lignes de tableau condensées */
 .users-table td {
     padding: 8px 10px;
     vertical-align: middle;
 }
 
-/* Réduire l'espace entre les lignes */
 .users-table tr {
     height: auto;
 }
 
-/* Amélioration de l'affichage des contacts */
 .users-table .contact-info {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-/* Style pour les valeurs des articles */
 .values-container {
     display: flex;
     flex-direction: column;
@@ -864,7 +839,6 @@ h6.mb-0 {
     gap: 5px;
 }
 
-/* Style pour les informations client/article */
 .item-info {
     display: flex;
     flex-direction: column;
@@ -903,7 +877,6 @@ h6.mb-0 {
     white-space: nowrap;
 }
 
-/* Pour les écrans mobiles */
 @media (max-width: 576px) {
     .search-action-bar {
         flex-direction: column;
@@ -1159,7 +1132,6 @@ h6.mb-0 {
     box-shadow: 0 0 0 2px rgba(3, 157, 218, 0.2);
 }
 
-/* Style spécifique pour le dark textarea */
 .dark-textarea {
     background-color: var(--bg-dark);
     border-color: var(--border-color);
@@ -1175,4 +1147,212 @@ h6.mb-0 {
     color: var(--text-primary);
     cursor: pointer;
     min-width: 180px;
+}
+
+.reservation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.reservation-customer-info h3 {
+    margin: 0 0 10px 0;
+}
+
+.reservation-customer-info p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.reservation-status-section {
+    text-align: right;
+}
+
+.reservation-status-badge {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.reservation-section-title {
+    margin-top: 0;
+}
+
+.reservation-donation-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reservation-actions-row {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.reservation-actions-row .auth-button {
+    margin: 0;
+}
+
+.reservation-notes-text {
+    white-space: pre-line;
+    margin: 0;
+}
+
+.reservation-footer-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.reservation-footer-actions .auth-button.secondary {
+    background-color: var(--bg-element);
+}
+
+@media (max-width: 768px) {
+    .reservation-header {
+        flex-direction: column;
+    }
+
+    .reservation-status-section {
+        text-align: left;
+    }
+
+    .reservation-actions-row {
+        flex-wrap: wrap;
+    }
+}
+
+.no-margin-title {
+    margin: 0 0 10px 0;
+}
+
+.auth-button.danger {
+    background-color: var(--accent-red);
+}
+
+.auth-button.danger:hover {
+    background-color: #b00f0f;
+}
+
+.auth-button.secondary {
+    background-color: var(--bg-element);
+    color: var(--text-primary);
+}
+
+.auth-button.secondary:hover {
+    background-color: var(--border-color);
+}
+
+.customer-type-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+h4.reservation-section-title,
+h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.history-icon {
+    margin-right: 8px;
+    color: var(--accent-blue);
+}
+
+.reservation-donation-amount {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.reservation-donation-amount i {
+    color: var(--accent-blue);
+}
+
+.reservation-donation-info {
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.reservation-action-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.reservation-action-link:hover {
+    text-decoration: underline;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.flex-row {
+    display: flex;
+    gap: 20px;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.notes-display {
+    background-color: var(--bg-element);
+    padding: 12px 15px;
+    border-radius: 5px;
+    white-space: pre-line;
+}
+
+@media (max-width: 768px) {
+    .flex-row {
+        flex-direction: column;
+    }
+
+    .text-right {
+        text-align: left;
+    }
+}
+
+.table-cell-center {
+    text-align: center;
+}
+
+tr.row-error {
+    background-color: var(--bg-error);
+}
+
+.quantity-warning {
+    color: var(--accent-red);
+}
+
+.customer-type-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.customer-type-display i {
+    font-size: 1.2rem;
 }
