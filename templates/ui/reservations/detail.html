@@ -76,7 +76,7 @@
                     <div>
                         <p class="reservation-donation-amount">
                             <i class="fas fa-hand-holding-heart"></i>
-                            <strong>{% trans "Don effectué" %}:</strong> {{ reservation.donation_amount }} €
+                            <strong>{% trans "Don effectué" %}:</strong> {{ reservation.total_donations }} €
                         </p>
                         <p class="reservation-donation-info">
                             <i class="fas fa-info-circle"></i>
@@ -93,6 +93,17 @@
                                     <p class="reservation-donation-info">
                                         <i class="fas fa-calculator"></i>
                                         {% trans "Coefficient" %}: {{ coef }}
+                                    </p>
+                                {% endif %}
+                                {% if customer_membership %}
+                                    <p class="reservation-donation-info">
+                                        <i class="fas fa-id-card"></i>
+                                        {% trans "Cotisation effectuée" %}
+                                    </p>
+                                {% else %}
+                                    <p class="reservation-donation-info">
+                                        <i class="fas fa-id-card"></i>
+                                        {% trans "Cotisation attendue:" %}{{ customer_membership_fee }} €
                                     </p>
                                 {% endif %}
                             {% endwith %}
@@ -257,8 +268,8 @@
 
             <!-- Boutons d'action -->
             <div class="reservation-footer-actions">
-                <a href="{% url 'ui:reservations' %}" class="auth-button secondary">
-                    <i class="fas fa-arrow-left"></i> {% trans "Retour à la liste" %}
+                <a href="javascript:history.back()" class="auth-button secondary">
+                    <i class="fas fa-arrow-left"></i> {% trans "Retour" %}
                 </a>
 
                 {% if reservation.status == 'created' or reservation.status == 'validated' %}

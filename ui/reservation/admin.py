@@ -40,7 +40,7 @@ class ReservationAdmin(admin.ModelAdmin):
         "actual_checkout_date",
         "return_date",
         "actual_return_date",
-        "donation_amount",
+        "display_total_donations",
         "total_expected_donation",
     )
     list_filter = ("status", "checkout_date", "return_date")
@@ -50,7 +50,7 @@ class ReservationAdmin(admin.ModelAdmin):
         "customer__company_name",
         "notes",
     )
-    readonly_fields = ("total_expected_donation",)
+    readonly_fields = ("total_expected_donation", "display_total_donations")
     date_hierarchy = "checkout_date"
     inlines = [ReservationItemInline]
 
@@ -83,8 +83,25 @@ class ReservationAdmin(admin.ModelAdmin):
             },
         ),
         (
-            _("Don"),
-            {"fields": ("donation_amount", "total_expected_donation")},
+            _("Dons"),
+            {"fields": ("display_total_donations", "total_expected_donation")},
         ),
         (_("Notes"), {"fields": ("notes",)}),
     )
+
+    def display_total_donations(self, obj):
+        """
+        Display total donations for the reservation.
+        :param obj: Reservation instance
+        :return: Formatted donation amount
+        """
+        return f"{obj.total_donations} €"
+
+    display_total_donations.short_description = _("Dons effectués")
+
+    def get_queryset(self, request):
+        """
+        Optimize queryset with prefetch_related to reduce database queries.
+        """
+        qs = super().get_queryset(request)
+        return qs.prefetch_related("donations")

@@ -2,8 +2,12 @@
 Models for managing customers and customer types.
 """
 
+from decimal import Decimal
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from utils.period import Period
 
 
 class CustomerType(models.Model):
@@ -128,6 +132,14 @@ class Customer(models.Model):
             return True
         return False
 
+    @property
+    def donation_exempted(self):
+        """
+        Property to check if the customer is exempted from donation.
+        :return: True if exempted, False otherwise
+        """
+        return self.is_exempted_from_donation()
+
     def get_donation_coefficient(self):
         """
         Get the donation coefficient for the customer.
@@ -140,3 +152,63 @@ class Customer(models.Model):
         if self.customer_type:
             return self.customer_type.donation_coefficient
         return 1.0
+
+    def get_total_donation_amount(self):
+        """
+        Compute the total donation amount for the customer.
+        :return: Total donation amount
+        """
+        total = sum(donation.amount for donation in self.donations.all())
+        return total
+
+    def get_donation_per_year(self, year):
+        """
+        Compute the total donation amount for the customer in a specific year.
+        :param year: Year to filter donations
+        :return: Total donation amount for the specified year
+        """
+        total = sum(
+            donation.amount for donation in self.donations.filter(date__year=year)
+        )
+        return total
+
+    def get_donation_in_period(self, period: Period):
+        """
+        Compute the total donation amount for the customer in a specific period.
+        :param period: Start date of the period
+        :return: Total donation amount for the specified period
+        """
+        total = sum(
+            donation.amount
+            for donation in self.donations.filter(
+                date__gte=period.start_date, date__lte=period.end_date
+            )
+        )
+        return total
+
+    def get_has_paid_membership_fee(self, year):
+        """
+        Check if the customer has paid the membership fee for a specific year.
+        :param year: Year to check membership fee payment
+        :return: True if membership fee is paid, False otherwise
+        """
+        if self.is_exempted_from_donation():
+            return True
+        membership_fee_donations = self.donations.filter(
+            date__year=year, includes_membership=True
+        )
+        return membership_fee_donations.exists()
+
+    def get_membership_fee(self, year):
+        """
+        Get the membership fee for a specific year.
+        :param year: Year to get the membership fee
+        :return: Membership fee amount
+        """
+        if self.is_exempted_from_donation():
+            return 0.0
+        if self.get_has_paid_membership_fee(year):
+            return 0.0
+        # Fixed membership fee amount (to be set dynamically later)
+        membership_donation = Decimal(5.00)
+        return membership_donation * Decimal(str(self.get_donation_coefficient()))

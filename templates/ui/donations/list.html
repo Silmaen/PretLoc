@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <div class="auth-container" style="max-width: 1200px;">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-hand-holding-heart auth-icon"></i>
+                <h2>{% trans "Gestion des dons" %}</h2>
+            </div>
+
+            <!-- Barre de recherche et filtres -->
+            <div class="search-action-bar">
+                <form method="get" class="search-container">
+                    <div class="search-input-group">
+                        <input type="text" name="search" value="{{ search_query }}"
+                               placeholder="{% trans 'Rechercher un client...' %}"
+                               class="search-input">
+                        <button type="submit" class="auth-button search-button">
+                            <i class="fas fa-search"></i> {% trans "Rechercher" %}
+                        </button>
+                    </div>
+                </form>
+
+                <a href="{% url 'ui:donation_create' %}" class="auth-button">
+                    <i class="fas fa-plus"></i> {% trans "Nouveau don" %}
+                </a>
+            </div>
+
+            <!-- Filtres -->
+            <div class="filters-row">
+                <div class="filter-group">
+                    <span class="filter-label">
+                        <i class="fas fa-id-card"></i>
+                        {% trans "Adhésion" %}
+                    </span>
+                    <div class="filter-buttons-container">
+                        <a href="?search={{ search_query }}&sort={{ sort }}"
+                           class="filter-button {% if not includes_membership %}active{% endif %}">
+                            {% trans "Toutes" %}
+                        </a>
+                        <a href="?search={{ search_query }}&includes_membership=true&sort={{ sort }}"
+                           class="filter-button {% if includes_membership == 'true' %}active{% endif %}">
+                            {% trans "Avec adhésion" %}
+                        </a>
+                        <a href="?search={{ search_query }}&includes_membership=false&sort={{ sort }}"
+                           class="filter-button {% if includes_membership == 'false' %}active{% endif %}">
+                            {% trans "Sans adhésion" %}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">
+                        <i class="fas fa-sort"></i>
+                        {% trans "Tri" %}
+                    </span>
+                    <select name="sort" class="filter-select"
+                            onchange="location.href='?search={{ search_query }}&includes_membership={{ includes_membership }}&sort=' + this.value">
+                        <option value="-date" {% if sort == "-date" %}selected{% endif %}>
+                            {% trans "Date (récent → ancien)" %}
+                        </option>
+                        <option value="date" {% if sort == "date" %}selected{% endif %}>
+                            {% trans "Date (ancien → récent)" %}
+                        </option>
+                        <option value="-amount" {% if sort == "-amount" %}selected{% endif %}>
+                            {% trans "Montant (élevé → faible)" %}
+                        </option>
+                        <option value="amount" {% if sort == "amount" %}selected{% endif %}>
+                            {% trans "Montant (faible → élevé)" %}
+                        </option>
+                        <option value="customer__last_name" {% if sort == "customer__last_name" %}selected{% endif %}>
+                            {% trans "Client (A → Z)" %}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Résumé -->
+            <div class="auth-card-secondary">
+                <div class="flex-between">
+                    <span>
+                        <i class="fas fa-list"></i>
+                        <strong>{{ donations.count }}</strong> {% trans "don(s)" %}
+                    </span>
+                    <span class="auth-blue" style="font-size: 1.2rem; font-weight: bold;">
+                        <i class="fas fa-euro-sign"></i> {{ total_donations|floatformat:2 }} €
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tableau des dons -->
+            <table>
+                <thead>
+                <tr>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Client" %}</th>
+                    <th>{% trans "Montant" %}</th>
+                    <th class="table-cell-center">{% trans "Adhésion" %}</th>
+                    <th>{% trans "Réservation" %}</th>
+                    <th class="table-cell-center">{% trans "Actions" %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for donation in donations %}
+                    <tr>
+                        <td>{{ donation.date|date:"d/m/Y" }}</td>
+                        <td>
+                            <div class="item-info">
+                                <a href="{% url 'ui:customer_detail' donation.customer.pk %}" class="auth-blue" style="text-decoration: none;">
+                                    <i class="fas fa-user"></i>
+                                    <span class="item-title">{{ donation.customer }}</span>
+                                </a>
+                            </div>
+                        </td>
+                        <td class="auth-blue" style="font-weight: bold;">
+                            {{ donation.amount|floatformat:2 }} €
+                        </td>
+                        <td class="table-cell-center">
+                            {% if donation.includes_membership %}
+                                <i class="fas fa-check-circle" style="color: var(--accent-green);"></i>
+                            {% else %}
+                                <i class="fas fa-times-circle" style="color: var(--text-secondary);"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if donation.reservation %}
+                                <a href="{% url 'ui:reservation_detail' donation.reservation.pk %}" class="auth-blue">
+                                    <i class="fas fa-link"></i>
+                                    Rés. #{{ donation.reservation.pk }}
+                                </a>
+                            {% else %}
+                                <span style="color: var(--text-secondary);">
+                                        <i class="fas fa-minus"></i> {% trans "Aucune" %}
+                                    </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="actions-buttons">
+                                <a href="{% url 'ui:donation_update' donation.pk %}" class="action-button">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'ui:donation_delete' donation.pk %}" class="action-button danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center" style="padding: 40px;">
+                            <i class="fas fa-inbox" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                            <p style="margin-top: 10px; color: var(--text-secondary);">
+                                {% trans "Aucun don trouvé" %}
+                            </p>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

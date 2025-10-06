@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from ui.customer.models import Customer
 from ui.stock.models import Asset
+from utils.period import Period
 
 
 class Reservation(models.Model):
@@ -46,9 +47,6 @@ class Reservation(models.Model):
         on_delete=models.CASCADE,
         related_name="reservations",
         verbose_name=_("Client"),
-    )
-    donation_amount = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, verbose_name=_("Don effectué")
     )
     notes = models.TextField(blank=True, verbose_name=_("Notes"))
     created_at = models.DateTimeField(auto_now_add=True)
@@ -112,6 +110,14 @@ class Reservation(models.Model):
         return f"{self.customer} - {self.checkout_date}"
 
     @property
+    def total_donations(self):
+        """
+        Calculate total donations linked to this reservation.
+        :return: Total donation amount
+        """
+        return sum(donation.amount for donation in self.donations.all())
+
+    @property
     def total_expected_donation(self):
         """
         Compute the total expected donation for the reservation based on reserved items.
@@ -131,19 +137,21 @@ class Reservation(models.Model):
         """
         return self.customer.customer_type
 
-    def get_start_date(self):
+    @property
+    def true_start_date(self):
         """
         Return the start date of the reservation.
-        :return: Start date (actual or planned)
+        :return: Start date (actual or planned).
         """
         if self.actual_checkout_date:
             return self.actual_checkout_date
         return self.checkout_date
 
-    def get_return_date(self):
+    @property
+    def true_return_date(self):
         """
         Return the return date of the reservation, considering actual return if available.
-        :return: Return date (actual, planned, or current if overdue)
+        :return: Return date (actual, planned, or current if overdue).
         """
         if self.actual_return_date:
             return self.actual_return_date
@@ -151,6 +159,13 @@ class Reservation(models.Model):
             if self.return_date < timezone.now():
                 return timezone.now()
         return self.return_date
+
+    def actual_period(self) -> Period:
+        """
+        Calculate the actual period of the reservation as a Period object.
+        :return: Period instance representing the actual period.
+        """
+        return Period(self.true_start_date, self.true_return_date)
 
 
 class ReservationItem(models.Model):

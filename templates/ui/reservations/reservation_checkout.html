@@ -1,168 +1,246 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load l10n %}
 
 {% block content %}
-<div class="auth-container" style="max-width: 800px;">
-    <div class="auth-card">
-        <div class="auth-header">
-            <i class="fas fa-arrow-right auth-icon" style="color: var(--accent-blue);"></i>
-            <h2>{% trans "Sortie de matériel" %}</h2>
-        </div>
+    <div class="auth-container" style="max-width: 800px;">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-arrow-right auth-icon" style="color: var(--accent-blue);"></i>
+                <h2>{% trans "Sortie de matériel" %}</h2>
+            </div>
 
-        <!-- En-tête avec informations de la réservation -->
-        <div class="form-group">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <h3 style="margin: 0;">{{ reservation.customer }}</h3>
-                <div>
+            <!-- En-tête avec informations de la réservation -->
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <h3 style="margin: 0;">{{ reservation.customer }}</h3>
+                    <div>
                     <span style="font-weight: bold; font-size: 0.9rem;">
                         <i class="fas fa-arrow-right"></i> {{ reservation.checkout_date }} | 
                         <i class="fas fa-arrow-left"></i> {{ reservation.return_date }}
                     </span>
+                    </div>
+                </div>
+                <div style="font-size: 0.9rem;">
+                    <i class="fas fa-envelope"></i> {{ reservation.customer.email }}
+                    {% if reservation.customer.phone %}
+                        | <i class="fas fa-phone"></i> {{ reservation.customer.phone }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="actual_checkout_date">
+                        <i class="fas fa-calendar-alt"></i> {% trans "Date de sortie réelle" %}
+                    </label>
+                    <div class="flatpickr-wrapper">
+                        <input type="text" id="actual_checkout_date" name="actual_checkout_date"
+                               placeholder="{% trans 'Sélectionner une date' %}"
+                               value="{% now 'Y-m-d H:M' %}"
+                               class="datepicker" data-input>
+                        <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
+                            <i class="fas fa-calendar-alt"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div style="font-size: 0.9rem;">
-                <i class="fas fa-envelope"></i> {{ reservation.customer.email }}
-                {% if reservation.customer.phone %}
-                | <i class="fas fa-phone"></i> {{ reservation.customer.phone }}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label for="actual_checkout_date">
-                    <i class="fas fa-calendar-alt"></i> {% trans "Date de sortie réelle" %}
-                </label>
-                <div class="flatpickr-wrapper">
-                    <input type="text" id="actual_checkout_date" name="actual_checkout_date"
-                           placeholder="{% trans 'Sélectionner une date' %}"
-                           value="{% now 'Y-m-d H:M' %}"
-                           class="datepicker" data-input>
-                    <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
-                        <i class="fas fa-calendar-alt"></i>
-                    </a>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Articles à sortir -->
+                <div class="auth-card" style="margin-top: 20px;">
+                    <h4 class="no-margin-title">
+                        <i class="fas fa-boxes"></i> {% trans "Articles à sortir" %}
+                    </h4>
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>{% trans "Article" %}</th>
+                            <th style="width: 100px; text-align: center;">{% trans "Réservé" %}</th>
+                            <th style="text-align: center;">{% trans "Disponible" %}</th>
+                            <th style="width: 100px; text-align: center;">{% trans "À sortir" %}</th>
+                            <th style="text-align: right;">{% trans "Don unitaire" %}</th>
+                            <th style="width: 150px; text-align: right;">{% trans "Don total" %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.asset.name }}</strong><br>
+                                    <small style="color: var(--text-secondary);">{{ item.asset.category.name }}</small>
+                                </td>
+                                <td style="text-align: center;">{{ item.quantity_reserved }}</td>
+                                <td style="text-align: center;">
+                                    {% if item.asset.stock_quantity < item.quantity_reserved %}
+                                        <span class="quantity-warning">{{ item.asset.stock_quantity }}</span>
+                                    {% else %}
+                                        {{ item.asset.stock_quantity }}
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    <input type="number"
+                                           name="checkout_{{ item.id }}"
+                                           class="quantity-input"
+                                           data-item-id="{{ item.id }}"
+                                           data-unit-price="{{ item.asset.rental_value }}"
+                                           value="{{ item.quantity_reserved }}"
+                                           min="0"
+                                           max="{{ item.asset.stock_quantity }}">
+                                </td>
+                                <td style="text-align: right;">{{ item.asset.rental_value }} €</td>
+                                <td style="text-align: right;">
+                                    <span class="item-total" data-item-id="{{ item.id }}">
+                                        {{ item.expected_donation }} €
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
 
-        <form method="post">
-            {% csrf_token %}
+                <!-- Don minimum attendu (en lecture seule) -->
+                <div class="auth-card" style="margin-top: 20px;">
+                    <h4 class="no-margin-title">
+                        <i class="fas fa-euro-sign"></i> {% trans "Totaux" %}
+                    </h4>
 
-            <!-- Articles à sortir -->
-            <div style="margin-bottom: 20px;">
-                <h4 style="margin-top: 0;">{% trans "Articles à sortir" %}</h4>
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            {% trans "Don attendu (articles)" %}
+                        </div>
+                        <div class="detail-value">
+                            <strong id="expected-donation">{{ total_expected }}</strong>
+                        </div>
+                    </div>
 
-                <table>
-                    <thead>
-                    <tr>
-                        <th>{% trans "Article" %}</th>
-                        <th style="width: 100px; text-align: center;">{% trans "Réservé" %}</th>
-                        <th style="width: 100px; text-align: center;">{% trans "À sortir" %}</th>
-                        <th style="width: 150px; text-align: right;">{% trans "Don minimum" %}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>
-                            <div class="item-info">
-                                <span class="item-title">{{ item.asset.name }}</span>
-                                <span class="item-subtitle">{{ item.asset.category.name }}</span>
+                    {% if not customer_membership %}
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-id-card"></i>
+                                {% trans "Cotisation annuelle" %}
                             </div>
-                        </td>
-                        <td style="text-align: center;">{{ item.quantity_reserved }}</td>
-                        <td style="text-align: center;">
-                            <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity_reserved }}"
-                                   min="0" max="{{ item.quantity_reserved }}"
-                                   style="width: 60px; text-align: center;"
-                                   onchange="updateTotal()">
-                        </td>
-                        <td style="text-align: right;">
-                                <span class="item-donation" data-value="{{ item.asset.rental_value }}">
-                                    {{ item.expected_donation }} €
-                                </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <td colspan="3" style="text-align: right; font-weight: bold;">
-                            {% trans "Don minimum total" %}:
-                        </td>
-                        <td style="text-align: right; font-weight: bold;">
-                            <span>{{ total_expected }} €</span>
-                        </td>
-                    </tr>
-                    </tfoot>
-                </table>
-            </div>
+                            <div class="detail-value">
+                                <strong>{{ customer_membership_fee }}</strong> €
+                                <span style="color: var(--accent-red);">({% trans "Non payée" %})</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-check-circle"></i>
+                                {% trans "Cotisation annuelle" %}
+                            </div>
+                            <div class="detail-value">
+                                <span style="color: var(--accent-blue);">({% trans "Déjà payée" %})</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if not reservation.customer.donation_exempted and reservation.customer.get_donation_coefficient != 1 %}
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-percent"></i>
+                                {% trans "Coefficient client" %}:
+                            </div>
+                            <div class="detail-value">
+                                <strong>{{ reservation.customer.get_donation_coefficient|floatformat:2 }}</strong>
+                            </div>
+                        </div>
+                    {% endif %}
 
-            <!-- Don minimum attendu (en lecture seule) -->
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-hand-holding-heart"></i> {% trans "Don minimum attendu" %}
-                </label>
-                <div style="background-color: var(--bg-element); padding: 12px 15px; border-radius: 5px; text-align: right; font-weight: bold;">
-                    <span id="total-donation">{{ total_expected }} €</span>
-                    <input type="hidden" name="donation_amount" value="{{ total_expected }}">
+                    <div class="detail-row" style="border-top: 2px solid var(--accent-blue); padding-top: 15px;">
+                        <div class="detail-label">
+                            <i class="fas fa-coins"></i>
+                            {% trans "Total à collecter" %}
+                        </div>
+                        <div class="detail-value">
+                            <strong id="total-donation" style="font-size: 1.2em; color: var(--accent-blue);">
+                                {% if customer_membership %}
+                                    {{ total_expected }}
+                                {% else %}
+                                    {% widthratio total_expected 1 1 as total_with_membership %}
+                                    {% widthratio customer_membership_fee 1 1 as membership_decimal %}
+                                    {{ total_expected|add:customer_membership_fee }}
+                                {% endif %}
+                            </strong> €
+                        </div>
+                    </div>
                 </div>
-                <div class="form-help-text">
-                    <i class="fas fa-info-circle"></i>
-                    {% trans "Le don minimum est calculé automatiquement selon les articles sortis" %}
-                </div>
-            </div>
 
-            <!-- Notes -->
-            <div class="form-group">
-                <label for="notes">
-                    <i class="fas fa-sticky-note"></i> {% trans "Notes" %}
-                </label>
-                <textarea id="notes" name="notes" rows="3">{{ reservation.notes }}</textarea>
-                <div class="form-help-text">
-                    <i class="fas fa-info-circle"></i>
-                    {% trans "Ajoutez des remarques ou informations complémentaires" %}
+                <!-- Notes -->
+                <div class="auth-card" style="margin-top: 20px;">
+                    <label for="notes">
+                        <i class="fas fa-sticky-note"></i> {% trans "Notes" %}
+                    </label>
+                    <textarea class="dark-textarea" id="notes" name="notes" rows="3">{{ reservation.notes }}</textarea>
+                    <div class="form-help-text">
+                        <i class="fas fa-info-circle"></i>
+                        {% trans "Ajoutez des remarques ou informations complémentaires" %}
+                    </div>
                 </div>
-            </div>
 
-            <!-- Boutons d'action -->
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
-                <a href="{% url 'ui:reservation_detail' reservation.pk %}" class="auth-button"
-                   style="background-color: var(--bg-element);">
-                    <i class="fas fa-times"></i> {% trans "Annuler" %}
-                </a>
-                <button type="submit" class="auth-button">
-                    <i class="fas fa-arrow-right"></i> {% trans "Valider la sortie" %}
-                </button>
-            </div>
-        </form>
+                <!-- Boutons d'action -->
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                    <a href="javascript:history.back()" class="auth-button"
+                       style="background-color: var(--bg-element);">
+                        <i class="fas fa-times"></i> {% trans "Annuler" %}
+                    </a>
+                    <button type="submit" class="auth-button">
+                        <i class="fas fa-arrow-right"></i> {% trans "Valider la sortie" %}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
-{% include "includes/flatpickr_script.html" %}
-<script>
-    function updateTotal() {
-        const rows = document.querySelectorAll('tbody tr');
-        let total = 0;
+    {% include "includes/flatpickr_script.html" %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const coefficient = parseFloat('{{ reservation.customer.get_donation_coefficient }}');
+            const items = [
+                {% for item in items %}
+                    {
+                        id: {{ item.id }},
+                        rentalValue: parseFloat('{{ item.asset.rental_value }}')
+                    }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
 
-        rows.forEach(row => {
-            const quantityInput = row.querySelector('input[type="number"]');
-            const donationElem = row.querySelector('.item-donation');
+            function updateTotals() {
+                let theoreticalTotal = 0;
 
-            if (quantityInput && donationElem) {
-                const quantity = parseInt(quantityInput.value) || 0;
-                const unitValue = parseFloat(donationElem.getAttribute('data-value')) || 0;
-                const itemDonation = quantity * unitValue;
+                items.forEach(item => {
+                    const input = document.querySelector(`input[name="checkout_${item.id}"]`);
+                    if (input) {
+                        const quantity = parseInt(input.value) || 0;
+                        theoreticalTotal += quantity * item.rentalValue;
+                    }
+                });
 
-                // Mettre à jour l'affichage du don pour cet article
-                donationElem.textContent = itemDonation.toFixed(2) + ' €';
+                let expectedTotal = theoreticalTotal * coefficient;
+                const hasMembership = {{ customer_membership|lower }};
+                const membershipFee = {{ customer_membership_fee|unlocalize }};
+                if (!hasMembership) {
+                    expectedTotal += membershipFee;
+                }
 
-                total += itemDonation;
+                document.getElementById('expected-donation').textContent = theoreticalTotal.toFixed(2) + ' €';
+                document.getElementById('total-donation').textContent = expectedTotal.toFixed(2) + ' €';
             }
-        });
 
-        // Mettre à jour le total et le champ de don
-        document.getElementById('total-donation').textContent = total.toFixed(2) + ' €';
-        document.getElementById('donation_amount').value = total.toFixed(2);
-    }
-</script>
+            // Écouter les changements sur tous les champs de quantité
+            const quantityInputs = document.querySelectorAll('input[name^="checkout_"]');
+            quantityInputs.forEach(input => {
+                input.addEventListener('input', updateTotals);
+                input.addEventListener('change', updateTotals);
+            });
+
+            // Initialiser au chargement
+            updateTotals();
+        });
+    </script>
 {% endblock %}

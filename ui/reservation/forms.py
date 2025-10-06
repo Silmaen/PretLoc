@@ -24,7 +24,7 @@ class ReservationForm(forms.ModelForm):
         model = Reservation
         fields = ["customer", "checkout_date", "return_date", "notes"]
         widgets = {
-            "notes": forms.Textarea(attrs={"rows": 3}),
+            "notes": forms.Textarea(attrs={"rows": 3, "class": "dark-textarea"}),
         }
 
 

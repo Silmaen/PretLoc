@@ -66,6 +66,10 @@ def get_capability(user):
             "can_view_categories": False,
             "can_add_reservations": False,
             "can_view_reservations": False,
+            "can_view_donations": False,
+            "can_add_donations": False,
+            "can_edit_donations": False,
+            "can_delete_donations": False,
         }
     return {
         # articles
@@ -89,4 +93,9 @@ def get_capability(user):
         "can_view_reservations": user.profile.user_type
         in ["admin", "manager", "member"],
         "can_delete_reservations": user.profile.user_type in ["admin", "manager"],
+        # donations
+        "can_view_donations": user.profile.user_type in ["admin", "manager"],
+        "can_add_donations": user.profile.user_type in ["admin", "manager"],
+        "can_edit_donations": user.profile.user_type in ["admin", "manager"],
+        "can_delete_donations": user.profile.user_type in ["admin", "manager"],
     }

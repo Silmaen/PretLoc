@@ -6,6 +6,7 @@
     --text-secondary: #b0b0b0;
     --accent-red: #d91313;
     --accent-blue: #039dda;
+    --accent-green: #28a745;
     --accent-blue-hover: #96d0f6;
     --border-color: #444;
     --fr-blue: #002395;
@@ -1043,6 +1044,16 @@ h6.mb-0 {
     border-bottom: none;
 }
 
+.detail-row-accentued {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 15px;
+    border-top: 3px solid var(--accent-blue);
+    padding-top: 20px;
+    margin-top: 15px;
+    background-color: rgba(3, 157, 218, 0.05);
+}
+
 .detail-label {
     width: 40%;
     font-weight: bold;
@@ -1059,6 +1070,13 @@ h6.mb-0 {
 
 .detail-value {
     width: 60%;
+}
+
+.detail-value-accentued {
+    width: 60%;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: var(--accent-blue);
 }
 
 .customer-type-icon {
@@ -1356,3 +1374,27 @@ tr.row-error {
 .customer-type-display i {
     font-size: 1.2rem;
 }
+
+.quantity-input {
+    width: 80px;
+    padding: 8px 12px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.quantity-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px rgba(3, 157, 218, 0.2);
+}
+
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+    opacity: 1;
+}
+
