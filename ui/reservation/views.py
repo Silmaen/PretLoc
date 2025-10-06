@@ -3,6 +3,7 @@ Views for managing reservations.
 """
 
 import base64
+import datetime
 from io import BytesIO
 from pathlib import Path
 
@@ -23,12 +24,14 @@ from django.utils.translation import gettext_lazy as _
 from weasyprint import HTML
 
 from accounts.decorators import user_type_required, get_capability
-from ui.computations import (
+from ui.donation.models import Donation
+from ui.stock.models import Category
+from utils.computations import (
     check_reservation_availability,
     analyze_asset_availability,
     get_asset_status_at_date,
 )
-from ui.stock.models import Category
+from utils.period import Period
 from .forms import (
     ReservationForm,
     ReservationItemForm,
@@ -150,10 +153,19 @@ def reservation_detail(request, pk):
             else:
                 item.is_problematic = False
 
+    customer_membership = reservation.customer.get_has_paid_membership_fee(
+        reservation.true_return_date.year
+    )
+    customer_membership_fee = reservation.customer.get_membership_fee(
+        reservation.true_return_date.year
+    )
+
     context = {
         "reservation": reservation,
         "items": items,
         "capability": get_capability(request.user),
+        "customer_membership": customer_membership,
+        "customer_membership_fee": customer_membership_fee,
     }
     return render(request, "ui/reservations/detail.html", context)
 
@@ -169,6 +181,18 @@ def reservation_create(request):
     ReservationItemFormSet = inlineformset_factory(
         Reservation, ReservationItem, form=ReservationItemForm, extra=1, can_delete=True
     )
+    # Récupérer le customer_id depuis les paramètres GET
+    customer_id = request.GET.get("customer_id")
+    initial_data = {}
+
+    if customer_id:
+        try:
+            from ui.customer.models import Customer
+
+            customer = Customer.objects.get(pk=customer_id)
+            initial_data["customer"] = customer
+        except Customer.DoesNotExist:
+            pass
 
     if request.method == "POST":
         form = ReservationForm(request.POST)
@@ -199,7 +223,7 @@ def reservation_create(request):
         else:
             formset = ReservationItemFormSet(request.POST)
     else:
-        form = ReservationForm()
+        form = ReservationForm(initial=initial_data)
         formset = ReservationItemFormSet()
 
     context = {
@@ -358,6 +382,14 @@ def reservation_checkout(request, pk):
 
     items = reservation.items.all().order_by("asset__category__name", "asset__name")
 
+    # Verify membership status
+    customer_membership = reservation.customer.get_has_paid_membership_fee(
+        reservation.checkout_date.year
+    )
+    customer_membership_fee = reservation.customer.get_membership_fee(
+        reservation.checkout_date.year
+    )
+
     if request.method == "POST":
         with transaction.atomic():
             errors = False
@@ -399,6 +431,8 @@ def reservation_checkout(request, pk):
         "reservation": reservation,
         "items": items,
         "total_expected": reservation.total_expected_donation,
+        "customer_membership": customer_membership,
+        "customer_membership_fee": customer_membership_fee,
         "capability": get_capability(request.user),
     }
     return render(request, "ui/reservations/reservation_checkout.html", context)
@@ -457,8 +491,19 @@ def reservation_return(request, pk):
                     asset.stock_quantity += returned_qty
                     asset.save()
             else:
-                donation = float(request.POST.get("donation_amount", 0))
-                reservation.donation_amount = donation
+                total_donations = float(request.POST.get("total_donations", 0))
+                customer_membership = reservation.customer.get_has_paid_membership_fee(
+                    reservation.true_return_date.year
+                )
+
+                if total_donations > 0:
+                    includes_membership = not customer_membership
+                    Donation.objects.create(
+                        customer=reservation.customer,
+                        amount=total_donations,
+                        includes_membership=includes_membership,
+                        reservation=reservation,
+                    )
                 reservation.status = "returned"
                 reservation.returned_by = request.user
 
@@ -474,11 +519,18 @@ def reservation_return(request, pk):
                     request, _("Retour de matériel enregistré avec succès")
                 )
                 return redirect("ui:reservation_detail", pk=reservation.pk)
-
+    customer_membership = reservation.customer.get_has_paid_membership_fee(
+        reservation.checkout_date.year
+    )
+    customer_membership_fee = reservation.customer.get_membership_fee(
+        reservation.checkout_date.year
+    )
     context = {
         "reservation": reservation,
         "items": items,
         "total_expected": reservation.total_expected_donation,
+        "customer_membership": customer_membership,
+        "customer_membership_fee": customer_membership_fee,
         "capability": get_capability(request.user),
     }
     return render(request, "ui/reservations/reservation_return.html", context)
@@ -531,13 +583,20 @@ def search_assets(request):
     query = request.GET.get("q", "")
     category_id = request.GET.get("category", None)
     excluded_ids = request.GET.getlist("exclude[]", [])
-    start_date = request.GET.get("start_date", timezone.now())
+    start_date = request.GET.get("start_date", "")
     end_date = request.GET.get("end_date", None)
 
     assets = Asset.objects.filter(stock_quantity__gt=0)
 
-    if category_id and category_id.isdigit():
-        assets = assets.filter(category_id=int(category_id))
+    if start_date == "":
+        start_date = timezone.now()
+    else:
+        start_date = datetime.datetime.fromisoformat(start_date)
+    if end_date is not None:
+        end_date = datetime.datetime.fromisoformat(end_date)
+
+    if category_id:
+        assets = assets.filter(category_id=category_id)
 
     if query:
         assets = assets.filter(
@@ -557,7 +616,7 @@ def search_assets(request):
             "rental_value": float(asset.rental_value),
         }
         if end_date:
-            quantities = analyze_asset_availability(asset, start_date, end_date)
+            quantities = analyze_asset_availability(asset, Period(start_date, end_date))
         else:
             quantities = get_asset_status_at_date(asset, start_date)
         r_asset["stock"] = quantities["available"]
@@ -622,7 +681,7 @@ def reservation_calendar_data(request):
                 <strong>Client:</strong> {reservation.customer}<br>
                 <strong>Statut:</strong> {reservation.get_status_display()}<br>
                 <strong>Articles:</strong> {items_text}<br>
-                <strong>Don:</strong> {reservation.donation_amount} €
+                <strong>Don:</strong> {reservation.total_donations} €
             """
 
         resource_id = f"customer-{reservation.customer}"
@@ -632,8 +691,8 @@ def reservation_calendar_data(request):
                 "id": reservation.id,
                 "resourceId": resource_id,
                 "title": f"{reservation.customer}",
-                "start": reservation.get_start_date().isoformat(),
-                "end": reservation.get_return_date().isoformat(),
+                "start": reservation.true_start_date.isoformat(),
+                "end": reservation.true_return_date.isoformat(),
                 "url": reverse("ui:reservation_detail", args=[reservation.id]),
                 "extendedProps": {
                     "customer": str(reservation.customer),

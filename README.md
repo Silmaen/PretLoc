@@ -96,6 +96,14 @@ PretLoc can be configured through environment variables or by editing the `.env`
 
 ## Requests
 
+* Home Page
+    * [ ] Create a dashboard displaying key metrics:
+        * [ ] Assets damaged or in repair
+        * [ ] Number of reservations (current and upcoming)
+        * [ ] Total donations received this year
+    * [ ] Display upcoming reservations (next monday and friday)
+        * [ ] Display departure
+        * [ ] Display return
 * Customer management
     * Customer types
         * [X] Allow defining customer types (member, non-member, external)
@@ -107,33 +115,29 @@ PretLoc can be configured through environment variables or by editing the `.env`
         * [ ] Allow archiving customers (no longer suggest them in searches)
         * [X] In Customer view, display customer type
             * [X] In Customer view, display if the customer has a donation exemption
-        * [ ] Add a field in customers to know if they have already made a donation this year (membership fee)
+        * [X] Add a field in customers to know if they have already made a donation this year (membership fee)
 * Reservation management
     * [X] Display customer type in reservation view
         * [X] Display if the customer has a donation exemption
-        * [ ] Display if the customer has already made a donation this year
-            * [ ] Display suggested donation amount deducing the membership fee if already paid this year
+        * [X] Display if the customer has already made a donation this year
+            * [X] Display suggested donation amount deducing the membership fee if already paid this year
     * [ ] Display asset availability in reservation view line
         * [ ] (optional) deduce of the availability the current reservation
             * [ ] Have the same search for customer in reservation and customer list
         * [ ] (optional) display customer type icon in search bar
     * [ ] Allow generating PDFs of all reservations due next Friday or Monday.
     * [ ] Allow customers to renew their reservation (same items, different date)
-    * [ ] In return view, display the articles
-        * [ ] Allow inputs of how many items are returned (in case of partial return or damaged)
-            * [ ] Compute donation based on the number of items returned (even exempt customers must pay for
+    * [X] In return view, display the articles
+        * [X] Allow inputs of how many items are returned (in case of partial return or damaged)
+            * [X] Compute donation based on the number of items returned (even exempt customers must pay for
               non-returned items)
 * Donation management
-    * [ ] Allow recording a donation for a customer
-    * [ ] Allow indicating if the donation is for the annual membership (exemption)
-    * [ ] Allow indicating the amount of the donation
-    * [ ] Allow indicating the date of the donation
-    * [ ] Display donations in the customer view
-    * [ ] Display donations in the home view (total number and total amount this year)
+    * [X] Allow recording a donation for a customer
+    * [X] Allow indicating if the donation is for the annual membership (exemption)
+    * [X] Allow indicating the amount of the donation
+    * [X] Allow indicating the date of the donation
+    * [X] Display donations in the customer view
 * Miscellaneous
-    * [ ] In home page, display the number of reservation in progress or to come.
-    * [ ] In home page, display the number of reservations due next Friday or Monday.
-    * [ ] In home page, display the amount of donations made this year
     * [ ] Timing management for reservations
         * [ ] Allow members and ganathans to reserve 12 months in advance
         * [ ] Allow external customers to reserve 1 month in advance

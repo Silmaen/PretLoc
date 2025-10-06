@@ -6,38 +6,49 @@
     <meta charset="UTF-8">
     <title>{% trans 'Résumé Réservation' %}</title>
     <style>
-        body { font-family: sans-serif; margin-bottom: 80px;}
+        body {
+            font-family: sans-serif;
+            margin-bottom: 80px;
+        }
+
         .header-flex {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             margin-bottom: 30px;
         }
+
         .left-group {
             display: flex;
             flex-direction: row;
             align-items: flex-start;
             gap: 24px;
         }
+
         .logo, .qr {
             width: 80px;
             display: block;
         }
+
         .qr {
             margin-left: 100px;
         }
+
         .client-info {
             text-align: right;
             font-size: 1.1em;
         }
+
         .client-info .date {
             font-size: 0.95em;
             color: #00445e;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         .donation-note {
             font-size: 0.6em;
             text-align: justify;
@@ -50,7 +61,7 @@
 
         .donation-note b,
         .donation-note p {
-            margin: 0;         /* supprime les interlignes entre les paragraphes */
+            margin: 0; /* supprime les interlignes entre les paragraphes */
             padding: 0;
         }
 
@@ -59,26 +70,27 @@
             display: block;
             margin-bottom: 6px;
         }
-        .page-footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        border-top: 1px solid #000;
-        background: #fff;
-        padding: 8px 12px;
-        text-align: center;
-        font-size: 0.8em;
-        box-sizing: border-box;
-    }
 
-    .page-footer p {
-        margin: 0;
-        padding: 0;
-        font-size: 0.5em;
-        text-align: justify;
-        text-justify: inter-word;
-    }
+        .page-footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            border-top: 1px solid #000;
+            background: #fff;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 0.8em;
+            box-sizing: border-box;
+        }
+
+        .page-footer p {
+            margin: 0;
+            padding: 0;
+            font-size: 0.5em;
+            text-align: justify;
+            text-justify: inter-word;
+        }
     </style>
 </head>
 <body>
@@ -96,19 +108,23 @@
 <div class="don-info">
     <strong>{% trans 'Don attendu:' %}</strong> {{ reservation.total_expected_donation }} €<br>
     <strong>{% trans 'Don réel: ' %}</strong>
-    {% if reservation.donation_amount %}
-        {{ reservation.donation_amount }} €
+    {% if reservation.total_donations %}
+        {{ reservation.total_donations }} €
     {% else %}
         ______________________
     {% endif %}
 </div>
 <div class="donation-note">
-    <b>{% blocktrans %} Suite à un prêt de matériel, l'adhésion annuelle (5€) est le don permettant d'entretenir le matériel et son
+    <b>{% blocktrans %} Suite à un prêt de matériel, l'adhésion annuelle (5€) est le don permettant d'entretenir le
+        matériel et son
         renouvellement, merci pour votre don lors du retour du matériel.{% endblocktrans %}</b>
-    <p>{% blocktrans %} Le matériel prêté par le Comité des Fêtes de Genay est sous la responsabilité de l'adhérent et doit être rendu
+    <p>{% blocktrans %} Le matériel prêté par le Comité des Fêtes de Genay est sous la responsabilité de l'adhérent et
+        doit être rendu
         propre. Tout article manquant ou détérioré vous sera facturé.{% endblocktrans %}</p>
-    <p>{% blocktrans %} Les barnums sont destinés exclusivement aux implantations de courtes durées, en ayant consulté au préalable la
-        météo. Ils doivent être démontés et évacués à partir de 50km/h de vent et en cas de forte pluie.{% endblocktrans %}</p>
+    <p>{% blocktrans %} Les barnums sont destinés exclusivement aux implantations de courtes durées, en ayant consulté
+        au préalable la
+        météo. Ils doivent être démontés et évacués à partir de 50km/h de vent et en cas de forte
+        pluie.{% endblocktrans %}</p>
 
 </div>
 <h3>{% trans 'Matériel réservé' %}</h3>
@@ -123,26 +139,34 @@
     </thead>
     <tbody>
     {% for item in items %}
-    <tr>
-        <td>{{ item.asset.name }}</td>
-        <td>{{ item.quantity_reserved }}</td>
-        <td>[ ]</td>
-        <td>[ ]</td>
-    </tr>
+        <tr>
+            <td>{{ item.asset.name }}</td>
+            <td>{{ item.quantity_reserved }}</td>
+            <td>[ ]</td>
+            <td>[ ]</td>
+        </tr>
     {% endfor %}
     </tbody>
 </table>
 <div class="page-footer" role="contentinfo">
     <p>
-    {% blocktrans %}Les données de ce formulaire sont recueillies avec votre accord implicite lors d'une première réservation de
-    matériel. Ces données sont recueillies en vue de tenir à jour notre fichier d'adhérents et faire le suivi de vos
-    réservations. En aucun cas ces données ne seront cédées ou vendues à des tiers. Le responsable de leur traitement
-    est la Collégiale. Tous les membres de la collégiale et de l'équipe des administrateurs en charge de la gestion des
-    reservations peuvent être destinataires de vos données. Le droit d'accès et de rectification en vertu du Règlement
-    européen sur la protection des données personnels, en vigueur depuis le 25/05/2018 vous donne accès aux données vous
-    concernant. Vous pouvez demander leur rectification et leur suppression à la fin de l'exercice annuel. Ces démarches
-    s'effectuent auprès de la Collégiale du CDF (relation-association@cdf-genay.com). Les données sont conservées
-    jusqu'à 4 ans après la fin de votre adhésion.{% endblocktrans %}
+        {% blocktrans %}Les données de ce formulaire sont recueillies avec votre accord implicite lors d'une première
+            réservation de
+            matériel. Ces données sont recueillies en vue de tenir à jour notre fichier d'adhérents et faire le suivi de
+            vos
+            réservations. En aucun cas ces données ne seront cédées ou vendues à des tiers. Le responsable de leur
+            traitement
+            est la Collégiale. Tous les membres de la collégiale et de l'équipe des administrateurs en charge de la
+            gestion des
+            reservations peuvent être destinataires de vos données. Le droit d'accès et de rectification en vertu du
+            Règlement
+            européen sur la protection des données personnels, en vigueur depuis le 25/05/2018 vous donne accès aux
+            données vous
+            concernant. Vous pouvez demander leur rectification et leur suppression à la fin de l'exercice annuel. Ces
+            démarches
+            s'effectuent auprès de la Collégiale du CDF (relation-association@cdf-genay.com). Les données sont
+            conservées
+            jusqu'à 4 ans après la fin de votre adhésion.{% endblocktrans %}
     </p>
 </div>
 </body>

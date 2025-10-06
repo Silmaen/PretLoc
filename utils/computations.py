@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from ui.reservation.models import ReservationItem
 from ui.stock.models import StockEvent
+from utils.period import Period
 
 logger = logging.getLogger(__name__)
 
@@ -63,11 +64,7 @@ def get_asset_status_at_date(asset, date=None, excluded_reservation=None):
     reservations = [
         reservation
         for reservation in reservations
-        if (
-            reservation.reservation.get_start_date()
-            <= date
-            <= reservation.reservation.get_return_date()
-        )
+        if reservation.reservation.actual_period().contains(date)
     ]
 
     # for each reservation, determine its status at the given date
@@ -87,15 +84,14 @@ def get_asset_status_at_date(asset, date=None, excluded_reservation=None):
     }
 
 
-def analyze_asset_availability(asset, start_date, end_date, excluded_reservation=None):
+def analyze_asset_availability(asset, period: Period, excluded_reservation=None):
     """
     Analyze the availability of an asset over a given period.
     Calculate critical values: minimum stock, maximum damaged products,
     maximum checked out or reserved products, and minimum available products.
 
     :param asset: The asset (Asset)
-    :param start_date: Start date of the period
-    :param end_date: End date of the period (end date is exclusive).
+    :param period: The period
     :param excluded_reservation: Reservation to exclude from calculations (optional)
 
     :return:
@@ -105,18 +101,11 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
             - reserved: nombre maximum réservé
             - available: nombre minimum disponible
     """
-    if start_date > end_date:
-        raise {
-            "total": 0,
-            "damaged": 0,
-            "reserved": 0,
-            "available": 0,
-        }
 
-    critical_dates = {start_date, end_date}
+    critical_dates = {period.start_date, period.end_date}
 
     stock_events = StockEvent.objects.filter(
-        asset=asset, date__gte=start_date, date__lte=end_date
+        asset=asset, date__gte=period.start_date, date__lte=period.end_date
     ).order_by("date")
 
     for event in stock_events:
@@ -131,17 +120,14 @@ def analyze_asset_availability(asset, start_date, end_date, excluded_reservation
     reservations = [
         item
         for item in reservations
-        if (
-            start_date < item.reservation.get_return_date() < end_date
-            or start_date < item.reservation.get_start_date() < end_date
-        )
+        if period.overlaps(item.reservation.actual_period())
     ]
 
     for item in reservations:
-        if start_date <= item.reservation.get_start_date() <= end_date:
-            critical_dates.add(item.reservation.get_start_date())
-        if start_date <= item.reservation.get_return_date() <= end_date:
-            critical_dates.add(item.reservation.get_return_date())
+        if period.contains(item.reservation.true_start_date):
+            critical_dates.add(item.reservation.true_start_date)
+        if period.contains(item.reservation.true_return_date):
+            critical_dates.add(item.reservation.true_return_date)
 
     min_total = float("inf")
     max_damaged = 0
@@ -180,14 +166,12 @@ def check_reservation_availability(reservation):
             - problematic_items: dict of items with insufficient availability
     """
     problematic_items = {}
-    real_start = reservation.get_start_date()
-    real_end = reservation.get_return_date()
+    reservation_period = reservation.actual_period()
 
     for item in reservation.items.all():
         availability = analyze_asset_availability(
             asset=item.asset,
-            start_date=real_start,
-            end_date=real_end,
+            period=reservation_period,
             excluded_reservation=reservation,
         )
         if item.quantity_reserved > availability["available"]:

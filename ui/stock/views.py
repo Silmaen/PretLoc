@@ -13,8 +13,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.decorators import user_type_required, get_capability
-from ui.computations import get_asset_status_at_date
 from ui.reservation.models import Reservation
+from utils.computations import get_asset_status_at_date
 from .forms import (
     CategoryForm,
     AssetForm,

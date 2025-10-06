@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-02 15:49+0000\n"
+"POT-Creation-Date: 2025-10-06 16:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr "User type"
 #: accounts/admin.py:59 templates/accounts/create_user.html:26
 #: templates/accounts/edit_user.html:27 templates/accounts/manage_users.html:19
 #: templates/accounts/profile.html:27 templates/accounts/signup.html:26
-#: ui/models.py:100
+#: templates/ui/customers/detail.html:57 ui/customer/models.py:89
 msgid "Email"
 msgstr "Email"
 
@@ -64,13 +64,13 @@ msgstr "Email address"
 
 #: accounts/forms.py:30 templates/accounts/create_user.html:34
 #: templates/accounts/edit_user.html:36 templates/accounts/profile.html:36
-#: ui/models.py:85
+#: ui/customer/models.py:74
 msgid "Prénom"
 msgstr "First name"
 
 #: accounts/forms.py:31 templates/accounts/create_user.html:42
 #: templates/accounts/edit_user.html:45 templates/accounts/profile.html:45
-#: ui/models.py:87
+#: ui/customer/models.py:76
 msgid "Nom de famille"
 msgstr "Last name"
 
@@ -90,10 +90,12 @@ msgstr "Manager"
 msgid "Membre"
 msgstr "Member"
 
-#: accounts/models.py:13 templates/ui/reservations/list.html:104
+#: accounts/models.py:13 templates/ui/donations/confirm_delete.html:19
+#: templates/ui/donations/list.html:97 templates/ui/reservations/list.html:104
 #: templates/ui/reservations/reservation_confirm_cancel.html:14
 #: templates/ui/reservations/reservation_confirm_validate.html:14
-#: ui/admin.py:156 ui/models.py:109 ui/models.py:147
+#: ui/customer/models.py:109 ui/donation/models.py:21
+#: ui/reservation/admin.py:58 ui/reservation/models.py:49
 msgid "Client"
 msgstr "Customer"
 
@@ -148,7 +150,6 @@ msgid "Créer l'utilisateur"
 msgstr "Create user"
 
 #: templates/accounts/create_user.html:75 templates/accounts/edit_user.html:90
-#: templates/ui/reservations/detail.html:250
 msgid "Retour à la liste"
 msgstr "Return to list"
 
@@ -213,7 +214,9 @@ msgstr "User management"
 
 #: templates/accounts/manage_users.html:21
 #: templates/ui/customers/customer_type_list.html:26
-#: templates/ui/customers/list.html:134 templates/ui/reservations/list.html:143
+#: templates/ui/customers/detail.html:172
+#: templates/ui/customers/detail.html:231 templates/ui/customers/list.html:135
+#: templates/ui/donations/list.html:101 templates/ui/reservations/list.html:143
 #: templates/ui/stock/category_list.html:24 templates/ui/stock/list.html:110
 msgid "Actions"
 msgstr "Actions"
@@ -318,7 +321,7 @@ msgid "Utilisateurs"
 msgstr "Users"
 
 #: templates/includes/header.html:53 templates/includes/header.html:54
-#: ui/models.py:199
+#: ui/reservation/models.py:102
 msgid "Réservations"
 msgstr "Reservations"
 
@@ -328,9 +331,14 @@ msgid "Stock"
 msgstr "Stock"
 
 #: templates/includes/header.html:63 templates/includes/header.html:64
-#: ui/models.py:110
+#: ui/customer/models.py:110
 msgid "Clients"
 msgstr "Customers"
+
+#: templates/includes/header.html:68 templates/includes/header.html:69
+#: ui/donation/models.py:45 ui/reservation/admin.py:86
+msgid "Dons"
+msgstr "Donations"
 
 #: templates/ui/customers/customer_confirm_delete.html:9
 msgid "Supprimer un client"
@@ -341,16 +349,18 @@ msgid "Êtes-vous sûr de vouloir supprimer ce client ?"
 msgstr "Are you sure you want to delete this customer?"
 
 #: templates/ui/customers/customer_confirm_delete.html:30
-#: templates/ui/customers/customer_form.html:211
+#: templates/ui/customers/customer_form.html:244
 #: templates/ui/customers/customer_type_confirm_delete.html:31
-#: templates/ui/reservations/reservation_checkout.html:129
+#: templates/ui/donations/confirm_delete.html:56
+#: templates/ui/donations/form.html:75
+#: templates/ui/reservations/reservation_checkout.html:188
 #: templates/ui/reservations/reservation_confirm_cancel.html:21
 #: templates/ui/reservations/reservation_confirm_validate.html:23
-#: templates/ui/reservations/reservation_form.html:188
-#: templates/ui/reservations/reservation_return.html:185
+#: templates/ui/reservations/reservation_form.html:189
+#: templates/ui/reservations/reservation_return.html:204
 #: templates/ui/stock/category_confirm_delete.html:34
 #: templates/ui/stock/item_confirm_delete.html:33
-#: templates/ui/stock/stock_event_form.html:129
+#: templates/ui/stock/stock_event_form.html:130
 msgid "Annuler"
 msgstr "Cancel"
 
@@ -358,31 +368,40 @@ msgstr "Cancel"
 msgid "Confirmer"
 msgstr "Confirm"
 
-#: templates/ui/customers/customer_form.html:11
+#: templates/ui/customers/customer_form.html:12
 msgid "Modifier le client"
 msgstr "Modify customer"
 
-#: templates/ui/customers/customer_form.html:13
+#: templates/ui/customers/customer_form.html:14
 #: templates/ui/customers/list.html:36
 msgid "Ajouter un client"
 msgstr "Add customer"
 
-#: templates/ui/customers/customer_form.html:24
-#: templates/ui/customers/list.html:49 ui/admin.py:84 ui/models.py:66
-#: ui/models.py:82
+#: templates/ui/customers/customer_form.html:25
+#: templates/ui/customers/detail.html:17 templates/ui/customers/list.html:49
+#: ui/customer/admin.py:72 ui/customer/models.py:48 ui/customer/models.py:71
 msgid "Type de client"
 msgstr "Customer type"
 
-#: templates/ui/customers/customer_form.html:166
+#: templates/ui/customers/customer_form.html:151
+msgid "Mettre 0 pour utiliser le coefficient du type de client."
+msgstr "Set to 0 to use the customer type coefficient."
+
+#: templates/ui/customers/customer_form.html:165
+msgid "Délai de réservation (jours)"
+msgstr "Reservation delay (days)"
+
+#: templates/ui/customers/customer_form.html:199
 msgid "Optionnel"
 msgstr "Optional"
 
-#: templates/ui/customers/customer_form.html:199
+#: templates/ui/customers/customer_form.html:232
 msgid "Informations supplémentaires sur le client"
 msgstr "Additional information about the customer"
 
-#: templates/ui/customers/customer_form.html:206
-#: templates/ui/stock/stock_event_form.html:132
+#: templates/ui/customers/customer_form.html:239
+#: templates/ui/donations/form.html:78
+#: templates/ui/stock/stock_event_form.html:133
 msgid "Enregistrer"
 msgstr "Save"
 
@@ -391,18 +410,17 @@ msgid "Supprimer le type de client"
 msgstr "Delete customer type"
 
 #: templates/ui/customers/customer_type_confirm_delete.html:15
-#, fuzzy, python-format
-#| msgid "Êtes-vous sûr de vouloir supprimer ce client ?"
+#, python-format
 msgid ""
 "\n"
-"                    Êtes-vous sûr de vouloir supprimer le type de client "
+"                        Êtes-vous sûr de vouloir supprimer le type de client "
 "\"%(name)s\" ?\n"
-"                "
+"                    "
 msgstr ""
 "\n"
-"                    Are you sure you want to delete the customer type "
+"                        Are you sure you want to delete the customer type "
 "\"%(name)s\"?\n"
-"                "
+"                    "
 
 #: templates/ui/customers/customer_type_confirm_delete.html:20
 msgid ""
@@ -413,10 +431,10 @@ msgstr ""
 #: templates/ui/customers/customer_type_confirm_delete.html:23
 msgid ""
 "Note : Si des clients utilisent ce type, la suppression sera impossible."
-msgstr ""
-"Note: If customers use this type, deletion will be impossible."
+msgstr "Note: If customers use this type, deletion will be impossible."
 
 #: templates/ui/customers/customer_type_confirm_delete.html:34
+#: templates/ui/donations/confirm_delete.html:9
 msgid "Confirmer la suppression"
 msgstr "Confirm suppression"
 
@@ -434,60 +452,206 @@ msgid "Créer le type de client"
 msgstr "Create customer type"
 
 #: templates/ui/customers/customer_type_form.html:55
-msgid "Retour à la liste des types de clients"
-msgstr "Return to customer types list"
+#: templates/ui/customers/customer_type_list.html:75
+#: templates/ui/customers/detail.html:268
+#: templates/ui/reservations/detail.html:272
+#: templates/ui/reservations/pdf_summary.html:137
+#: templates/ui/stock/category_form.html:55
+#: templates/ui/stock/category_list.html:61
+#: templates/ui/stock/item_detail.html:182
+#: templates/ui/stock/item_detail.html:203 templates/ui/stock/item_form.html:55
+msgid "Retour"
+msgstr "Return"
 
 #: templates/ui/customers/customer_type_list.html:9
 msgid "Gestion des types de clients"
 msgstr "Customer types management"
 
 #: templates/ui/customers/customer_type_list.html:22
+#: templates/ui/customers/detail.html:30
 #: templates/ui/stock/category_list.html:22 templates/ui/stock/list.html:83
-#: ui/admin.py:112 ui/models.py:8 ui/models.py:21 ui/models.py:55
+#: ui/customer/admin.py:108 ui/customer/models.py:23 ui/stock/models.py:15
+#: ui/stock/models.py:40
 msgid "Nom"
 msgstr "Name"
 
-#: templates/ui/customers/customer_type_list.html:23 ui/models.py:56
-msgid "Code"
-msgstr "Code"
+#: templates/ui/customers/customer_type_list.html:23
+msgid "Type et couleur"
+msgstr "Type and color"
 
-#: templates/ui/customers/customer_type_list.html:24 ui/admin.py:117
-#: ui/models.py:59
-msgid "Type d'entité"
-msgstr "Entity type"
+#: templates/ui/customers/customer_type_list.html:24
+#: templates/ui/reservations/detail.html:95
+msgid "Coefficient"
+msgstr "Coefficient"
 
-#: templates/ui/customers/customer_type_list.html:25 ui/models.py:62
-msgid "Couleur"
-msgstr "Color"
+#: templates/ui/customers/customer_type_list.html:25
+msgid "Délai (jours)"
+msgstr "Delay (days)"
 
-#: templates/ui/customers/customer_type_list.html:37 ui/admin.py:86
-#: ui/models.py:51
+#: templates/ui/customers/customer_type_list.html:36 ui/customer/admin.py:74
+#: ui/customer/models.py:19
 msgid "Personne physique"
 msgstr "Physical person"
 
-#: templates/ui/customers/customer_type_list.html:40 ui/admin.py:94
-#: ui/models.py:52
+#: templates/ui/customers/customer_type_list.html:39 ui/customer/admin.py:82
+#: ui/customer/models.py:20
 msgid "Personne morale"
 msgstr "Legal entity"
 
-#: templates/ui/customers/customer_type_list.html:61
+#: templates/ui/customers/customer_type_list.html:44
+#: templates/ui/customers/list.html:96
+msgid "Exonéré"
+msgstr "Exempted"
+
+#: templates/ui/customers/customer_type_list.html:65
 msgid "Aucun type de client trouvé"
 msgstr "No customer type found"
 
-#: templates/ui/customers/customer_type_list.html:71
-msgid "Retour aux clients"
-msgstr "Return to customers"
+#: templates/ui/customers/detail.html:9
+msgid "Détails du Client"
+msgstr "Customer details"
+
+#: templates/ui/customers/detail.html:14 ui/stock/admin.py:59
+msgid "Informations générales"
+msgstr "General information"
+
+#: templates/ui/customers/detail.html:39 ui/customer/models.py:80
+msgid "Raison sociale"
+msgstr "Legal name"
+
+#: templates/ui/customers/detail.html:47
+msgid "Représentant légal"
+msgstr "Representative"
+
+#: templates/ui/customers/detail.html:67 ui/customer/models.py:90
+msgid "Téléphone"
+msgstr "Telephone"
+
+#: templates/ui/customers/detail.html:77 ui/customer/models.py:91
+msgid "Adresse"
+msgstr "Address"
+
+#: templates/ui/customers/detail.html:87
+msgid "Exonération"
+msgstr "Donation exemption"
+
+#: templates/ui/customers/detail.html:91
+msgid "Exonéré de don"
+msgstr "Donation exempted"
+
+#: templates/ui/customers/detail.html:98 ui/customer/admin.py:128
+#: ui/customer/models.py:36 ui/customer/models.py:98
+msgid "Coefficient de don"
+msgstr "Donation coefficient"
+
+#: templates/ui/customers/detail.html:109
+#: templates/ui/reservations/detail.html:143
+#: templates/ui/reservations/reservation_checkout.html:175
+#: templates/ui/reservations/reservation_form.html:108 ui/customer/models.py:95
+#: ui/reservation/admin.py:89 ui/reservation/models.py:51
+msgid "Notes"
+msgstr "Notes"
+
+#: templates/ui/customers/detail.html:120
+msgid "Statistiques"
+msgstr "Statistics"
+
+#: templates/ui/customers/detail.html:123
+msgid "Total des dons"
+msgstr "Donation total"
+
+#: templates/ui/customers/detail.html:129
+msgid "Nombre de réservations"
+msgstr "Reservation number"
+
+#: templates/ui/customers/detail.html:135 templates/ui/customers/list.html:134
+msgid "Cotisation"
+msgstr "Membership"
+
+#: templates/ui/customers/detail.html:140 templates/ui/customers/list.html:195
+msgid "À jour"
+msgstr "Up to date"
+
+#: templates/ui/customers/detail.html:144 templates/ui/customers/list.html:198
+msgid "Non à jour"
+msgstr "Not up to date"
+
+#: templates/ui/customers/detail.html:155
+msgid "Historique des dons"
+msgstr "Donation history"
+
+#: templates/ui/customers/detail.html:160
+#: templates/ui/customers/detail.html:219 templates/ui/stock/list.html:50
+msgid "Ajouter"
+msgstr "Add"
+
+#: templates/ui/customers/detail.html:169
+#: templates/ui/customers/detail.html:228
+#: templates/ui/donations/confirm_delete.html:25
+#: templates/ui/donations/list.html:96
+#: templates/ui/reservations/detail.html:210
+#: templates/ui/stock/item_detail.html:127 templates/ui/stock/list.html:27
+#: ui/stock/models.py:102
+msgid "Date"
+msgstr "Date"
+
+#: templates/ui/customers/detail.html:170
+#: templates/ui/donations/confirm_delete.html:22
+#: templates/ui/donations/list.html:98 ui/donation/models.py:25
+msgid "Montant"
+msgstr "Amount"
+
+#: templates/ui/customers/detail.html:171 templates/ui/donations/list.html:35
+#: templates/ui/donations/list.html:99
+msgid "Adhésion"
+msgstr "Membership"
+
+#: templates/ui/customers/detail.html:194
+msgid "Editer"
+msgstr "Edit"
+
+#: templates/ui/customers/detail.html:206
+msgid "Aucun don enregistré"
+msgstr "No donation found"
+
+#: templates/ui/customers/detail.html:214
+msgid "Historique des réservations"
+msgstr "Reservation history"
+
+#: templates/ui/customers/detail.html:229
+msgid "Événement"
+msgstr "Event"
+
+#: templates/ui/customers/detail.html:230
+#: templates/ui/reservations/detail.html:211
+#: templates/ui/reservations/list.html:130 ui/reservation/models.py:43
+msgid "Statut"
+msgstr "Status"
+
+#: templates/ui/customers/detail.html:249 templates/ui/customers/list.html:205
+msgid "Voir détails"
+msgstr "See details"
+
+#: templates/ui/customers/detail.html:261
+msgid "Aucune réservation enregistrée"
+msgstr "No reservation found"
+
+#: templates/ui/customers/detail.html:272 templates/ui/customers/list.html:211
+#: templates/ui/reservations/detail.html:117
+#: templates/ui/stock/item_detail.html:85
+msgid "Modifier"
+msgstr "Modify"
 
 #: templates/ui/customers/list.html:9
 msgid "Gestion des Clients"
 msgstr "Customer management"
 
-#: templates/ui/customers/list.html:17
-#: templates/ui/reservations/reservation_form.html:490
+#: templates/ui/customers/list.html:17 templates/ui/donations/list.html:17
+#: templates/ui/reservations/reservation_form.html:492
 msgid "Rechercher un client..."
 msgstr "Search for a customer..."
 
-#: templates/ui/customers/list.html:32 ui/models.py:67
+#: templates/ui/customers/list.html:32 ui/customer/models.py:49
 msgid "Types de clients"
 msgstr "Customer types"
 
@@ -512,10 +676,6 @@ msgstr "Donor"
 msgid "Avec don"
 msgstr "With donation"
 
-#: templates/ui/customers/list.html:96
-msgid "Exonéré"
-msgstr "Exempted"
-
 #: templates/ui/customers/list.html:108
 msgid "Type"
 msgstr "Type"
@@ -528,27 +688,109 @@ msgstr "Customer information"
 msgid "Contact"
 msgstr "Contact"
 
-#: templates/ui/customers/list.html:142 ui/models.py:104
+#: templates/ui/customers/list.html:143 ui/customer/models.py:33
+#: ui/customer/models.py:93
 msgid "Exonération de don"
 msgstr "Donation exemption"
 
-#: templates/ui/customers/list.html:174
-msgid "Envoyer un mail"
-msgstr "Send an email"
-
-#: templates/ui/customers/list.html:190
-#: templates/ui/reservations/detail.html:96
-#: templates/ui/stock/item_detail.html:85
-msgid "Modifier"
-msgstr "Modify"
-
-#: templates/ui/customers/list.html:196
+#: templates/ui/customers/list.html:217
+#: templates/ui/donations/confirm_delete.html:59
 msgid "Supprimer"
 msgstr "Delete"
 
-#: templates/ui/customers/list.html:208
+#: templates/ui/customers/list.html:229
 msgid "Aucun client trouvé"
 msgstr "No customer found"
+
+#: templates/ui/donations/confirm_delete.html:14
+msgid "Êtes-vous sûr de vouloir supprimer ce don ?"
+msgstr "Are you sure you want to delete this donation?"
+
+#: templates/ui/donations/confirm_delete.html:29
+msgid "Inclut l'adhésion"
+msgstr "Includes membership"
+
+#: templates/ui/donations/confirm_delete.html:34
+#: templates/ui/donations/list.html:100 ui/customer/admin.py:40
+#: ui/reservation/models.py:101 ui/reservation/models.py:180
+msgid "Réservation"
+msgstr "Reservation"
+
+#: templates/ui/donations/confirm_delete.html:47
+msgid "Attention :"
+msgstr "Warning:"
+
+#: templates/ui/donations/confirm_delete.html:48
+msgid "Cette action est irréversible."
+msgstr "This action is irreversible."
+
+#: templates/ui/donations/form.html:53
+msgid "Cochez si ce don inclut l'adhésion annuelle"
+msgstr "Check if this donation includes the annual membership"
+
+#: templates/ui/donations/form.html:69
+msgid "Optionnel : associer ce don à une réservation"
+msgstr "Optional: associate this donation with a reservation"
+
+#: templates/ui/donations/list.html:9
+msgid "Gestion des dons"
+msgstr "Donation management"
+
+#: templates/ui/donations/list.html:20
+msgid "Rechercher"
+msgstr "Search"
+
+#: templates/ui/donations/list.html:26
+msgid "Nouveau don"
+msgstr "New donation"
+
+#: templates/ui/donations/list.html:40 templates/ui/stock/list.html:65
+msgid "Toutes"
+msgstr "All"
+
+#: templates/ui/donations/list.html:44
+msgid "Avec adhésion"
+msgstr "With membership"
+
+#: templates/ui/donations/list.html:48
+msgid "Sans adhésion"
+msgstr "Without membership"
+
+#: templates/ui/donations/list.html:56
+msgid "Tri"
+msgstr "Sort"
+
+#: templates/ui/donations/list.html:61
+msgid "Date (récent → ancien)"
+msgstr "Date (recent → old)"
+
+#: templates/ui/donations/list.html:64
+msgid "Date (ancien → récent)"
+msgstr "Date (old → recent)"
+
+#: templates/ui/donations/list.html:67
+msgid "Montant (élevé → faible)"
+msgstr "Amount (high → low)"
+
+#: templates/ui/donations/list.html:70
+msgid "Montant (faible → élevé)"
+msgstr "Amount (low → high)"
+
+#: templates/ui/donations/list.html:73
+msgid "Client (A → Z)"
+msgstr "Customer (A → Z)"
+
+#: templates/ui/donations/list.html:84
+msgid "don(s)"
+msgstr "donation(s)"
+
+#: templates/ui/donations/list.html:134
+msgid "Aucune"
+msgstr "None"
+
+#: templates/ui/donations/list.html:154
+msgid "Aucun don trouvé"
+msgstr "No donation found"
 
 #: templates/ui/home.html:12
 msgid "Compte en attente de validation"
@@ -591,168 +833,155 @@ msgstr "Asset management application"
 msgid "Détails de la Réservation"
 msgstr "Reservation details"
 
-#: templates/ui/reservations/detail.html:27
-#: templates/ui/reservations/detail.html:198
+#: templates/ui/reservations/detail.html:32
+#: templates/ui/reservations/detail.html:220
 #: templates/ui/reservations/list.html:76
-#: templates/ui/reservations/list.html:183 ui/models.py:121
+#: templates/ui/reservations/list.html:183 ui/reservation/models.py:23
 msgid "Créée"
 msgstr "Created"
 
-#: templates/ui/reservations/detail.html:31
-#: templates/ui/reservations/detail.html:208
+#: templates/ui/reservations/detail.html:36
+#: templates/ui/reservations/detail.html:230
 #: templates/ui/reservations/list.html:80
-#: templates/ui/reservations/list.html:187 ui/models.py:122
+#: templates/ui/reservations/list.html:187 ui/reservation/models.py:24
 msgid "Validée"
 msgstr "Validated"
 
-#: templates/ui/reservations/detail.html:35
-#: templates/ui/reservations/detail.html:137
-#: templates/ui/reservations/detail.html:228
+#: templates/ui/reservations/detail.html:40
+#: templates/ui/reservations/detail.html:159
+#: templates/ui/reservations/detail.html:250
 #: templates/ui/reservations/list.html:84
 #: templates/ui/reservations/list.html:191
-#: templates/ui/reservations/pdf_summary.html:120
-#: templates/ui/reservations/reservation_return.html:80
-#: templates/ui/stock/item_detail.html:164 ui/models.py:123
+#: templates/ui/reservations/pdf_summary.html:136
+#: templates/ui/stock/item_detail.html:166 ui/reservation/models.py:25
 msgid "Sortie"
 msgstr "Out"
 
-#: templates/ui/reservations/detail.html:39
+#: templates/ui/reservations/detail.html:44
 #: templates/ui/reservations/list.html:88
-#: templates/ui/reservations/list.html:195 ui/models.py:124
+#: templates/ui/reservations/list.html:195 ui/reservation/models.py:26
 msgid "Rendue"
 msgstr "Back"
 
-#: templates/ui/reservations/detail.html:43
-#: templates/ui/reservations/detail.html:218
+#: templates/ui/reservations/detail.html:48
+#: templates/ui/reservations/detail.html:240
 #: templates/ui/reservations/list.html:92
-#: templates/ui/reservations/list.html:199 ui/models.py:125
+#: templates/ui/reservations/list.html:199 ui/reservation/models.py:27
 msgid "Annulée"
 msgstr "Canceled"
 
-#: templates/ui/reservations/detail.html:50
-#: templates/ui/reservations/pdf_summary.html:92
+#: templates/ui/reservations/detail.html:55
+#: templates/ui/reservations/pdf_summary.html:104
 msgid "Sortie prévue"
 msgstr "Scheduled checkout"
 
-#: templates/ui/reservations/detail.html:53
+#: templates/ui/reservations/detail.html:58
 msgid "Sortie réelle"
 msgstr "Effective checkout"
 
-#: templates/ui/reservations/detail.html:57
+#: templates/ui/reservations/detail.html:62
 msgid "Retour prévu"
 msgstr "Scheduled return"
 
-#: templates/ui/reservations/detail.html:60
+#: templates/ui/reservations/detail.html:65
 msgid "Retour réel"
 msgstr "Effective return"
 
-#: templates/ui/reservations/detail.html:69
-#: templates/ui/reservations/detail.html:140
-#: templates/ui/reservations/list.html:142 ui/admin.py:184
+#: templates/ui/reservations/detail.html:74
+#: templates/ui/reservations/detail.html:162
+#: templates/ui/reservations/list.html:142 ui/donation/models.py:44
 msgid "Don"
 msgstr "Donation"
 
-#: templates/ui/reservations/detail.html:74
-#: templates/ui/reservations/reservation_return.html:171 ui/models.py:150
+#: templates/ui/reservations/detail.html:79
+#: templates/ui/reservations/reservation_return.html:182
 msgid "Don effectué"
 msgstr "Donation made"
 
-#: templates/ui/reservations/detail.html:78
-#: templates/ui/reservations/reservation_checkout.html:101
-#: templates/ui/reservations/reservation_return.html:130
-#: templates/ui/stock/list.html:159
+#: templates/ui/reservations/detail.html:83 templates/ui/stock/list.html:159
 msgid "Don minimum attendu"
 msgstr "Expected minimum donation"
 
-#: templates/ui/reservations/detail.html:84
-#: templates/ui/reservations/detail.html:123
-#: templates/ui/reservations/reservation_checkout.html:116
-#: templates/ui/reservations/reservation_form.html:107
-#: templates/ui/reservations/reservation_return.html:159 ui/admin.py:187
-#: ui/models.py:106 ui/models.py:152
-msgid "Notes"
-msgstr "Notes"
+#: templates/ui/reservations/detail.html:88
+msgid "Client exonéré de don"
+msgstr "Customer exempted from donation"
 
 #: templates/ui/reservations/detail.html:101
+msgid "Cotisation effectuée"
+msgstr "Membership made"
+
+#: templates/ui/reservations/detail.html:106
+msgid "Cotisation attendue:"
+msgstr "Expected membership:"
+
+#: templates/ui/reservations/detail.html:122
 #: templates/ui/reservations/reservation_confirm_validate.html:26
 msgid "Valider la réservation"
 msgstr "Validate reservation"
 
-#: templates/ui/reservations/detail.html:105
-#: templates/ui/reservations/list.html:226
+#: templates/ui/reservations/detail.html:126
+#: templates/ui/reservations/list.html:227
 msgid "Sortir le matériel"
 msgstr "Get out the equipment"
 
-#: templates/ui/reservations/detail.html:109
-#: templates/ui/reservations/list.html:241
-#: templates/ui/reservations/reservation_return.html:9
+#: templates/ui/reservations/detail.html:130
+#: templates/ui/reservations/list.html:243
 msgid "Enregistrer le retour"
 msgstr "Save the return"
 
-#: templates/ui/reservations/detail.html:115
+#: templates/ui/reservations/detail.html:135
 msgid "Bon de sortie"
 msgstr "Checkout document"
 
-#: templates/ui/reservations/detail.html:130
+#: templates/ui/reservations/detail.html:152
 msgid "Articles réservés"
 msgstr "Assets reserved"
 
-#: templates/ui/reservations/detail.html:135
-#: templates/ui/reservations/pdf_summary.html:118
-#: templates/ui/reservations/reservation_checkout.html:55
-#: templates/ui/reservations/reservation_form.html:130
-#: templates/ui/reservations/reservation_return.html:79 ui/models.py:42
-#: ui/models.py:237 ui/models.py:283
+#: templates/ui/reservations/detail.html:157
+#: templates/ui/reservations/pdf_summary.html:134
+#: templates/ui/reservations/reservation_checkout.html:58
+#: templates/ui/reservations/reservation_form.html:131
+#: templates/ui/reservations/reservation_return.html:64
+#: ui/reservation/models.py:186 ui/stock/models.py:65 ui/stock/models.py:96
 msgid "Article"
 msgstr "Asset"
 
-#: templates/ui/reservations/detail.html:136
-#: templates/ui/reservations/reservation_checkout.html:56
+#: templates/ui/reservations/detail.html:158
+#: templates/ui/reservations/reservation_checkout.html:59
 msgid "Réservé"
 msgstr "Reserved"
 
-#: templates/ui/reservations/detail.html:138
+#: templates/ui/reservations/detail.html:160
 msgid "Rendu"
 msgstr "Back"
 
-#: templates/ui/reservations/detail.html:139
+#: templates/ui/reservations/detail.html:161
 #: templates/ui/stock/item_detail.html:61 templates/ui/stock/list.html:149
 msgid "En panne"
 msgstr "In repair"
 
-#: templates/ui/reservations/detail.html:154
+#: templates/ui/reservations/detail.html:177
 msgid "Quantité rééllement disponible"
 msgstr "Really available amount"
 
-#: templates/ui/reservations/detail.html:171
+#: templates/ui/reservations/detail.html:194
 msgid "Aucun article dans cette réservation"
 msgstr "No asset in this reservation"
 
-#: templates/ui/reservations/detail.html:182
+#: templates/ui/reservations/detail.html:205
 msgid "Historique des statuts"
 msgstr "Status history"
 
-#: templates/ui/reservations/detail.html:188
-#: templates/ui/stock/item_detail.html:126 templates/ui/stock/list.html:27
-#: ui/models.py:289
-msgid "Date"
-msgstr "Date"
-
-#: templates/ui/reservations/detail.html:189
-#: templates/ui/reservations/list.html:130 ui/models.py:141
-msgid "Statut"
-msgstr "Status"
-
-#: templates/ui/reservations/detail.html:190
-#: templates/ui/stock/item_detail.html:130
+#: templates/ui/reservations/detail.html:212
+#: templates/ui/stock/item_detail.html:131
 msgid "Utilisateur"
 msgstr "User"
 
-#: templates/ui/reservations/detail.html:238
+#: templates/ui/reservations/detail.html:260
 msgid "Retournée"
 msgstr "Returned"
 
-#: templates/ui/reservations/detail.html:257
+#: templates/ui/reservations/detail.html:278
 msgid "Annuler la reservation"
 msgstr "Cancel reservation"
 
@@ -770,7 +999,7 @@ msgid "Nouvelle réservation"
 msgstr "New reservation"
 
 #: templates/ui/reservations/list.html:51
-#: templates/ui/reservations/list.html:511
+#: templates/ui/reservations/list.html:513
 msgid "Liste"
 msgstr "List"
 
@@ -783,7 +1012,7 @@ msgid "Statut:"
 msgstr "Status:"
 
 #: templates/ui/reservations/list.html:117
-#: templates/ui/reservations/pdf_summary.html:95 ui/admin.py:158
+#: templates/ui/reservations/pdf_summary.html:107 ui/reservation/admin.py:60
 msgid "Dates"
 msgstr "Dates"
 
@@ -799,40 +1028,40 @@ msgstr "Reservation details"
 msgid "Éditer la réservation"
 msgstr "Modify reservation"
 
-#: templates/ui/reservations/list.html:233
+#: templates/ui/reservations/list.html:235
 #: templates/ui/reservations/reservation_confirm_cancel.html:9
 msgid "Annuler la réservation"
 msgstr "Cancel reservation"
 
-#: templates/ui/reservations/list.html:250
+#: templates/ui/reservations/list.html:252
 msgid "Aucune réservation trouvée"
 msgstr "No reservation found"
 
-#: templates/ui/reservations/list.html:258
+#: templates/ui/reservations/list.html:260
 msgid "Maintenant"
 msgstr "Now"
 
-#: templates/ui/reservations/list.html:261
+#: templates/ui/reservations/list.html:263
 msgid "Précédent"
 msgstr "Earlier"
 
-#: templates/ui/reservations/list.html:264
+#: templates/ui/reservations/list.html:266
 msgid "Suivant"
 msgstr "Following"
 
-#: templates/ui/reservations/list.html:267
+#: templates/ui/reservations/list.html:269
 msgid "Zoom avant"
 msgstr "Zoom in"
 
-#: templates/ui/reservations/list.html:270
+#: templates/ui/reservations/list.html:272
 msgid "Zoom arrière"
 msgstr "Zoom out"
 
-#: templates/ui/reservations/list.html:332
+#: templates/ui/reservations/list.html:334
 msgid "Problème détecté"
 msgstr "Detected issue"
 
-#: templates/ui/reservations/list.html:508
+#: templates/ui/reservations/list.html:510
 msgid "Calendrier"
 msgstr "Calendar"
 
@@ -840,80 +1069,85 @@ msgstr "Calendar"
 msgid "Résumé Réservation"
 msgstr "Reservation summary"
 
-#: templates/ui/reservations/pdf_summary.html:97
+#: templates/ui/reservations/pdf_summary.html:109
 msgid "Don attendu:"
 msgstr "Expected donation:"
 
-#: templates/ui/reservations/pdf_summary.html:98
+#: templates/ui/reservations/pdf_summary.html:110
 msgid "Don réel: "
 msgstr "Effective donation: "
 
-#: templates/ui/reservations/pdf_summary.html:106
+#: templates/ui/reservations/pdf_summary.html:118
 msgid ""
 " Suite à un prêt de matériel, l'adhésion annuelle (5€) est le don permettant "
-"d'entretenir le matériel et son\n"
+"d'entretenir le\n"
+"        matériel et son\n"
 "        renouvellement, merci pour votre don lors du retour du matériel."
 msgstr ""
 " Following a loan of equipment, the annual membership (5€) is the donation "
 "that allows the equipment to be maintained and\n"
 "        renewed, thank you for your donation when the equipment is returned."
 
-#: templates/ui/reservations/pdf_summary.html:108
+#: templates/ui/reservations/pdf_summary.html:121
 msgid ""
 " Le matériel prêté par le Comité des Fêtes de Genay est sous la "
-"responsabilité de l'adhérent et doit être rendu\n"
+"responsabilité de l'adhérent et\n"
+"        doit être rendu\n"
 "        propre. Tout article manquant ou détérioré vous sera facturé."
 msgstr ""
 " The equipment loaned by the Genay Festival Committee is the responsibility "
 "of the member and must be returned\n"
 "        clean. Any missing or damaged item will be charged to you."
 
-#: templates/ui/reservations/pdf_summary.html:110
+#: templates/ui/reservations/pdf_summary.html:124
 msgid ""
 " Les barnums sont destinés exclusivement aux implantations de courtes "
-"durées, en ayant consulté au préalable la\n"
+"durées, en ayant consulté\n"
+"        au préalable la\n"
 "        météo. Ils doivent être démontés et évacués à partir de 50km/h de "
-"vent et en cas de forte pluie."
+"vent et en cas de forte\n"
+"        pluie."
 msgstr ""
 " The marquees are intended exclusively for short-term installations, having "
 "consulted the weather in advance. They must be dismantled and evacuated "
 "from\n"
 "        50km/h wind and in case of heavy rain."
 
-#: templates/ui/reservations/pdf_summary.html:114
+#: templates/ui/reservations/pdf_summary.html:130
 msgid "Matériel réservé"
 msgstr "Reserved equipment"
 
-#: templates/ui/reservations/pdf_summary.html:119 ui/models.py:240
+#: templates/ui/reservations/pdf_summary.html:135 ui/reservation/models.py:189
 msgid "Quantité réservée"
 msgstr "Reserved quantity"
 
-#: templates/ui/reservations/pdf_summary.html:121
-#: templates/ui/reservations/reservation_return.html:81
-#: templates/ui/stock/item_detail.html:178
-#: templates/ui/stock/item_detail.html:199
-msgid "Retour"
-msgstr "Return"
-
-#: templates/ui/reservations/pdf_summary.html:137
+#: templates/ui/reservations/pdf_summary.html:153
 msgid ""
 "Les données de ce formulaire sont recueillies avec votre accord implicite "
-"lors d'une première réservation de\n"
-"    matériel. Ces données sont recueillies en vue de tenir à jour notre "
-"fichier d'adhérents et faire le suivi de vos\n"
-"    réservations. En aucun cas ces données ne seront cédées ou vendues à des "
-"tiers. Le responsable de leur traitement\n"
-"    est la Collégiale. Tous les membres de la collégiale et de l'équipe des "
-"administrateurs en charge de la gestion des\n"
-"    reservations peuvent être destinataires de vos données. Le droit d'accès "
-"et de rectification en vertu du Règlement\n"
-"    européen sur la protection des données personnels, en vigueur depuis le "
-"25/05/2018 vous donne accès aux données vous\n"
-"    concernant. Vous pouvez demander leur rectification et leur suppression "
-"à la fin de l'exercice annuel. Ces démarches\n"
-"    s'effectuent auprès de la Collégiale du CDF (relation-association@cdf-"
-"genay.com). Les données sont conservées\n"
-"    jusqu'à 4 ans après la fin de votre adhésion."
+"lors d'une première\n"
+"            réservation de\n"
+"            matériel. Ces données sont recueillies en vue de tenir à jour "
+"notre fichier d'adhérents et faire le suivi de\n"
+"            vos\n"
+"            réservations. En aucun cas ces données ne seront cédées ou "
+"vendues à des tiers. Le responsable de leur\n"
+"            traitement\n"
+"            est la Collégiale. Tous les membres de la collégiale et de "
+"l'équipe des administrateurs en charge de la\n"
+"            gestion des\n"
+"            reservations peuvent être destinataires de vos données. Le droit "
+"d'accès et de rectification en vertu du\n"
+"            Règlement\n"
+"            européen sur la protection des données personnels, en vigueur "
+"depuis le 25/05/2018 vous donne accès aux\n"
+"            données vous\n"
+"            concernant. Vous pouvez demander leur rectification et leur "
+"suppression à la fin de l'exercice annuel. Ces\n"
+"            démarches\n"
+"            s'effectuent auprès de la Collégiale du CDF (relation-"
+"association@cdf-genay.com). Les données sont\n"
+"            conservées\n"
+"            jusqu'à 4 ans après la fin de votre adhésion."
 msgstr ""
 "The data in this form is collected with your implicit consent during an "
 "initial equipment reservation. This data is collected to keep our member "
@@ -928,56 +1162,87 @@ msgstr ""
 "Collegiate of the CDF (relation-association@cdf-genay.com).The data is kept "
 "for up to 4 years after the end of your membership."
 
-#: templates/ui/reservations/reservation_checkout.html:9
+#: templates/ui/reservations/reservation_checkout.html:10
 msgid "Sortie de matériel"
 msgstr "Get out equipment"
 
-#: templates/ui/reservations/reservation_checkout.html:31 ui/models.py:131
+#: templates/ui/reservations/reservation_checkout.html:32
+#: ui/reservation/models.py:33
 msgid "Date de sortie réelle"
 msgstr "Effective checkout date"
 
-#: templates/ui/reservations/reservation_checkout.html:35
-#: templates/ui/reservations/reservation_checkout.html:38
+#: templates/ui/reservations/reservation_checkout.html:36
+#: templates/ui/reservations/reservation_checkout.html:39
 #: templates/ui/reservations/reservation_form.html:63
 #: templates/ui/reservations/reservation_form.html:66
-#: templates/ui/reservations/reservation_form.html:86
-#: templates/ui/reservations/reservation_form.html:89
-#: templates/ui/reservations/reservation_return.html:59
-#: templates/ui/reservations/reservation_return.html:62
-#: templates/ui/stock/item_detail.html:105
-#: templates/ui/stock/item_detail.html:113 templates/ui/stock/list.html:30
+#: templates/ui/reservations/reservation_form.html:87
+#: templates/ui/reservations/reservation_form.html:90
+#: templates/ui/reservations/reservation_return.html:41
+#: templates/ui/reservations/reservation_return.html:44
+#: templates/ui/stock/item_detail.html:106
+#: templates/ui/stock/item_detail.html:114 templates/ui/stock/list.html:30
 #: templates/ui/stock/stock_event_form.html:87
 #: templates/ui/stock/stock_event_form.html:90
 msgid "Sélectionner une date"
 msgstr "Select a date"
 
-#: templates/ui/reservations/reservation_checkout.html:50
+#: templates/ui/reservations/reservation_checkout.html:52
 msgid "Articles à sortir"
 msgstr "Assets to get out"
 
-#: templates/ui/reservations/reservation_checkout.html:57
+#: templates/ui/reservations/reservation_checkout.html:60
+msgid "Disponible"
+msgstr "Available"
+
+#: templates/ui/reservations/reservation_checkout.html:61
 msgid "À sortir"
 msgstr "To get out"
 
-#: templates/ui/reservations/reservation_checkout.html:58
-#: templates/ui/stock/item_detail.html:75
-msgid "Don minimum"
-msgstr "Minimum donation"
+#: templates/ui/reservations/reservation_checkout.html:62
+msgid "Don unitaire"
+msgstr "Unit donation"
 
-#: templates/ui/reservations/reservation_checkout.html:88
-msgid "Don minimum total"
-msgstr "Minimum total donation"
+#: templates/ui/reservations/reservation_checkout.html:63
+msgid "Don total"
+msgstr "Total donation"
 
-#: templates/ui/reservations/reservation_checkout.html:109
-msgid "Le don minimum est calculé automatiquement selon les articles sortis"
-msgstr "Minimum recommended donation is based on the assets checked out"
+#: templates/ui/reservations/reservation_checkout.html:106
+msgid "Totaux"
+msgstr "Totals"
 
-#: templates/ui/reservations/reservation_checkout.html:121
-#: templates/ui/reservations/reservation_return.html:164
+#: templates/ui/reservations/reservation_checkout.html:112
+msgid "Don attendu (articles)"
+msgstr "Expected donation (assets)"
+
+#: templates/ui/reservations/reservation_checkout.html:123
+#: templates/ui/reservations/reservation_checkout.html:134
+#: templates/ui/reservations/reservation_return.html:141
+msgid "Cotisation annuelle"
+msgstr "Annual membership"
+
+#: templates/ui/reservations/reservation_checkout.html:127
+msgid "Non payée"
+msgstr "Not paid"
+
+#: templates/ui/reservations/reservation_checkout.html:137
+msgid "Déjà payée"
+msgstr "Already paid"
+
+#: templates/ui/reservations/reservation_checkout.html:145
+#: templates/ui/reservations/reservation_return.html:152
+msgid "Coefficient client"
+msgstr "Customer coefficient"
+
+#: templates/ui/reservations/reservation_checkout.html:156
+#: templates/ui/reservations/reservation_return.html:172
+msgid "Total à collecter"
+msgstr "Total to collect"
+
+#: templates/ui/reservations/reservation_checkout.html:180
 msgid "Ajoutez des remarques ou informations complémentaires"
 msgstr "Add remarks or additional information"
 
-#: templates/ui/reservations/reservation_checkout.html:132
+#: templates/ui/reservations/reservation_checkout.html:191
 msgid "Valider la sortie"
 msgstr "Validate the checkout"
 
@@ -1006,6 +1271,7 @@ msgid "Date de sortie"
 msgstr "Checkout date"
 
 #: templates/ui/reservations/reservation_confirm_validate.html:16
+#: templates/ui/reservations/reservation_return.html:33
 msgid "Date de retour"
 msgstr "Return date"
 
@@ -1013,101 +1279,106 @@ msgstr "Return date"
 msgid "Modifier la réservation"
 msgstr "Modify reservation"
 
-#: templates/ui/reservations/reservation_form.html:121 ui/models.py:43
+#: templates/ui/reservations/reservation_form.html:122 ui/stock/models.py:66
 msgid "Articles"
 msgstr "Assets"
 
-#: templates/ui/reservations/reservation_form.html:131
-#: templates/ui/stock/item_detail.html:129 templates/ui/stock/list.html:108
-#: ui/models.py:288
+#: templates/ui/reservations/reservation_form.html:132
+#: templates/ui/stock/item_detail.html:130 templates/ui/stock/list.html:108
+#: ui/stock/models.py:101
 msgid "Quantité"
 msgstr "Amount"
 
-#: templates/ui/reservations/reservation_form.html:132
+#: templates/ui/reservations/reservation_form.html:133
 msgid "Action"
 msgstr "Action"
 
-#: templates/ui/reservations/reservation_form.html:181
-#: templates/ui/reservations/reservation_form.html:254
+#: templates/ui/reservations/reservation_form.html:182
+#: templates/ui/reservations/reservation_form.html:255
 #: templates/ui/stock/item_form.html:13
 msgid "Ajouter un article"
 msgstr "Add asset"
 
-#: templates/ui/reservations/reservation_form.html:193
+#: templates/ui/reservations/reservation_form.html:194
 msgid "Mettre à jour"
 msgstr "Update"
 
-#: templates/ui/reservations/reservation_form.html:195
+#: templates/ui/reservations/reservation_form.html:196
 msgid "Créer la réservation"
 msgstr "Create reservation"
 
-#: templates/ui/reservations/reservation_form.html:242
+#: templates/ui/reservations/reservation_form.html:243
 #: templates/ui/stock/item_confirm_delete.html:16
 #: templates/ui/stock/item_detail.html:16 templates/ui/stock/list.html:96
-#: ui/models.py:13 ui/models.py:30
+#: ui/stock/models.py:24 ui/stock/models.py:49
 msgid "Catégorie"
 msgstr "Category"
 
-#: templates/ui/reservations/reservation_form.html:244
+#: templates/ui/reservations/reservation_form.html:245
 msgid "Toutes les catégories"
 msgstr "All categories"
 
-#: templates/ui/reservations/reservation_form.html:382
-#: templates/ui/reservations/reservation_form.html:450
-#: templates/ui/stock/list.html:16 templates/ui/stock/stock_event_form.html:150
+#: templates/ui/reservations/reservation_form.html:383
+#: templates/ui/reservations/reservation_form.html:451
+#: templates/ui/stock/list.html:16 templates/ui/stock/stock_event_form.html:151
 msgid "Rechercher un article..."
 msgstr "Search for an asset..."
 
-#: templates/ui/reservations/reservation_form.html:434
-#: templates/ui/stock/stock_event_form.html:181
+#: templates/ui/reservations/reservation_form.html:435
+#: templates/ui/stock/stock_event_form.html:182
 msgid "Stock:"
 msgstr "Stock:"
 
-#: templates/ui/reservations/reservation_return.html:30
-msgid "Dates prévues"
-msgstr "Scheduled dates"
+#: templates/ui/reservations/reservation_return.html:10
+msgid "Retour de matériel"
+msgstr "Return equipment"
 
-#: templates/ui/reservations/reservation_return.html:40
-msgid "Dates réelles"
-msgstr "Effective dates"
-
-#: templates/ui/reservations/reservation_return.html:55 ui/models.py:134
+#: templates/ui/reservations/reservation_return.html:37
+#: ui/reservation/models.py:36
 msgid "Date de retour réelle"
 msgstr "Effective return date"
 
-#: templates/ui/reservations/reservation_return.html:74
+#: templates/ui/reservations/reservation_return.html:58
 msgid "Articles à retourner"
 msgstr "Assets to return"
 
-#: templates/ui/reservations/reservation_return.html:82
-msgid "Panne"
-msgstr "In repair"
+#: templates/ui/reservations/reservation_return.html:65
+msgid "Sortis"
+msgstr "Out"
 
-#: templates/ui/reservations/reservation_return.html:83
-msgid "Détruit"
+#: templates/ui/reservations/reservation_return.html:66
+msgid "Rendus OK"
+msgstr "Back OK"
+
+#: templates/ui/reservations/reservation_return.html:67
+msgid "Abîmés"
+msgstr "Damaged"
+
+#: templates/ui/reservations/reservation_return.html:68
+msgid "Détruits"
 msgstr "Destroyed"
 
-#: templates/ui/reservations/reservation_return.html:84
-msgid "Remplacement"
-msgstr "Replacement"
+#: templates/ui/reservations/reservation_return.html:118
+msgid "Le total pour chaque ligne doit correspondre à la quantité sortie"
+msgstr "The total for each line must correspond to the quantity checked out"
 
-#: templates/ui/reservations/reservation_return.html:122
-msgid "Aucun article à retourner pour cette réservation"
-msgstr "No asset to return for this reservation"
+#: templates/ui/reservations/reservation_return.html:125
+msgid "Calcul des dons"
+msgstr "Donation calculation"
 
-#: templates/ui/reservations/reservation_return.html:138
-msgid "Articles non retournés/endommagés"
-msgstr "Broken/Not returned assets"
+#: templates/ui/reservations/reservation_return.html:131
+msgid "Articles empruntés"
+msgstr "Assets borrowed"
 
-#: templates/ui/reservations/reservation_return.html:146
-msgid "Don exigible"
-msgstr "Expected donation"
+#: templates/ui/reservations/reservation_return.html:162 ui/stock/models.py:91
+msgid "Réparation"
+msgstr "Repair"
 
-#: templates/ui/reservations/reservation_return.html:177
-msgid "Don effectué par le client pour cette réservation"
-msgstr "Donation made by the customer for this reservation"
+#: templates/ui/reservations/reservation_return.html:197
+msgid "Ajustez le montant du don selon le retour effectif"
+msgstr "Adjust the donation amount according to the actual return"
 
-#: templates/ui/reservations/reservation_return.html:188
+#: templates/ui/reservations/reservation_return.html:207
 msgid "Valider le retour"
 msgstr "Validate the return"
 
@@ -1142,27 +1413,20 @@ msgstr "Add a category"
 msgid "Créer la catégorie"
 msgstr "Manage the category"
 
-#: templates/ui/stock/category_form.html:55
-msgid "Retour à la liste des catégories"
-msgstr "Return to category list"
-
 #: templates/ui/stock/category_list.html:9
 msgid "Gestion des catégories"
 msgstr "Manage categories"
 
 #: templates/ui/stock/category_list.html:23
-#: templates/ui/stock/item_detail.html:23 ui/admin.py:27 ui/models.py:9
-#: ui/models.py:22 ui/models.py:57 ui/models.py:290
+#: templates/ui/stock/item_detail.html:23 ui/customer/models.py:25
+#: ui/stock/admin.py:36 ui/stock/models.py:16 ui/stock/models.py:41
+#: ui/stock/models.py:103
 msgid "Description"
 msgstr "Description"
 
 #: templates/ui/stock/category_list.html:50
 msgid "Aucune catégorie disponible."
 msgstr "No category available."
-
-#: templates/ui/stock/category_list.html:61
-msgid "Retour au stock"
-msgstr "Return to stock"
 
 #: templates/ui/stock/item_confirm_delete.html:9
 msgid "Supprimer l'article"
@@ -1197,9 +1461,13 @@ msgid "En prêt"
 msgstr "Checked out"
 
 #: templates/ui/stock/item_detail.html:68 templates/ui/stock/list.html:162
-#: ui/models.py:33
+#: ui/stock/models.py:52
 msgid "Valeur de remplacement"
 msgstr "Replacement value"
+
+#: templates/ui/stock/item_detail.html:75
+msgid "Don minimum"
+msgstr "Minimum donation"
 
 #: templates/ui/stock/item_detail.html:92
 msgid "Nouvel événement"
@@ -1213,28 +1481,28 @@ msgstr "Asset history"
 msgid "Du"
 msgstr "From"
 
-#: templates/ui/stock/item_detail.html:109
+#: templates/ui/stock/item_detail.html:110
 msgid "Au"
 msgstr "To"
 
-#: templates/ui/stock/item_detail.html:118
+#: templates/ui/stock/item_detail.html:119
 msgid "Filtrer"
 msgstr "Filter"
 
-#: templates/ui/stock/item_detail.html:127 ui/models.py:286
+#: templates/ui/stock/item_detail.html:128 ui/stock/models.py:99
 msgid "Type d'événement"
 msgstr "Event type"
 
-#: templates/ui/stock/item_detail.html:128 ui/admin.py:201
+#: templates/ui/stock/item_detail.html:129 ui/stock/admin.py:79
 msgid "Détails"
 msgstr "Details"
 
-#: templates/ui/stock/item_detail.html:167
-#: templates/ui/stock/item_detail.html:181 templates/ui/stock/list.html:169
+#: templates/ui/stock/item_detail.html:169
+#: templates/ui/stock/item_detail.html:185 templates/ui/stock/list.html:169
 msgid "Voir les détails"
 msgstr "See details"
 
-#: templates/ui/stock/item_detail.html:236
+#: templates/ui/stock/item_detail.html:240
 msgid "Aucun événement trouvé pour cette période"
 msgstr "No event found for this period"
 
@@ -1246,15 +1514,11 @@ msgstr "Modify asset"
 msgid "Créer l'article"
 msgstr "Create asset"
 
-#: templates/ui/stock/item_form.html:55
-msgid "Retour à la liste des articles"
-msgstr "Return to asset list"
-
 #: templates/ui/stock/list.html:9
 msgid "Gestion du Stock"
 msgstr "Stock management"
 
-#: templates/ui/stock/list.html:40 ui/models.py:14
+#: templates/ui/stock/list.html:40 ui/stock/models.py:25
 msgid "Catégories"
 msgstr "Categories"
 
@@ -1262,19 +1526,11 @@ msgstr "Categories"
 msgid "Nouvel événement de stock"
 msgstr "New stock event"
 
-#: templates/ui/stock/list.html:50
-msgid "Ajouter"
-msgstr "Add"
-
 #: templates/ui/stock/list.html:60
 msgid "Catégorie:"
 msgstr "Category:"
 
-#: templates/ui/stock/list.html:65
-msgid "Toutes"
-msgstr "All"
-
-#: templates/ui/stock/list.html:109 ui/admin.py:48
+#: templates/ui/stock/list.html:109 ui/stock/admin.py:61
 msgid "Valeurs"
 msgstr "Values"
 
@@ -1294,47 +1550,43 @@ msgstr "Delete asset"
 msgid "Aucun article trouvé"
 msgstr "No asset found"
 
-#: ui/admin.py:46
-msgid "Informations générales"
-msgstr "General information"
-
-#: ui/admin.py:47
-msgid "Gestion du stock"
-msgstr "Stock management"
-
-#: ui/admin.py:60
+#: ui/customer/admin.py:34
 msgid "Informations"
 msgstr "Informations"
 
-#: ui/admin.py:61
+#: ui/customer/admin.py:35
 msgid "Classification"
 msgstr "Classification"
 
-#: ui/admin.py:90
+#: ui/customer/admin.py:37
+msgid "Paramètres de don"
+msgstr "Donation settings"
+
+#: ui/customer/admin.py:78
 msgid "Informations pour une personne physique"
 msgstr "Informations for a physical person"
 
-#: ui/admin.py:102
+#: ui/customer/admin.py:90
 msgid "Informations pour une personne morale"
 msgstr "Informations for a legal entity"
 
-#: ui/admin.py:105
+#: ui/customer/admin.py:93
 msgid "Coordonnées"
 msgstr "Contact details"
 
-#: ui/admin.py:106
+#: ui/customer/admin.py:95 ui/donation/admin.py:30
 msgid "Options"
 msgstr "Options"
 
-#: ui/admin.py:171
-msgid "Statut et don"
-msgstr "Status and donation"
+#: ui/customer/admin.py:118 ui/customer/models.py:27
+msgid "Type d'entité"
+msgstr "Entity type"
 
-#: ui/forms.py:71
+#: ui/customer/forms.py:71
 msgid "Don minimum demandé pour l'emprunt de cet article."
 msgstr "Minimum donation requested for borrowing this asset."
 
-#: ui/forms.py:73
+#: ui/customer/forms.py:73
 msgid ""
 "Valeur exigée si l'article n'est pas rendu ou est rendu dans un état "
 "irréparable."
@@ -1342,226 +1594,213 @@ msgstr ""
 "Value required if the asset is not returned or is returned in an irreparable "
 "state."
 
-#: ui/forms.py:85 ui/forms.py:96
+#: ui/customer/forms.py:88 ui/customer/forms.py:90
 msgid "Ce champ est obligatoire."
 msgstr "This field is mandatory."
 
-#: ui/forms.py:101
-msgid "Le nom du représentant légal est obligatoire"
-msgstr "Name of the legal representative is mandatory"
+#: ui/customer/forms.py:97
+msgid "Ce champ est obligatoire pour une personne physique."
+msgstr "This field is mandatory for a physical person."
 
-#: ui/models.py:24
-msgid "Quantité en stock"
-msgstr "Total stock"
+#: ui/customer/forms.py:103
+msgid "Ce champ est obligatoire pour une personne morale."
+msgstr "This field is mandatory for a legal entity."
 
-#: ui/models.py:36
-msgid "Don minimum exigé"
-msgstr "Minimum donation required"
+#: ui/customer/forms.py:108
+msgid "Le nom du représentant légal est obligatoire."
+msgstr "Name of the legal representative is mandatory."
 
-#: ui/models.py:91
-msgid "Raison sociale"
-msgstr "Legal name"
+#: ui/customer/models.py:24
+msgid "Code"
+msgstr "Code"
 
-#: ui/models.py:94
+#: ui/customer/models.py:30
+msgid "Couleur"
+msgstr "Color"
+
+#: ui/customer/models.py:40
+msgid "Période de réservation (jours avant manifestation)"
+msgstr "Reservation period (days before event)"
+
+#: ui/customer/models.py:83
 msgid "Prénom du représentant"
 msgstr "First name of the representative"
 
-#: ui/models.py:97
+#: ui/customer/models.py:86
 msgid "Nom du représentant"
 msgstr "Last name of the representative"
 
-#: ui/models.py:101
-msgid "Téléphone"
-msgstr "Telephone"
-
-#: ui/models.py:102
-msgid "Adresse"
-msgstr "Address"
-
-#: ui/models.py:128
-msgid "Date de sortie prévue"
-msgstr "Scheduled checkout date"
-
-#: ui/models.py:129
-msgid "Date de retour prévue"
-msgstr "Scheduled return date"
-
-#: ui/models.py:162
-msgid "Créé par"
-msgstr "Created by"
-
-#: ui/models.py:170
-msgid "Validé par"
-msgstr "Validated by"
-
-#: ui/models.py:178
-msgid "Annulé par"
-msgstr "Canceled by"
-
-#: ui/models.py:186
-msgid "Sortie par"
-msgstr "Checked out by"
-
-#: ui/models.py:194
-msgid "Retour par"
-msgstr "Returned by"
-
-#: ui/models.py:198 ui/models.py:231
-msgid "Réservation"
-msgstr "Reservation"
-
-#: ui/models.py:243
-msgid "Quantité sortie"
-msgstr "Checkout quantity"
-
-#: ui/models.py:246
-msgid "Quantité rendue"
-msgstr "Returned quantity"
-
-#: ui/models.py:249
-msgid "Quantité en panne"
-msgstr "In repair quantity"
-
-#: ui/models.py:253
-msgid "Élément de réservation"
-msgstr "Reservation item"
-
-#: ui/models.py:254
-msgid "Éléments de réservation"
-msgstr "Reservation items"
-
-#: ui/models.py:273
-msgid "Panne réparable"
+#: ui/customer/models.py:100
+msgid ""
+"Coefficient appliqué aux dons effectués par ce client, 0 applique le "
+"coefficient pour son type."
 msgstr ""
+"Coefficient applied to donations made by this customer, 0 applies the "
+"coefficient for its type."
 
-#: ui/models.py:274
-msgid "Destruction"
-msgstr "Destruction"
-
-#: ui/models.py:275
-msgid "Acquisition"
-msgstr "Acquisition"
-
-#: ui/models.py:276
-msgid "Vente"
-msgstr "Sale"
-
-#: ui/models.py:277
-msgid "Ajustement d'inventaire"
-msgstr "Inventory adjustment"
-
-#: ui/models.py:278
-msgid "Réparation"
-msgstr "Repair"
-
-#: ui/models.py:295
-msgid "Utilisateur responsable"
-msgstr "Responsible user"
-
-#: ui/models.py:299
-msgid "Événement de stock"
-msgstr "Stock event"
-
-#: ui/models.py:300
-msgid "Événements de stock"
-msgstr "Stock events"
-
-#: ui/views.py:153
-msgid "Catégorie créée avec succès"
-msgstr "Successfully created category"
-
-#: ui/views.py:175
-msgid "Catégorie modifiée avec succès"
-msgstr "Successfully modified category"
-
-#: ui/views.py:196
-msgid "Catégorie supprimée avec succès"
-msgstr "Successfully deleted category"
-
-#: ui/views.py:215
-msgid "Article créé avec succès"
-msgstr "Successfully created asset"
-
-#: ui/views.py:237
-msgid "Article modifié avec succès"
-msgstr "Successfully modified asset"
-
-#: ui/views.py:258
-msgid "Article supprimé avec succès"
-msgstr "Successfully deleted asset"
-
-#: ui/views.py:362
-#, fuzzy
-#| msgid "Client créé avec succès"
+#: ui/customer/views.py:54
 msgid "Type de client créé avec succès"
-msgstr "Successfully created customer"
+msgstr "Customer type successfully created"
 
-#: ui/views.py:384
-#, fuzzy
-#| msgid "Client modifié avec succès"
+#: ui/customer/views.py:82
 msgid "Type de client modifié avec succès"
-msgstr "Successfully modified customer"
+msgstr "Customer type successfully modified"
 
-#: ui/views.py:406
-#, fuzzy
-#| msgid "Client supprimé avec succès"
+#: ui/customer/views.py:110
 msgid "Type de client supprimé avec succès"
-msgstr "Successfully deleted customer"
+msgstr "Customer type successfully deleted"
 
-#: ui/views.py:409
+#: ui/customer/views.py:113
 msgid "Ce type de client est utilisé par des clients existants"
-msgstr ""
+msgstr "This customer type is used by existing customers"
 
-#: ui/views.py:489
+#: ui/customer/views.py:246
 msgid "Client créé avec succès"
 msgstr "Successfully created customer"
 
-#: ui/views.py:511
+#: ui/customer/views.py:275
 msgid "Client modifié avec succès"
 msgstr "Successfully modified customer"
 
-#: ui/views.py:532
+#: ui/customer/views.py:303
 msgid "Client supprimé avec succès"
 msgstr "Successfully deleted customer"
 
-#: ui/views.py:688 ui/views.py:769
+#: ui/donation/admin.py:29
+msgid "Informations principales"
+msgstr "General information"
+
+#: ui/donation/models.py:23
+msgid "Date du don"
+msgstr "Donation date"
+
+#: ui/donation/models.py:28
+msgid "Inclut l'adhésion annuelle"
+msgstr "Includes annual membership"
+
+#: ui/donation/models.py:36
+msgid "Réservation associée"
+msgstr "Associated reservation"
+
+#: ui/donation/models.py:53
+#, python-brace-format
+msgid "Don de {self.amount}€ par {self.customer} le {self.date}"
+msgstr "Donation of {self.amount}€ by {self.customer} on {self.date}"
+
+#: ui/donation/views.py:80
+msgid "Don créé avec succès"
+msgstr "Successfully created donation"
+
+#: ui/donation/views.py:98
+msgid "Créer un don"
+msgstr "Create a donation"
+
+#: ui/donation/views.py:119
+msgid "Don modifié avec succès"
+msgstr "Successfully modified donation"
+
+#: ui/donation/views.py:127
+msgid "Modifier le don"
+msgstr "Modify donation"
+
+#: ui/donation/views.py:146
+msgid "Don supprimé avec succès"
+msgstr "Successfully deleted donation"
+
+#: ui/reservation/admin.py:73
+msgid "Statut et don"
+msgstr "Status and donation"
+
+#: ui/reservation/admin.py:100
+msgid "Dons effectués"
+msgstr "Donation made"
+
+#: ui/reservation/models.py:30
+msgid "Date de sortie prévue"
+msgstr "Scheduled checkout date"
+
+#: ui/reservation/models.py:31
+msgid "Date de retour prévue"
+msgstr "Scheduled return date"
+
+#: ui/reservation/models.py:61
+msgid "Créé par"
+msgstr "Created by"
+
+#: ui/reservation/models.py:69
+msgid "Validé par"
+msgstr "Validated by"
+
+#: ui/reservation/models.py:77
+msgid "Annulé par"
+msgstr "Canceled by"
+
+#: ui/reservation/models.py:85
+msgid "Sortie par"
+msgstr "Checked out by"
+
+#: ui/reservation/models.py:93
+msgid "Retour par"
+msgstr "Returned by"
+
+#: ui/reservation/models.py:192
+msgid "Quantité sortie"
+msgstr "Checkout quantity"
+
+#: ui/reservation/models.py:195
+msgid "Quantité rendue"
+msgstr "Returned quantity"
+
+#: ui/reservation/models.py:198
+msgid "Quantité en panne"
+msgstr "In repair quantity"
+
+#: ui/reservation/models.py:206
+msgid "Élément de réservation"
+msgstr "Reservation item"
+
+#: ui/reservation/models.py:207
+msgid "Éléments de réservation"
+msgstr "Reservation items"
+
+#: ui/reservation/views.py:207 ui/reservation/views.py:296
 msgid "Veuillez ajouter au moins un article à la réservation."
 msgstr "Please add at least one asset to the reservation."
 
-#: ui/views.py:702
+#: ui/reservation/views.py:221
 msgid "Réservation créée avec succès"
 msgstr "Successfully created reservation"
 
-#: ui/views.py:727
+#: ui/reservation/views.py:250
 msgid "Cette réservation ne peut pas être validée"
 msgstr "This reservation cannot be validated"
 
-#: ui/views.py:735
+#: ui/reservation/views.py:258
 msgid "Réservation validée avec succès"
 msgstr "Successfully validated reservation"
 
-#: ui/views.py:754
+#: ui/reservation/views.py:281
 msgid "Impossible de modifier une réservation sortie ou rendue"
 msgstr "Impossible to modify a checkout or returned reservation"
 
-#: ui/views.py:793
+#: ui/reservation/views.py:317
 msgid "Réservation modifiée avec succès"
 msgstr "Successfully modified reservation"
 
-#: ui/views.py:820
+#: ui/reservation/views.py:348
 msgid ""
 "Seules les réservations à l'état 'créée' ou 'validée' peuvent être annulées"
 msgstr "Only reservations in 'created' or 'validated' state can be canceled"
 
-#: ui/views.py:830
+#: ui/reservation/views.py:358
 msgid "Réservation annulée avec succès"
 msgstr "Successfully canceled reservation"
 
-#: ui/views.py:848
+#: ui/reservation/views.py:380
 msgid "Cette réservation ne peut pas être sortie"
 msgstr "This reservation cannot be checked out"
 
-#: ui/views.py:865
+#: ui/reservation/views.py:404
 #, python-brace-format
 msgid ""
 "Quantité insuffisante pour {item.asset.name} (disponible: {item.asset."
@@ -1570,23 +1809,118 @@ msgstr ""
 "Insufficient quantity for {item.asset.name} (available: {item.asset."
 "stock_quantity})"
 
-#: ui/views.py:891
+#: ui/reservation/views.py:427
 msgid "Sortie de matériel effectuée avec succès"
 msgstr "Successfully created assets checkout"
 
-#: ui/views.py:911
+#: ui/reservation/views.py:453
 msgid "Cette réservation ne peut pas être retournée"
 msgstr "This reservation cannot be returned"
 
-#: ui/views.py:938
+#: ui/reservation/views.py:479
 #, python-brace-format
 msgid "Quantités invalides pour {item.asset.name}"
 msgstr "Invalid quantities for {item.asset.name}"
 
-#: ui/views.py:972
+#: ui/reservation/views.py:519
 msgid "Retour de matériel enregistré avec succès"
 msgstr "Successfully registered assets return"
 
-#: ui/views.py:1037
+#: ui/stock/admin.py:60
+msgid "Gestion du stock"
+msgstr "Stock management"
+
+#: ui/stock/models.py:43
+msgid "Quantité en stock"
+msgstr "Total stock"
+
+#: ui/stock/models.py:55
+msgid "Don minimum exigé"
+msgstr "Minimum donation required"
+
+#: ui/stock/models.py:86
+msgid "Panne réparable"
+msgstr "Repairable"
+
+#: ui/stock/models.py:87
+msgid "Destruction"
+msgstr "Destruction"
+
+#: ui/stock/models.py:88
+msgid "Acquisition"
+msgstr "Acquisition"
+
+#: ui/stock/models.py:89
+msgid "Vente"
+msgstr "Sale"
+
+#: ui/stock/models.py:90
+msgid "Ajustement d'inventaire"
+msgstr "Inventory adjustment"
+
+#: ui/stock/models.py:108
+msgid "Utilisateur responsable"
+msgstr "Responsible user"
+
+#: ui/stock/models.py:116
+msgid "Événement de stock"
+msgstr "Stock event"
+
+#: ui/stock/models.py:117
+msgid "Événements de stock"
+msgstr "Stock events"
+
+#: ui/stock/views.py:126
+msgid "Catégorie créée avec succès"
+msgstr "Successfully created category"
+
+#: ui/stock/views.py:154
+msgid "Catégorie modifiée avec succès"
+msgstr "Successfully modified category"
+
+#: ui/stock/views.py:181
+msgid "Catégorie supprimée avec succès"
+msgstr "Successfully deleted category"
+
+#: ui/stock/views.py:205
+msgid "Article créé avec succès"
+msgstr "Successfully created asset"
+
+#: ui/stock/views.py:233
+msgid "Article modifié avec succès"
+msgstr "Successfully modified asset"
+
+#: ui/stock/views.py:260
+msgid "Article supprimé avec succès"
+msgstr "Successfully deleted asset"
+
+#: ui/stock/views.py:366
 msgid "Événement de stock enregistré avec succès"
 msgstr "Stock event successfully registered"
+
+#~ msgid "Le don minimum est calculé automatiquement selon les articles sortis"
+#~ msgstr "Minimum recommended donation is based on the assets checked out"
+
+#~ msgid "Dates prévues"
+#~ msgstr "Scheduled dates"
+
+#~ msgid "Dates réelles"
+#~ msgstr "Effective dates"
+
+#~ msgid "Panne"
+#~ msgstr "In repair"
+
+#~ msgid "Remplacement"
+#~ msgstr "Replacement"
+
+#~ msgid "Aucun article à retourner pour cette réservation"
+#~ msgstr "No asset to return for this reservation"
+
+#~ msgid "Articles non retournés/endommagés"
+#~ msgstr "Broken/Not returned assets"
+
+#~ msgid "Don exigible"
+#~ msgstr "Expected donation"
+
+#~ msgid "Don effectué par le client pour cette réservation"
+#~ msgstr "Donation made by the customer for this reservation"

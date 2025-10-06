@@ -2,6 +2,8 @@
 Views for managing customers and customer types.
 """
 
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -171,6 +173,13 @@ def customers_view(request):
     if filters_q is not None:
         customers = customers.filter(filters_q)
 
+    current_year = datetime.now().year
+    for customer in customers:
+        customer.is_membership_up_to_date = (
+            customer.is_exempted_from_donation()
+            or customer.get_has_paid_membership_fee(current_year)
+        )
+
     customer_types = CustomerType.objects.all().order_by("name")
 
     context = {
@@ -185,6 +194,41 @@ def customers_view(request):
         "capability": get_capability(request.user),
     }
     return render(request, "ui/customers/list.html", context)
+
+
+@login_required
+@user_type_required("manager")
+def customer_detail(request, pk):
+    """
+    Display detailed information about a customer.
+    :param request: HTTP request object
+    :param pk: Primary key of the customer
+    :return: Rendered customer detail page
+    """
+    customer = get_object_or_404(Customer, pk=pk)
+
+    # Récupérer les réservations du client
+    reservations = customer.reservations.all().order_by("-checkout_date")
+
+    # Récupérer les dons du client
+    donations = customer.donations.all().order_by("-date")
+
+    # Calculer les statistiques
+    total_donations = customer.get_total_donation_amount()
+    total_reservations = reservations.count()
+    current_year = datetime.now().year
+    is_membership_up_to_date = customer.get_has_paid_membership_fee(current_year)
+
+    context = {
+        "customer": customer,
+        "reservations": reservations,
+        "donations": donations,
+        "total_donations": total_donations,
+        "total_reservations": total_reservations,
+        "capability": get_capability(request.user),
+        "is_membership_up_to_date": is_membership_up_to_date,
+    }
+    return render(request, "ui/customers/detail.html", context)
 
 
 @login_required
