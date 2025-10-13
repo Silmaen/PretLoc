@@ -97,13 +97,13 @@ PretLoc can be configured through environment variables or by editing the `.env`
 ## Requests
 
 * Home Page
-    * [ ] Create a dashboard displaying key metrics:
-        * [ ] Assets damaged or in repair
-        * [ ] Number of reservations (current and upcoming)
-        * [ ] Total donations received this year
-    * [ ] Display upcoming reservations (next monday and friday)
-        * [ ] Display departure
-        * [ ] Display return
+    * [X] Create a dashboard displaying key metrics:
+        * [X] Assets damaged or in repair
+        * [X] Number of reservations (current and upcoming)
+        * [X] Total donations received this year
+    * [X] Display upcoming reservations (next monday and friday)
+        * [X] Display departure
+        * [X] Display return
 * Customer management
     * Customer types
         * [X] Allow defining customer types (member, non-member, external)

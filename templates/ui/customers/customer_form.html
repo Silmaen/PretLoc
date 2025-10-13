@@ -1,253 +1,242 @@
 <!-- html -->
-{% extends 'base.html' %}
+{% extends 'includes/custom_form.html' %}
 {% load i18n %}
 
-{% block content %}
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <i class="fas fa-user-plus auth-icon"></i>
-                <h2>
-                    {% if customer %}
-                        {% trans "Modifier le client" %}
-                    {% else %}
-                        {% trans "Ajouter un client" %}
-                    {% endif %}
-                </h2>
+{% block form_title %}
+    {% if customer %}
+        {% trans "Modifier le client" %}
+    {% else %}
+        {% trans "Ajouter un client" %}
+    {% endif %}
+{% endblock %}
+
+{% block form_content %}
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_customer_type">
+                <i class="fas fa-users"></i>
+                {% trans "Type de client" %}
+            </label>
+            <select name="customer_type" id="id_customer_type" class="form-control">
+                {% for ct in customer_types %}
+                    <option value="{{ ct.id }}"
+                            {% if customer and customer.customer_type and customer.customer_type.id == ct.id %}selected{% endif %}
+                            data-entity="{{ ct.entity_type }}"
+                            data-reservation="{{ ct.reservation_period_days }}"
+                            data-donation-coefficient="{{ ct.donation_coefficient }}"
+                            data-exemption="{{ ct.donation_exemption|yesno:"true,false" }}">
+                        {{ ct.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if form.customer_type.errors %}
+                <ul class="errorlist">
+                    {% for error in form.customer_type.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div id="physical-fields">
+            <div class="form-group">
+                <label for="{{ form.last_name.id_for_label }}">
+                    <i class="fas fa-user"></i>
+                    {{ form.last_name.label }}
+                </label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.last_name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
 
-            <form method="post" class="auth-form">
-                {% csrf_token %}
-
-                <div class="form-group">
-                    <label for="id_customer_type">
-                        <i class="fas fa-users"></i>
-                        {% trans "Type de client" %}
-                    </label>
-                    <select name="customer_type" id="id_customer_type" class="form-control">
-                        {% for ct in customer_types %}
-                            <option value="{{ ct.id }}"
-                                    {% if customer and customer.customer_type and customer.customer_type.id == ct.id %}selected{% endif %}
-                                    data-entity="{{ ct.entity_type }}"
-                                    data-reservation="{{ ct.reservation_period_days }}"
-                                    data-donation-coefficient="{{ ct.donation_coefficient }}"
-                                    data-exemption="{{ ct.donation_exemption|yesno:"true,false" }}">
-                                {{ ct.name }}
-                            </option>
+            <div class="form-group">
+                <label for="{{ form.first_name.id_for_label }}">
+                    <i class="fas fa-user"></i>
+                    {{ form.first_name.label }}
+                </label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.first_name.errors %}
+                            <li>{{ error }}</li>
                         {% endfor %}
-                    </select>
-                    {% if form.customer_type.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.customer_type.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-
-                <div id="physical-fields">
-                    <div class="form-group">
-                        <label for="{{ form.last_name.id_for_label }}">
-                            <i class="fas fa-user"></i>
-                            {{ form.last_name.label }}
-                        </label>
-                        {{ form.last_name }}
-                        {% if form.last_name.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.last_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.first_name.id_for_label }}">
-                            <i class="fas fa-user"></i>
-                            {{ form.first_name.label }}
-                        </label>
-                        {{ form.first_name }}
-                        {% if form.first_name.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.first_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div id="legal-fields" style="display: none;">
-                    <div class="form-group">
-                        <label for="{{ form.company_name.id_for_label }}">
-                            <i class="fas fa-building"></i>
-                            {{ form.company_name.label }}
-                        </label>
-                        {{ form.company_name }}
-                        {% if form.company_name.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.company_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label for="{{ form.legal_rep_last_name.id_for_label }}">
-                            <i class="fas fa-user-tie"></i>
-                            {{ form.legal_rep_last_name.label }}
-                        </label>
-                        {{ form.legal_rep_last_name }}
-                        {% if form.legal_rep_last_name.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.legal_rep_last_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.legal_rep_first_name.id_for_label }}">
-                            <i class="fas fa-user-tie"></i>
-                            {{ form.legal_rep_first_name.label }}
-                        </label>
-                        {{ form.legal_rep_first_name }}
-                        {% if form.legal_rep_first_name.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.legal_rep_first_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div style="display: flex; align-items: center;cursor: pointer;">
-                        <label for="{{ form.donation_exemption.id_for_label }}">
-                            <i class="fas fa-hand-holding-usd"></i>
-                            {{ form.donation_exemption.label }}
-                        </label>
-                        {{ form.donation_exemption }}
-                    </div>
-                    {% if form.donation_exemption.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.donation_exemption.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.donation_coefficient.id_for_label }}">
-                        <i class="fas fa-percentage"></i>
-                        {{ form.donation_coefficient.label }}
-                    </label>
-                    {{ form.donation_coefficient }}
-                    <div class="form-help-text">
-                        <i class="fas fa-info-circle"></i>
-                        {% trans "Mettre 0 pour utiliser le coefficient du type de client." %}
-                    </div>
-                    {% if form.donation_coefficient.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.donation_coefficient.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-
-                <div id="reservation-info" class="form-group" style="display: none;">
-                    <label>
-                        <i class="fas fa-calendar-alt"></i>
-                        {% trans "Délai de réservation (jours)" %}
-                    </label>
-                    <div id="reservation-period-display" class="form-help-text"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}">
-                        <i class="fas fa-envelope"></i>
-                        {{ form.email.label }}
-                    </label>
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.email.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.phone.id_for_label }}">
-                        <i class="fas fa-phone"></i>
-                        {{ form.phone.label }}
-                    </label>
-                    {{ form.phone }}
-                    {% if form.phone.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.phone.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    <div class="form-help-text">
-                        <i class="fas fa-info-circle"></i> {% trans "Optionnel" %}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.address.id_for_label }}">
-                        <i class="fas fa-map-marker-alt"></i>
-                        {{ form.address.label }}
-                    </label>
-                    {{ form.address }}
-                    {% if form.address.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.address.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.notes.id_for_label }}">
-                        <i class="fas fa-sticky-note"></i>
-                        {{ form.notes.label }}
-                    </label>
-                    {{ form.notes }}
-                    {% if form.notes.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.notes.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    <div class="form-help-text">
-                        <i class="fas fa-info-circle"></i> {% trans "Informations supplémentaires sur le client" %}
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="auth-button">
-                        <i class="fas fa-save"></i>
-                        {% trans "Enregistrer" %}
-                    </button>
-                    <a href="javascript:history.back()" class="auth-button"
-                       style="background-color: var(--bg-element); color: var(--text-primary);">
-                        <i class="fas fa-times"></i>
-                        {% trans "Annuler" %}
-                    </a>
-                </div>
-            </form>
+                    </ul>
+                {% endif %}
+            </div>
         </div>
-    </div>
 
+        <div id="legal-fields" style="display: none;">
+            <div class="form-group">
+                <label for="{{ form.company_name.id_for_label }}">
+                    <i class="fas fa-building"></i>
+                    {{ form.company_name.label }}
+                </label>
+                {{ form.company_name }}
+                {% if form.company_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.company_name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.legal_rep_last_name.id_for_label }}">
+                    <i class="fas fa-user-tie"></i>
+                    {{ form.legal_rep_last_name.label }}
+                </label>
+                {{ form.legal_rep_last_name }}
+                {% if form.legal_rep_last_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.legal_rep_last_name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.legal_rep_first_name.id_for_label }}">
+                    <i class="fas fa-user-tie"></i>
+                    {{ form.legal_rep_first_name.label }}
+                </label>
+                {{ form.legal_rep_first_name }}
+                {% if form.legal_rep_first_name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.legal_rep_first_name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.donation_exemption.id_for_label }}">
+                <i class="fas fa-hand-holding-usd"></i>
+                {{ form.donation_exemption.label }}
+            </label>
+            {{ form.donation_exemption }}
+
+            {% if form.donation_exemption.errors %}
+                <ul class="errorlist">
+                    {% for error in form.donation_exemption.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.donation_coefficient.id_for_label }}">
+                <i class="fas fa-percentage"></i>
+                {{ form.donation_coefficient.label }}
+            </label>
+            {{ form.donation_coefficient }}
+            <div class="form-help-text">
+                <i class="fas fa-info-circle"></i>
+                {% trans "Mettre 0 pour utiliser le coefficient du type de client." %}
+            </div>
+            {% if form.donation_coefficient.errors %}
+                <ul class="errorlist">
+                    {% for error in form.donation_coefficient.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div id="reservation-info" class="form-group" style="display: none;">
+            <label>
+                <i class="fas fa-calendar-alt"></i>
+                {% trans "Délai de réservation (jours)" %}
+            </label>
+            <div id="reservation-period-display" class="form-help-text"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">
+                <i class="fas fa-envelope"></i>
+                {{ form.email.label }}
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <ul class="errorlist">
+                    {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.phone.id_for_label }}">
+                <i class="fas fa-phone"></i>
+                {{ form.phone.label }}
+            </label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <ul class="errorlist">
+                    {% for error in form.phone.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="form-help-text">
+                <i class="fas fa-info-circle"></i> {% trans "Optionnel" %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.address.id_for_label }}">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ form.address.label }}
+            </label>
+            {{ form.address }}
+            {% if form.address.errors %}
+                <ul class="errorlist">
+                    {% for error in form.address.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.notes.id_for_label }}">
+                <i class="fas fa-sticky-note"></i>
+                {{ form.notes.label }}
+            </label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+                <ul class="errorlist">
+                    {% for error in form.notes.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="form-help-text">
+                <i class="fas fa-info-circle"></i> {% trans "Informations supplémentaires sur le client" %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="auth-button" title="{% trans "Enregistrer" %}">
+                <i class="fas fa-save"></i>
+                {% trans "Enregistrer" %}
+            </button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block extra_js %}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const select = document.getElementById('id_customer_type');

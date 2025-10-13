@@ -1,0 +1,45 @@
+{% extends 'includes/custom_form.html' %}
+{% load i18n %}
+
+{% block form_title_icon %}fa-tag{% endblock %}
+{% block form_title %}
+    {% if category %}
+        {% trans "Modifier la catégorie" %}
+    {% else %}
+        {% trans "Ajouter une catégorie" %}
+    {% endif %}
+{% endblock %}
+{% block form_content %}
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    <i class="fas fa-{% if field.name == 'name' %}tag{% else %}align-left{% endif %}"></i>
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <div class="form-help-text">
+                        <i class="fas fa-info-circle"></i> {{ field.help_text }}
+                    </div>
+                {% endif %}
+                {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for error in field.errors %}
+                            <li><i class="fas fa-exclamation-triangle"></i> {{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="form-group">
+            <button type="submit" class="auth-button">
+                <i class="fas fa-save"></i>
+                {% trans "Enregistrer" %}
+            </button>
+        </div>
+    </form>
+{% endblock %}

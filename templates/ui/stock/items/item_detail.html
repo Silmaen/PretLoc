@@ -8,20 +8,20 @@
                 <h2>{% trans "Détails de l'article" %}</h2>
             </div>
 
-            <div class="auth-card">
+            <div class="auth-card-secondary">
                 <h3>{{ item.name }}</h3>
 
                 <div class="detail-row">
-                <span class="detail-label">
-                    <i class="fas fa-tag auth-blue"></i> {% trans "Catégorie" %}
-                </span>
+                    <span class="detail-label">
+                        <i class="fas fa-tag auth-blue"></i> {% trans "Catégorie" %}
+                    </span>
                     <span class="detail-value">{{ item.category.name }}</span>
                 </div>
 
                 <div class="detail-row">
-                <span class="detail-label">
-                    <i class="fas fa-align-left auth-blue"></i> {% trans "Description" %}
-                </span>
+                    <span class="detail-label">
+                        <i class="fas fa-align-left auth-blue"></i> {% trans "Description" %}
+                    </span>
                     <span class="detail-value">{{ item.description }}</span>
                 </div>
 
@@ -64,45 +64,48 @@
                 </div>
 
                 <div class="detail-row">
-                <span class="detail-label">
-                    <i class="fas fa-euro-sign auth-blue"></i> {% trans "Valeur de remplacement" %}
-                </span>
+                    <span class="detail-label">
+                        <i class="fas fa-euro-sign auth-blue"></i> {% trans "Valeur de remplacement" %}
+                    </span>
                     <span class="detail-value">{{ item.replacement_value }} €</span>
                 </div>
 
                 <div class="detail-row">
-                <span class="detail-label">
-                    <i class="fas fa-hand-holding-heart auth-blue"></i>{% trans "Don minimum" %}
-                </span>
+                    <span class="detail-label">
+                        <i class="fas fa-hand-holding-heart auth-blue"></i>{% trans "Don minimum" %}
+                    </span>
                     <span class="detail-value">{{ item.rental_value }} €</span>
                 </div>
             </div>
 
-            <div class="actions-buttons">
-                {% if capability.can_edit_articles %}
-                    <a href="{% url 'ui:item_update' item.id %}" class="auth-button secondary-button">
-                        <i class="fas fa-edit"></i>
-                        {% trans "Modifier" %}
-                    </a>
-                {% endif %}
+            <div class="auth-card-secondary">
+                <div class="actions-buttons">
+                    {% if capability.can_edit_articles %}
+                        <a href="{% url 'ui:item_update' item.id %}" class="auth-button secondary-button">
+                            <i class="fas fa-edit"></i>
+                            {% trans "Modifier" %}
+                        </a>
+                    {% endif %}
 
-                {% if capability.can_add_articles %}
-                    <a href="{% url 'ui:stock_event_create_for_asset' item.id %}" class="auth-button secondary-button">
-                        <i class="fas fa-history"></i>
-                        {% trans "Nouvel événement" %}
-                    </a>
-                {% endif %}
+                    {% if capability.can_add_articles %}
+                        <a href="{% url 'ui:stock_event_create_for_asset' item.id %}"
+                           class="auth-button secondary-button">
+                            <i class="fas fa-history"></i>
+                            {% trans "Nouvel événement" %}
+                        </a>
+                    {% endif %}
+                </div>
             </div>
 
-            <div class="auth-card">
+            <div class="auth-card-secondary">
                 <h3>{% trans "Historique de l'article" %}</h3>
-                <form method="get" id="date-filter-form" class="auth-form form-group">
-                    <div class="filters-row" style="flex-wrap: unset; align-items: center;">
+                <form method="get" id="date-filter-form" class="auth-form">
+                    <div class="filters-row">
                         <label for="start_date">{% trans "Du" %}</label>
                         <div class="flatpickr-wrapper">
                             <input type="text" id="start_date" name="start_date"
                                    value="{{ start_date|date:'Y-m-d H:i' }}"
-                                   class="datepicker" data-input>
+                                   class="datepicker search-input-round" data-input>
                             <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
                                 <i class="fas fa-calendar-alt"></i>
                             </a>
@@ -110,7 +113,7 @@
                         <label for="end_date">{% trans "Au" %}</label>
                         <div class="flatpickr-wrapper">
                             <input type="text" id="end_date" name="end_date" value="{{ end_date |date:'Y-m-d H:i' }}"
-                                   class="datepicker" data-input>
+                                   class="datepicker search-input-round" data-input>
                             <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
                                 <i class="fas fa-calendar-alt"></i>
                             </a>
@@ -137,7 +140,7 @@
                 </table>
             </div>
 
-            <!-- Tableaux masqués contenant les données d'origine -->
+            <!-- Origin data, hidden -->
             <div style="display: none;">
                 <table id="stockEventsTable">
                     <tbody>
@@ -196,8 +199,10 @@
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            <div class="back-action" style="margin-top: 20px;">
+        <div class="auth-card">
+            <div class="back-action">
                 <a href="javascript:history.back()" class="auth-button">
                     <i class="fas fa-arrow-left"></i>
                     {% trans "Retour" %}

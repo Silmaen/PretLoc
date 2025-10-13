@@ -23,7 +23,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from weasyprint import HTML
 
-from accounts.decorators import user_type_required, get_capability
+from accounts.decorators import get_capability, user_capability_required
 from ui.donation.models import Donation
 from ui.stock.models import Category
 from utils.computations import (
@@ -43,8 +43,7 @@ from .models import (
 )
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_view_reservations")
 def reservation_list(request):
     """
     Display a list of reservations with filtering, searching, and sorting capabilities.
@@ -126,11 +125,10 @@ def reservation_list(request):
         "active_only": active_only,
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/reservations/list.html", context)
+    return render(request, "ui/reservations/reservation_list.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_view_reservations")
 def reservation_detail(request, pk):
     """
     Display detailed information about a specific reservation.
@@ -167,11 +165,10 @@ def reservation_detail(request, pk):
         "customer_membership": customer_membership,
         "customer_membership_fee": customer_membership_fee,
     }
-    return render(request, "ui/reservations/detail.html", context)
+    return render(request, "ui/reservations/reservation_detail.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_add_reservations")
 def reservation_create(request):
     """
     Create a new reservation.
@@ -235,8 +232,7 @@ def reservation_create(request):
     return render(request, "ui/reservations/reservation_form.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_reservations")
 def reservation_validate(request, pk):
     """
     Validate a reservation, changing its status to 'validated'.
@@ -265,8 +261,7 @@ def reservation_validate(request, pk):
     return render(request, "ui/reservations/reservation_confirm_validate.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_reservations")
 def reservation_update(request, pk):
     """
     Update an existing reservation.
@@ -330,8 +325,7 @@ def reservation_update(request, pk):
     return render(request, "ui/reservations/reservation_form.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_reservations")
 def reservation_cancel(request, pk):
     """
     Cancel a reservation, changing its status to 'cancelled'.
@@ -365,8 +359,7 @@ def reservation_cancel(request, pk):
     return render(request, "ui/reservations/reservation_confirm_cancel.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_reservations")
 def reservation_checkout(request, pk):
     """
     Check out items for a reservation, updating stock and reservation status.
@@ -438,8 +431,7 @@ def reservation_checkout(request, pk):
     return render(request, "ui/reservations/reservation_checkout.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_reservations")
 def reservation_return(request, pk):
     """
     Process the return of items for a reservation, updating stock and reservation status.
@@ -536,8 +528,7 @@ def reservation_return(request, pk):
     return render(request, "ui/reservations/reservation_return.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_reservations")
 def reservation_pdf(request, pk):
     """
     Generate a PDF summary of the reservation, including a QR code linking to its detail page.
@@ -574,6 +565,7 @@ def reservation_pdf(request, pk):
     return response
 
 
+@login_required
 def search_assets(request):
     """
     Search for assets based on query parameters, returning JSON results.
@@ -629,6 +621,7 @@ def search_assets(request):
     return JsonResponse({"results": results})
 
 
+@login_required
 def check_reservation(request):
     """
     Check the availability of items in a reservation.
@@ -645,7 +638,6 @@ def check_reservation(request):
 
 
 @login_required
-@user_type_required("manager")
 def reservation_calendar_data(request):
     """
     Provide reservation data in JSON format for calendar display.

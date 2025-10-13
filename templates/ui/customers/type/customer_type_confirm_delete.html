@@ -1,0 +1,27 @@
+{% extends 'includes/custom_confirm_delete.html' %}
+{% load i18n %}
+
+{% block form_title %}
+    {% trans "Supprimer un type de client" %}
+{% endblock %}
+
+{% block form_content %}
+    <div class="auth-card-secondary">
+        <p>{% trans "Êtes-vous sûr de vouloir supprimer ce type de client ?" %}</p>
+        <p>
+            {% trans "Note : Si des clients utilisent ce type, la suppression sera impossible." %}
+        </p>
+    </div>
+
+    <div class="auth-card-secondary">
+        {{ customer_type.name }}
+        <p>
+            <i class="fas fa-users"></i>
+            {% if customer_type.entity_type == "legal" %}
+                {% trans "Personne morale" %}
+            {% else %}
+                {% trans "Personne physique" %}
+            {% endif %}
+        </p>
+    </div>
+{% endblock %}

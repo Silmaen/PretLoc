@@ -5,14 +5,13 @@ Views for managing customers and customer types.
 from datetime import datetime
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db.models.deletion import ProtectedError
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
-from accounts.decorators import user_type_required, get_capability
+from accounts.decorators import get_capability, user_capability_required
 from .forms import (
     CustomerForm,
     CustomerTypeForm,
@@ -23,8 +22,7 @@ from .models import (
 )
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_view_customer_types")
 def customer_type_list(request):
     """
     List all customer types.
@@ -36,11 +34,10 @@ def customer_type_list(request):
         "customer_types": customer_types,
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/customers/customer_type_list.html", context)
+    return render(request, "ui/customers/type/customer_type_list.html", context)
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_add_customer_types")
 def customer_type_create(request):
     """
     Create a new customer type.
@@ -57,7 +54,7 @@ def customer_type_create(request):
         form = CustomerTypeForm()
     return render(
         request,
-        "ui/customers/customer_type_form.html",
+        "ui/customers/type/customer_type_form.html",
         {
             "form": form,
             "capability": get_capability(request.user),
@@ -65,8 +62,7 @@ def customer_type_create(request):
     )
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_edit_customer_types")
 def customer_type_update(request, pk):
     """
     Update an existing customer type.
@@ -85,7 +81,7 @@ def customer_type_update(request, pk):
         form = CustomerTypeForm(instance=customer_type)
     return render(
         request,
-        "ui/customers/customer_type_form.html",
+        "ui/customers/type/customer_type_form.html",
         {
             "form": form,
             "customer_type": customer_type,
@@ -94,8 +90,7 @@ def customer_type_update(request, pk):
     )
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_delete_customer_types")
 def customer_type_delete(request, pk):
     """
     Delete a customer type after confirming.
@@ -115,7 +110,7 @@ def customer_type_delete(request, pk):
         return redirect("ui:customer_type_list")
     return render(
         request,
-        "ui/customers/customer_type_confirm_delete.html",
+        "ui/customers/type/customer_type_confirm_delete.html",
         {
             "customer_type": customer_type,
             "capability": get_capability(request.user),
@@ -123,8 +118,7 @@ def customer_type_delete(request, pk):
     )
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_view_customers")
 def customers_view(request):
     """
     View to list and filter customers.
@@ -193,11 +187,10 @@ def customers_view(request):
         "direction": direction,
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/customers/list.html", context)
+    return render(request, "ui/customers/customer_list.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_view_customers")
 def customer_detail(request, pk):
     """
     Display detailed information about a customer.
@@ -228,11 +221,10 @@ def customer_detail(request, pk):
         "capability": get_capability(request.user),
         "is_membership_up_to_date": is_membership_up_to_date,
     }
-    return render(request, "ui/customers/detail.html", context)
+    return render(request, "ui/customers/customer_details.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_add_customers")
 def customer_create(request):
     """
     Create a new customer.
@@ -258,8 +250,7 @@ def customer_create(request):
     )
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_customers")
 def customer_update(request, pk):
     """
     Update an existing customer.
@@ -288,8 +279,7 @@ def customer_update(request, pk):
     )
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_delete_customers")
 def customer_delete(request, pk):
     """
     Delete a customer after confirming.
@@ -312,8 +302,7 @@ def customer_delete(request, pk):
     )
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_view_customers")
 def search_customers(request):
     """
     Search customers for AJAX requests (e.g., Select2).
@@ -341,7 +330,10 @@ def search_customers(request):
         {
             "id": c.id,
             "text": str(c),
-            "email": c.email,  # Ajoutez d'autres champs si nécessaire
+            "exempted": c.is_exempted_from_donation(),
+            "icon": c.customer_type.icon,
+            "color": c.customer_type.color,
+            "type_name": c.customer_type.name if c.customer_type else "",
         }
         for c in customers
     ]

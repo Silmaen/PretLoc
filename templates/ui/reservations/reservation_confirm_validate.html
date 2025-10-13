@@ -15,7 +15,7 @@
             <p><strong>{% trans "Date de sortie" %}:</strong> {{ reservation.checkout_date }}</p>
             <p><strong>{% trans "Date de retour" %}:</strong> {{ reservation.return_date }}</p>
 
-            <form method="post">
+            <form method="post" class="auth-form">
                 {% csrf_token %}
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
                     <a href="javascript:history.back()" class="auth-button"
@@ -23,7 +23,7 @@
                         <i class="fas fa-arrow-left"></i> {% trans "Annuler" %}
                     </a>
                     <button type="submit" class="auth-button">
-                        <i class="fas fa-check"></i> {% trans "Valider la réservation" %}
+                        <i class="fas fa-check"></i> {% trans "Confirmer" %}
                     </button>
                 </div>
             </form>

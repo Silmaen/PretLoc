@@ -5,14 +5,13 @@ Views for managing stock items, categories, and stock events.
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from accounts.decorators import user_type_required, get_capability
+from accounts.decorators import get_capability, user_capability_required
 from ui.reservation.models import Reservation
 from utils.computations import get_asset_status_at_date
 from .forms import (
@@ -26,8 +25,7 @@ from .models import (
 )
 
 
-@login_required
-@user_type_required("member")
+@user_capability_required("can_view_articles")
 def stock_view(request):
     """
     Main view for displaying and managing stock items.
@@ -92,11 +90,10 @@ def stock_view(request):
         "stock_date": stock_date,
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/stock/list.html", context)
+    return render(request, "ui/stock/stock_list.html", context)
 
 
-@login_required
-@user_type_required("member")
+@user_capability_required("can_view_articles")
 def category_list(request):
     """
     View to list all categories.
@@ -108,11 +105,10 @@ def category_list(request):
         "categories": categories,
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/stock/category_list.html", context)
+    return render(request, "ui/stock/categories/category_list.html", context)
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_add_articles")
 def category_create(request):
     """
     Create a new category.
@@ -129,7 +125,7 @@ def category_create(request):
         form = CategoryForm()
     return render(
         request,
-        "ui/stock/category_form.html",
+        "ui/stock/categories/category_form.html",
         {
             "form": form,
             "capability": get_capability(request.user),
@@ -137,8 +133,7 @@ def category_create(request):
     )
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_edit_articles")
 def category_update(request, pk):
     """
     Update an existing category.
@@ -157,7 +152,7 @@ def category_update(request, pk):
         form = CategoryForm(instance=category)
     return render(
         request,
-        "ui/stock/category_form.html",
+        "ui/stock/categories/category_form.html",
         {
             "form": form,
             "category": category,
@@ -166,8 +161,7 @@ def category_update(request, pk):
     )
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_delete_articles")
 def category_delete(request, pk):
     """
     Delete an existing category.
@@ -182,7 +176,7 @@ def category_delete(request, pk):
         return redirect("ui:category_list")
     return render(
         request,
-        "ui/stock/category_confirm_delete.html",
+        "ui/stock/categories/category_confirm_delete.html",
         {
             "category": category,
             "capability": get_capability(request.user),
@@ -190,8 +184,7 @@ def category_delete(request, pk):
     )
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_add_articles")
 def item_create(request):
     """
     View to create a new stock item.
@@ -208,7 +201,7 @@ def item_create(request):
         form = AssetForm()
     return render(
         request,
-        "ui/stock/item_form.html",
+        "ui/stock/items/item_form.html",
         {
             "form": form,
             "capability": get_capability(request.user),
@@ -216,8 +209,7 @@ def item_create(request):
     )
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_articles")
 def item_update(request, pk):
     """
     View to update an existing stock item.
@@ -236,7 +228,7 @@ def item_update(request, pk):
         form = AssetForm(instance=item)
     return render(
         request,
-        "ui/stock/item_form.html",
+        "ui/stock/items/item_form.html",
         {
             "form": form,
             "item": item,
@@ -245,8 +237,7 @@ def item_update(request, pk):
     )
 
 
-@login_required
-@user_type_required("admin")
+@user_capability_required("can_delete_articles")
 def item_delete(request, pk):
     """
     View to delete an existing stock item.
@@ -261,7 +252,7 @@ def item_delete(request, pk):
         return redirect("ui:stock")
     return render(
         request,
-        "ui/stock/item_confirm_delete.html",
+        "ui/stock/items/item_confirm_delete.html",
         {
             "item": item,
             "capability": get_capability(request.user),
@@ -269,8 +260,7 @@ def item_delete(request, pk):
     )
 
 
-@login_required
-@user_type_required("member")
+@user_capability_required("can_view_articles")
 def item_detail(request, pk):
     """
     View to display details of a stock item, including stock events and reservations.
@@ -337,11 +327,10 @@ def item_detail(request, pk):
         "end_date": end_date,
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/stock/item_detail.html", context)
+    return render(request, "ui/stock/items/item_detail.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_articles")
 def stock_event_create(request, asset_id=None):
     """
     Create a new stock event, optionally linked to a specific asset.

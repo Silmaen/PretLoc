@@ -3,12 +3,12 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 {% get_current_language as CURRENT_LANGUAGE %}
 {% if CURRENT_LANGUAGE == 'fr' %}
-<script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
-<script>
-  flatpickr.localize(flatpickr.l10ns.fr);
-</script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+    <script>
+        flatpickr.localize(flatpickr.l10ns.fr);
+    </script>
 {% elif CURRENT_LANGUAGE == 'en' %}
-<!-- L'anglais est la langue par défaut de flatpickr, pas besoin de charger un fichier supplémentaire -->
+    <!-- L'anglais est la langue par défaut de flatpickr, pas besoin de charger un fichier supplémentaire -->
 {% endif %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -26,7 +26,8 @@
             locale: currentLang,  // Utiliser la langue actuelle
             minuteIncrement: 30,
             allowInput: true,
-            onDayCreate: function(dObj, dStr, fp, dayElem) {
+            clickOpens: true,
+            onDayCreate: function (dObj, dStr, fp, dayElem) {
                 // Ajouter des classes pour les lundis (1) et vendredis (5)
                 const dayOfWeek = dayElem.dateObj.getDay();
                 if (dayOfWeek === 1) {
@@ -34,6 +35,21 @@
                 } else if (dayOfWeek === 5) {
                     dayElem.classList.add('vendredi');
                 }
+            },
+            onOpen: function () {
+                // On supprime d'abord tout message préexistant
+                document.querySelectorAll(".date-suggestion").forEach(el => el.remove());
+
+                // On ajoute le message au bon calendrier (celui qui vient de s'ouvrir)
+                setTimeout(() => {
+                    const calendarContainer = document.querySelector(".flatpickr-calendar.open");
+                    if (calendarContainer) {
+                        const infoMsg = document.createElement("div");
+                        infoMsg.className = "date-suggestion";
+                        infoMsg.innerHTML = "<i class='fas fa-info-circle'></i> {% trans 'Privilégiez les lundis et vendredis pour la date de retour' %}";
+                        calendarContainer.appendChild(infoMsg);
+                    }
+                }, 50);
             }
         };
 
@@ -42,7 +58,7 @@
             ...fpConfig,
             defaultHour: 19,
             defaultMinute: 0,
-            onChange: function(selectedDates, dateStr) {
+            onChange: function (selectedDates, dateStr) {
                 if (selectedDates.length > 0) {
                     const selectedDate = selectedDates[0];
                     const dayOfWeek = selectedDate.getDay();
@@ -72,21 +88,6 @@
                     validateDates();
                 }
             },
-            onOpen: function() {
-                // On supprime d'abord tout message préexistant
-                document.querySelectorAll(".date-suggestion").forEach(el => el.remove());
-
-                // On ajoute le message au bon calendrier (celui qui vient de s'ouvrir)
-                setTimeout(() => {
-                    const calendarContainer = document.querySelector(".flatpickr-calendar.open");
-                    if (calendarContainer) {
-                        const infoMsg = document.createElement("div");
-                        infoMsg.className = "date-suggestion";
-                        infoMsg.innerHTML = "<i class='fas fa-info-circle'></i> {% trans 'Privilégiez les lundis et vendredis pour la date de départ' %}";
-                        calendarContainer.appendChild(infoMsg);
-                    }
-                }, 50);
-            }
         });
 
         // Sélecteur de date de retour
@@ -95,21 +96,6 @@
             defaultHour: 18,
             defaultMinute: 0,
             onChange: validateDates,
-            onOpen: function() {
-                // On supprime d'abord tout message préexistant
-                document.querySelectorAll(".date-suggestion").forEach(el => el.remove());
-
-                // On ajoute le message au bon calendrier (celui qui vient de s'ouvrir)
-                setTimeout(() => {
-                    const calendarContainer = document.querySelector(".flatpickr-calendar.open");
-                    if (calendarContainer) {
-                        const infoMsg = document.createElement("div");
-                        infoMsg.className = "date-suggestion";
-                        infoMsg.innerHTML = "<i class='fas fa-info-circle'></i> {% trans 'Privilégiez les lundis et vendredis pour la date de retour' %}";
-                        calendarContainer.appendChild(infoMsg);
-                    }
-                }, 50);
-            }
         });
 
         // Message d'avertissement

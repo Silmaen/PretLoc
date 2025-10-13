@@ -2,94 +2,97 @@
 {% load i18n %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <i class="fas fa-user-edit auth-icon"></i>
-            <h2>{% trans "Modifier l'utilisateur" %}</h2>
-        </div>
-
-        <form method="post" class="auth-form">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="id_username">
-                    <i class="fas fa-user"></i>
-                    {% trans "Nom d'utilisateur" %}
-                </label>
-                <input type="text" name="username" id="id_username" value="{{ user_profile.user.username }}"
-                       class="form-control">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-user-edit auth-icon"></i>
+                <h2>{% trans "Modifier l'utilisateur" %}</h2>
             </div>
 
-            <div class="form-group">
-                <label for="id_email">
-                    <i class="fas fa-envelope"></i>
-                    {% trans "Email" %}
-                </label>
-                <input type="email" name="email" id="id_email" value="{{ user_profile.user.email }}"
-                       class="form-control">
-            </div>
+            <form method="post" class="auth-form">
+                {% csrf_token %}
 
-            <div class="form-group">
-                <label for="id_first_name">
-                    <i class="fas fa-id-card"></i>
-                    {% trans "Prénom" %}
-                </label>
-                <input type="text" name="first_name" id="id_first_name" value="{{ user_profile.user.first_name }}"
-                       class="form-control">
-            </div>
+                <div class="form-group">
+                    <label for="id_username">
+                        <i class="fas fa-user"></i>
+                        {% trans "Nom d'utilisateur" %}
+                    </label>
+                    <input type="text" name="username" id="id_username" value="{{ user_profile.user.username }}"
+                           class="form-control">
+                </div>
 
-            <div class="form-group">
-                <label for="id_last_name">
-                    <i class="fas fa-id-card"></i>
-                    {% trans "Nom de famille" %}
-                </label>
-                <input type="text" name="last_name" id="id_last_name" value="{{ user_profile.user.last_name }}"
-                       class="form-control">
-            </div>
+                <div class="form-group">
+                    <label for="id_email">
+                        <i class="fas fa-envelope"></i>
+                        {% trans "Email" %}
+                    </label>
+                    <input type="email" name="email" id="id_email" value="{{ user_profile.user.email }}"
+                           class="form-control">
+                </div>
 
-            <div class="form-group">
-                <label for="id_user_type">
-                    <i class="fas fa-user-tag"></i>
-                    {% trans "Type d'utilisateur" %}
-                </label>
-                <select name="user_type" id="id_user_type" class="form-control" {% if user_profile.user.is_superuser %}disabled{% endif %}>
-                    {% for value, text in user_profile.USER_TYPE_CHOICES %}
-                    <!-- @formatter:off -->
+                <div class="form-group">
+                    <label for="id_first_name">
+                        <i class="fas fa-id-card"></i>
+                        {% trans "Prénom" %}
+                    </label>
+                    <input type="text" name="first_name" id="id_first_name" value="{{ user_profile.user.first_name }}"
+                           class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_last_name">
+                        <i class="fas fa-id-card"></i>
+                        {% trans "Nom de famille" %}
+                    </label>
+                    <input type="text" name="last_name" id="id_last_name" value="{{ user_profile.user.last_name }}"
+                           class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_user_type">
+                        <i class="fas fa-user-tag"></i>
+                        {% trans "Type d'utilisateur" %}
+                    </label>
+                    <select name="user_type" id="id_user_type" class="form-control"
+                            {% if user_profile.user.is_superuser %}disabled{% endif %}>
+                        {% for value, text in user_profile.USER_TYPE_CHOICES %}
+                            <!-- @formatter:off -->
                     <option value="{{ value }}" {% if user_profile.user_type == value %}selected{% endif %}>{{ text }}</option>
                     <!-- @formatter:on -->
-                    {% endfor %}
-                </select>
-                {% if user_profile.user.is_superuser %}
-                <p class="form-help-text"><i class="fas fa-lock"></i> {% trans "Le type d'utilisateur est fixé comme Administrateur pour les superutilisateurs" %}</p>
-                <input type="hidden" name="user_type" value="admin">
-                {% endif %}
-            </div>
-            <!-- Ajout du bouton de réinitialisation de mot de passe -->
-            <div style="margin-top: 20px; margin-bottom: 20px;">
-                {% if user_profile.user.id != request.user.id %}
-                <a href="{% url 'accounts:reset_password' user_profile.id %}" class="auth-button"
-                   onclick="return confirm('{% trans "Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur?" %}')">
-                    <i class="fas fa-key"></i> {% trans "Réinitialiser le mot de passe" %}
-                </a>
-                {% else %}
-                <p class="form-help-text">
-                    <i class="fas fa-info-circle"></i>
-                    {% trans "Pour modifier votre propre mot de passe, utilisez la fonctionnalité dédiée dans votre profil." %}
-                </p>
-                {% endif %}
-            </div>
-            <button type="submit" class="auth-button">
-                <i class="fas fa-save"></i>
-                {% trans "Enregistrer les modifications" %}
-            </button>
-        </form>
+                        {% endfor %}
+                    </select>
+                    {% if user_profile.user.is_superuser %}
+                        <p class="form-help-text"><i
+                                class="fas fa-lock"></i> {% trans "Le type d'utilisateur est fixé comme Administrateur pour les superutilisateurs" %}
+                        </p>
+                        <input type="hidden" name="user_type" value="admin">
+                    {% endif %}
+                </div>
+                <!-- Ajout du bouton de réinitialisation de mot de passe -->
+                <div class="form-group">
+                    {% if user_profile.user.id != request.user.id %}
+                        <a href="{% url 'accounts:reset_password' user_profile.id %}" class="auth-button"
+                           onclick="return confirm('{% trans "Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur?" %}')">
+                            <i class="fas fa-key"></i> {% trans "Réinitialiser le mot de passe" %}
+                        </a>
+                    {% else %}
+                        <p class="form-help-text">
+                            <i class="fas fa-info-circle"></i>
+                            {% trans "Pour modifier votre propre mot de passe, utilisez la fonctionnalité dédiée dans votre profil." %}
+                        </p>
+                    {% endif %}
+                </div>
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-save"></i>
+                    {% trans "Enregistrer les modifications" %}
+                </button>
+            </form>
+        </div>
 
-        <div style="margin-top: 20px;">
-            <a href="{% url 'accounts:manage_users' %}" class="auth-button">
-                <i class="fas fa-arrow-left"></i> {% trans "Retour à la liste" %}
+        <div class="auth-card">
+            <a href="javascript:history.back()" class="auth-button">
+                <i class="fas fa-arrow-left"></i> {% trans "Retour" %}
             </a>
         </div>
     </div>
-</div>
 {% endblock %}

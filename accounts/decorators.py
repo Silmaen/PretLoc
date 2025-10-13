@@ -5,19 +5,30 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 
 
-def user_type_required(minimum_user_type):
+def user_capability_required(capability):
     """
-    Décorateur qui vérifie si le type d'utilisateur a un niveau d'accès suffisant.
-    La hiérarchie des types est: new < client < member < manager < admin
+    Decorator that checks if the user has a specific capability.
+    Capabilities are ordered can_<action>_<what>
+    with <action> in [add, edit, delete, view]
+    and with priority: delete > edit > add > view
     """
 
     def decorator(view_func):
+        """
+        Checks if the user has sufficient capability to access the view.
+        :param view_func: The view function to be decorated.
+        :return: The wrapped view function.
+        """
+
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
-            # Définir l'ordre hiérarchique des types d'utilisateur
-            hierarchy = {"new": 0, "client": 1, "member": 2, "manager": 3, "admin": 4}
-
-            # Vérifier si l'utilisateur est connecté
+            """
+            Wrapper function that performs the capability check.
+            :param request: The HTTP request object.
+            :param args: Positional arguments for the view function.
+            :param kwargs: Keyword arguments for the view function.
+            :return: The result of the view function if access is granted, otherwise redirects to home with an error message.
+            """
             if not request.user.is_authenticated:
                 messages.error(
                     request,
@@ -25,15 +36,11 @@ def user_type_required(minimum_user_type):
                 )
                 return redirect("ui:home")
 
-            # Si c'est un superutilisateur, lui donner toujours accès
             if request.user.is_superuser:
                 return view_func(request, *args, **kwargs)
 
-            # Vérifier le niveau d'accès
-            user_level = hierarchy.get(request.user.profile.user_type, -1)
-            required_level = hierarchy.get(minimum_user_type, 0)
-
-            if user_level >= required_level:
+            capabilities = get_capability(request.user)
+            if capabilities.get(capability, False):
                 return view_func(request, *args, **kwargs)
             else:
                 messages.error(
@@ -63,6 +70,10 @@ def get_capability(user):
             "can_add_customers": False,
             "can_edit_customers": False,
             "can_delete_customers": False,
+            "can_view_customers_type": False,
+            "can_add_customers_type": False,
+            "can_edit_customers_type": False,
+            "can_delete_customers_type": False,
             "can_view_categories": False,
             "can_add_reservations": False,
             "can_view_reservations": False,
@@ -70,6 +81,10 @@ def get_capability(user):
             "can_add_donations": False,
             "can_edit_donations": False,
             "can_delete_donations": False,
+            "can_view_users": False,
+            "can_add_users": False,
+            "can_edit_users": False,
+            "can_delete_users": False,
         }
     return {
         # articles
@@ -82,6 +97,11 @@ def get_capability(user):
         "can_add_customers": user.profile.user_type in ["admin", "manager"],
         "can_edit_customers": user.profile.user_type in ["admin", "manager"],
         "can_delete_customers": user.profile.user_type in ["admin"],
+        # customer types
+        "can_view_customer_types": user.profile.user_type in ["admin"],
+        "can_add_customer_types": user.profile.user_type in ["admin"],
+        "can_edit_customer_types": user.profile.user_type in ["admin"],
+        "can_delete_customer_types": user.profile.user_type in ["admin"],
         # categories
         "can_add_categories": user.profile.user_type == "admin",
         "can_edit_categories": user.profile.user_type == "admin",
@@ -98,4 +118,9 @@ def get_capability(user):
         "can_add_donations": user.profile.user_type in ["admin", "manager"],
         "can_edit_donations": user.profile.user_type in ["admin", "manager"],
         "can_delete_donations": user.profile.user_type in ["admin", "manager"],
+        # users
+        "can_view_users": user.profile.user_type in ["admin"],
+        "can_add_users": user.profile.user_type in ["admin"],
+        "can_edit_users": user.profile.user_type in ["admin"],
+        "can_delete_users": user.profile.user_type in ["admin"],
     }

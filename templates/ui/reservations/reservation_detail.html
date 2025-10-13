@@ -22,9 +22,9 @@
                 </div>
                 <div class="reservation-status-section">
                     <div class="customer-type-display">
-                        <i class="{% if reservation.customer_type.entity_type == 'physical' %}fas fa-user{% else %}fas fa-building{% endif %}"
-                           style="color: {{ reservation.customer_type.color }}"></i>
-                        <span>{{ reservation.customer_type.name }}</span>
+                        <i class="fas {{ reservation.customer.icon }}"
+                           style="color: {{ reservation.customer.color }}"></i>
+                        <span>{{ reservation.customer.name }}</span>
                     </div>
                     <div class="reservation-status-badge">
                         {% if reservation.status == 'created' %}
@@ -70,72 +70,74 @@
             </div>
 
             <!-- Don -->
-            <div class="auth-card-secondary">
-                <h4 class="reservation-section-title">{% trans "Don" %}</h4>
-                <div class="reservation-donation-row">
-                    <div>
-                        <p class="reservation-donation-amount">
-                            <i class="fas fa-hand-holding-heart"></i>
-                            <strong>{% trans "Don effectué" %}:</strong> {{ reservation.total_donations }} €
-                        </p>
-                        <p class="reservation-donation-info">
-                            <i class="fas fa-info-circle"></i>
-                            {% trans "Don minimum attendu" %}: {{ reservation.total_expected_donation }} €
-                        </p>
-                        {% if reservation.customer.is_exempted_from_donation %}
-                            <p class="reservation-donation-info">
-                                <i class="fas fa-hand-holding-usd"></i>
-                                <strong>{% trans "Client exonéré de don" %}</strong>
+            {% if capability.can_view_donations %}
+                <div class="auth-card-secondary">
+                    <h4 class="reservation-section-title">{% trans "Don" %}</h4>
+                    <div class="reservation-donation-row">
+                        <div>
+                            <p class="reservation-donation-amount">
+                                <i class="fas fa-hand-holding-heart"></i>
+                                <strong>{% trans "Don effectué" %}:</strong> {{ reservation.total_donations }} €
                             </p>
-                        {% else %}
-                            {% with coef=reservation.customer.get_donation_coefficient %}
-                                {% if coef != 1.0 %}
-                                    <p class="reservation-donation-info">
-                                        <i class="fas fa-calculator"></i>
-                                        {% trans "Coefficient" %}: {{ coef }}
-                                    </p>
-                                {% endif %}
-                                {% if customer_membership %}
-                                    <p class="reservation-donation-info">
-                                        <i class="fas fa-id-card"></i>
-                                        {% trans "Cotisation effectuée" %}
-                                    </p>
-                                {% else %}
-                                    <p class="reservation-donation-info">
-                                        <i class="fas fa-id-card"></i>
-                                        {% trans "Cotisation attendue:" %}{{ customer_membership_fee }} €
-                                    </p>
-                                {% endif %}
-                            {% endwith %}
-                        {% endif %}
+                            <p class="reservation-donation-info">
+                                <i class="fas fa-info-circle"></i>
+                                {% trans "Don minimum attendu" %}: {{ reservation.total_expected_donation }} €
+                            </p>
+                            {% if reservation.customer.is_exempted_from_donation %}
+                                <p class="reservation-donation-info">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                    <strong>{% trans "Client exonéré de don" %}</strong>
+                                </p>
+                            {% else %}
+                                {% with coef=reservation.customer.get_donation_coefficient %}
+                                    {% if coef != 1.0 %}
+                                        <p class="reservation-donation-info">
+                                            <i class="fas fa-calculator"></i>
+                                            {% trans "Coefficient" %}: {{ coef }}
+                                        </p>
+                                    {% endif %}
+                                    {% if customer_membership %}
+                                        <p class="reservation-donation-info">
+                                            <i class="fas fa-id-card"></i>
+                                            {% trans "Cotisation effectuée" %}
+                                        </p>
+                                    {% else %}
+                                        <p class="reservation-donation-info">
+                                            <i class="fas fa-id-card"></i>
+                                            {% trans "Cotisation attendue:" %}{{ customer_membership_fee }} €
+                                        </p>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="auth-card-secondary reservation-actions-row">
-                {% if reservation.status == 'created' or reservation.status == 'validated' %}
-                    <a href="{% url 'ui:reservation_update' reservation.pk %}" class="auth-button">
-                        <i class="fas fa-edit"></i> {% trans "Modifier" %}
-                    </a>
-                {% endif %}
-                {% if reservation.status == 'created' %}
-                    <a href="{% url 'ui:reservation_validate' reservation.pk %}" class="auth-button">
-                        <i class="fas fa-check-circle"></i> {% trans "Valider la réservation" %}
-                    </a>
-                {% elif reservation.status == 'validated' %}
-                    <a href="{% url 'ui:reservation_checkout' reservation.pk %}" class="auth-button">
-                        <i class="fas fa-arrow-right"></i> {% trans "Sortir le matériel" %}
-                    </a>
-                {% elif reservation.status == 'checked_out' %}
-                    <a href="{% url 'ui:reservation_return' reservation.pk %}" class="auth-button">
-                        <i class="fas fa-arrow-left"></i> {% trans "Enregistrer le retour" %}
-                    </a>
-                {% endif %}
-                {% if reservation.status != 'returned' and reservation.status != 'canceled' %}
+            {% endif %}
+            {% if capability.can_edit_reservations and reservation.status != 'returned' and reservation.status != 'canceled' %}
+                <div class="auth-card-secondary reservation-actions-row">
+                    {% if reservation.status == 'created' or reservation.status == 'validated' %}
+                        <a href="{% url 'ui:reservation_update' reservation.pk %}" class="auth-button">
+                            <i class="fas fa-edit"></i> {% trans "Modifier" %}
+                        </a>
+                    {% endif %}
+                    {% if reservation.status == 'created' %}
+                        <a href="{% url 'ui:reservation_validate' reservation.pk %}" class="auth-button">
+                            <i class="fas fa-check-circle"></i> {% trans "Valider la réservation" %}
+                        </a>
+                    {% elif reservation.status == 'validated' %}
+                        <a href="{% url 'ui:reservation_checkout' reservation.pk %}" class="auth-button">
+                            <i class="fas fa-arrow-right"></i> {% trans "Sortir le matériel" %}
+                        </a>
+                    {% elif reservation.status == 'checked_out' %}
+                        <a href="{% url 'ui:reservation_return' reservation.pk %}" class="auth-button">
+                            <i class="fas fa-arrow-left"></i> {% trans "Enregistrer le retour" %}
+                        </a>
+                    {% endif %}
                     <a href="{% url 'ui:reservation_pdf' reservation.pk %}" class="auth-button" target="_blank">
                         <i class="fas fa-file-pdf"></i> {% trans 'Bon de sortie' %}
                     </a>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
 
             <!-- Notes -->
             {% if reservation.notes %}
@@ -159,7 +161,9 @@
                             <th class="table-cell-center">{% trans "Sortie" %}</th>
                             <th class="table-cell-center">{% trans "Rendu" %}</th>
                             <th class="table-cell-center">{% trans "En panne" %}</th>
-                            <th>{% trans "Don" %}</th>
+                            {% if capability.can_view_donations %}
+                                <th class="table-cell-center">{% trans "Don" %}</th>
+                            {% endif %}
                         </tr>
                         </thead>
                         <tbody>
@@ -182,11 +186,13 @@
                                 <td class="table-cell-center">{{ item.quantity_checked_out }}</td>
                                 <td class="table-cell-center">{{ item.quantity_returned }}</td>
                                 <td class="table-cell-center">{{ item.quantity_damaged }}</td>
-                                <td>
-                                    <div class="values-container">
-                                        <span class="value-item">{{ item.expected_donation }} €</span>
-                                    </div>
-                                </td>
+                                {% if capability.can_view_donations %}
+                                    <td>
+                                        <div class="values-container">
+                                            <span class="value-item">{{ item.expected_donation }} €</span>
+                                        </div>
+                                    </td>
+                                {% endif %}
                             </tr>
                         {% empty %}
                             <tr>
@@ -268,7 +274,7 @@
 
             <!-- Boutons d'action -->
             <div class="reservation-footer-actions">
-                <a href="javascript:history.back()" class="auth-button secondary">
+                <a href="javascript:history.back()" class="auth-button">
                     <i class="fas fa-arrow-left"></i> {% trans "Retour" %}
                 </a>
 

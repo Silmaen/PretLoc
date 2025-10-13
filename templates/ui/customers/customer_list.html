@@ -9,13 +9,14 @@
                 <h2>{% trans "Gestion des Clients" %}</h2>
             </div>
 
-            <!-- Barre de recherche et boutons d'action sur la même ligne -->
+            <!-- Search & action buttons -->
             <div class="search-action-bar">
                 <form method="get" class="search-container">
                     <div class="search-input-group">
                         <input type="text" name="search" value="{{ search_query }}"
-                               placeholder="{% trans 'Rechercher un client...' %}" class="search-input">
-                        <button type="submit" class="auth-button search-button">
+                               placeholder="{% trans 'Rechercher un client...' %}"
+                               class="search-input">
+                        <button type="submit" class="auth-button search-button" title="{% trans "Rechercher" %}">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -27,11 +28,13 @@
                 </form>
 
                 <div class="actions-buttons">
-                    {% if capability.can_add_customers %}
+                    {% if capability.can_view_customer_types %}
                         <a href="{% url 'ui:customer_type_list' %}" class="auth-button"
                            title="{% trans 'Types de clients' %}">
                             <i class="fas fa-users-cog"></i>
                         </a>
+                    {% endif %}
+                    {% if capability.can_add_customers %}
                         <a href="{% url 'ui:customer_create' %}" class="auth-button"
                            title="{% trans "Ajouter un client" %}">
                             <i class="fas fa-plus"></i>
@@ -40,7 +43,7 @@
                 </div>
             </div>
 
-            <!-- Ligne de filtres -->
+            <!-- Filter list -->
             <div class="filters-row">
 
                 <!-- Filtre par type de client -->
@@ -99,8 +102,7 @@
                 </div>
             </div>
 
-
-            <!-- Liste des clients -->
+            <!-- Customer list -->
             <div class="users-table">
                 <table>
                     <thead>
@@ -131,8 +133,8 @@
                             </div>
                         </th>
                         <th>{% trans "Contact" %}</th>
-                        <th class="table-cell-center">{% trans "Cotisation" %}</th>
-                        <th class="table-cell-center">{% trans "Actions" %}</th>
+                        <th>{% trans "Cotisation" %}</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -144,30 +146,23 @@
                                             <i class="fas fa-hand-holding-usd"></i>
                                         </span>
                                 {% endif %}
-                                <i class=
-                                           {% if customer.customer_type.entity_type == "physical" %}
-                                               "fas fa-user"
-                                           {% else %}
-                                               "fas fa-building"
-                                           {% endif %}
-                                style="color: {{ customer.customer_type.color }}"
-                                title="{{ customer.customer_type.name }}"></i>
+                                <i class="fas {{ customer.icon }}"
+                                   style="color: {{ customer.color }}"
+                                   title="{{ customer.customer_type.name }}"></i>
 
                             </td>
                             <td>
                                 <div class="customer-info">
-                                    {% if customer.customer_type.entity_type == "physical" %}
-                                        <span class="customer-name">{{ customer.last_name }} {{ customer.first_name }}</span>
-                                    {% else %}
-                                        <span class="customer-name">{{ customer.company_name }}</span>
+                                    <span class="customer-name">{{ customer.name }}</span>
+                                    {% if customer.customer_type.entity_type == "legal" %}
                                         <span class="customer-subtitle">
-                                                <i class="fas fa-user-tie"></i> {{ customer.legal_rep_last_name }} {{ customer.legal_rep_first_name }}
-                                            </span>
+                                            <i class="fas fa-user-tie"></i> {{ customer.legal_rep_last_name }} {{ customer.legal_rep_first_name }}
+                                        </span>
                                     {% endif %}
 
                                     <span class="customer-address">
-                                            <i class="fas fa-map-marker-alt"></i> {{ customer.address|truncatewords:6 }}
-                                        </span>
+                                        <i class="fas fa-map-marker-alt"></i> {{ customer.address|truncatewords:6 }}
+                                    </span>
                                 </div>
                             </td>
                             <td>
@@ -190,11 +185,10 @@
                             </td>
                             <td class="table-cell-center">
                                 {% if customer.is_membership_up_to_date %}
-                                    <i class="fas fa-check-circle"
-                                       style="color: var(--accent-green); font-size: 1.2rem;"
+                                    <i class="fas fa-check-circle donation-value good"
                                        title="{% trans 'À jour' %}"></i>
                                 {% else %}
-                                    <i class="fas fa-times-circle" style="color: var(--accent-red); font-size: 1.2rem;"
+                                    <i class="fas fa-times-circle donation-value bad"
                                        title="{% trans 'Non à jour' %}"></i>
                                 {% endif %}
                             </td>
@@ -223,10 +217,11 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="4" style="text-align: center; padding: 20px;">
-                                <i class="fas fa-search"
-                                   style="font-size: 2rem; margin-bottom: 15px; color: var(--text-secondary);"></i>
-                                <p>{% trans "Aucun client trouvé" %}</p>
+                            <td colspan="4" class="text-center">
+                                <i class="fas fa-inbox table-empty-logo"></i>
+                                <p class="table-empty-text">
+                                    {% trans "Aucun client trouvé" %}
+                                </p>
                             </td>
                         </tr>
                     {% endfor %}

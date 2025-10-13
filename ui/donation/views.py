@@ -5,12 +5,11 @@ Views for managing donations.
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
-from accounts.decorators import user_type_required, get_capability
+from accounts.decorators import get_capability, user_capability_required
 from ui.customer.models import Customer
 from .forms import DonationForm
 from .models import Donation
@@ -18,8 +17,7 @@ from .models import Donation
 logger = logging.getLogger(__name__)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_view_donations")
 def donation_list(request):
     """
     Display a list of donations with filtering and searching capabilities.
@@ -28,17 +26,18 @@ def donation_list(request):
     """
     search_query = request.GET.get("search", "")
     includes_membership = request.GET.get("includes_membership", "")
-    sort = request.GET.get("sort", "-date")
+    sort = request.GET.get("sort", "date")
+    direction = request.GET.get("direction", "desc")
 
     donations = Donation.objects.select_related("customer", "reservation")
 
-    # Filtres
+    # Filters
     if includes_membership:
         donations = donations.filter(
             includes_membership=(includes_membership == "true")
         )
 
-    # Recherche
+    # Search
     if search_query:
         donations = donations.filter(
             Q(customer__last_name__icontains=search_query)
@@ -47,10 +46,20 @@ def donation_list(request):
             | Q(customer__email__icontains=search_query)
         )
 
-    # Tri
-    donations = donations.order_by(sort)
+    # Sorting
+    sort_mapping = {
+        "date": "date",
+        "customer": "customer__last_name",
+        "amount": "amount",
+    }
 
-    # Calcul du total
+    sort_field = sort_mapping.get(sort, "date")
+    if direction == "desc":
+        sort_field = f"-{sort_field}"
+
+    donations = donations.order_by(sort_field)
+
+    # Calculate total donations
     total_donations = sum(donation.amount for donation in donations)
 
     context = {
@@ -58,14 +67,14 @@ def donation_list(request):
         "search_query": search_query,
         "includes_membership": includes_membership,
         "sort": sort,
+        "direction": direction,
         "total_donations": total_donations,
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/donations/list.html", context)
+    return render(request, "ui/donations/donation_list.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_add_donations")
 def donation_create(request):
     """
     Create a new donation.
@@ -98,11 +107,10 @@ def donation_create(request):
         "title": _("Créer un don"),
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/donations/form.html", context)
+    return render(request, "ui/donations/donation_form.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_edit_donations")
 def donation_update(request, pk):
     """
     Update an existing donation.
@@ -127,11 +135,10 @@ def donation_update(request, pk):
         "title": _("Modifier le don"),
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/donations/form.html", context)
+    return render(request, "ui/donations/donation_form.html", context)
 
 
-@login_required
-@user_type_required("manager")
+@user_capability_required("can_delete_donations")
 def donation_delete(request, pk):
     """
     Delete a donation.
@@ -150,4 +157,4 @@ def donation_delete(request, pk):
         "donation": donation,
         "capability": get_capability(request.user),
     }
-    return render(request, "ui/donations/confirm_delete.html", context)
+    return render(request, "ui/donations/donation_confirm_delete.html", context)

@@ -40,6 +40,16 @@ class CustomerType(models.Model):
         verbose_name=_("Période de réservation (jours avant manifestation)"),
     )
 
+    @property
+    def icon(self):
+        """
+        Get the icon representation for the customer type.
+        :return: Icon string
+        """
+        if self.entity_type == "physical":
+            return "fa-user"
+        return "fa-building"
+
     class Meta:
         """
         Meta information for the CustomerType model.
@@ -115,9 +125,33 @@ class Customer(models.Model):
         String representation of the Customer instance.
         :return: Name of the customer, prioritizing company name if available
         """
+        return self.name
+
+    @property
+    def name(self):
+        """
+        Get the full name of the customer.
+        :return: Full name string
+        """
         if self.customer_type.entity_type in ["legal"]:
             return self.company_name
         return f"{self.last_name} {self.first_name}"
+
+    @property
+    def icon(self):
+        """
+        Get the icon representation for the customer.
+        :return: Icon string
+        """
+        return self.customer_type.icon if self.customer_type else "fa-user"
+
+    @property
+    def color(self):
+        """
+        Get the color associated with the customer type.
+        :return: Color string
+        """
+        return self.customer_type.color if self.customer_type else "#3498db"
 
     def is_exempted_from_donation(self):
         """
@@ -202,7 +236,7 @@ class Customer(models.Model):
     def get_membership_fee(self, year):
         """
         Get the membership fee for a specific year.
-        :param year: Year to get the membership fee
+        :param year: Year to get the membership fee.
         :return: Membership fee amount
         """
         if self.is_exempted_from_donation():

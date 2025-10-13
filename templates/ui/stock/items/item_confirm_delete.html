@@ -1,0 +1,24 @@
+{% extends 'includes/custom_confirm_delete.html' %}
+{% load i18n %}
+
+{% block form_title %}
+    {% trans "Supprimer l'article" %}
+{% endblock %}
+
+{% block form_content %}
+    <div class="auth-card-secondary">
+        <p class="no-margin-title">
+            {% trans "Êtes-vous sûr de vouloir supprimer cet article?" %}
+        </p>
+    </div>
+
+    <div class="auth-card-secondary">
+        <strong>{{ item.name }}</strong>
+        <p>{% trans "Catégorie" %}: {{ item.category.name }}</p>
+        <p>{% trans "Stock" %}: {{ item.stock_quantity }}</p>
+        <p>{% trans "Valeur de location" %}: {{ item.rental_value }} €</p>
+        {% if item.description %}
+            <p>{{ item.description }}</p>
+        {% endif %}
+    </div>
+{% endblock %}

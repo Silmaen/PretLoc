@@ -3,25 +3,23 @@
 {% load l10n %}
 
 {% block content %}
-    <div class="auth-container" style="max-width: 800px;">
+    <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <i class="fas fa-arrow-right auth-icon" style="color: var(--accent-blue);"></i>
+                <i class="fas fa-arrow-right auth-icon"></i>
                 <h2>{% trans "Sortie de matériel" %}</h2>
             </div>
 
             <!-- En-tête avec informations de la réservation -->
-            <div class="form-group">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <h3 style="margin: 0;">{{ reservation.customer }}</h3>
+            <div class="auth-card-secondary">
+                <div class="form-group">
+                    <h3>{{ reservation.customer }}</h3>
                     <div>
-                    <span style="font-weight: bold; font-size: 0.9rem;">
-                        <i class="fas fa-arrow-right"></i> {{ reservation.checkout_date }} | 
+                        <i class="fas fa-arrow-right"></i> {{ reservation.checkout_date }} |
                         <i class="fas fa-arrow-left"></i> {{ reservation.return_date }}
-                    </span>
                     </div>
                 </div>
-                <div style="font-size: 0.9rem;">
+                <div class="form-group">
                     <i class="fas fa-envelope"></i> {{ reservation.customer.email }}
                     {% if reservation.customer.phone %}
                         | <i class="fas fa-phone"></i> {{ reservation.customer.phone }}
@@ -35,7 +33,7 @@
                         <input type="text" id="actual_checkout_date" name="actual_checkout_date"
                                placeholder="{% trans 'Sélectionner une date' %}"
                                value="{% now 'Y-m-d H:M' %}"
-                               class="datepicker" data-input>
+                               class="datepicker search-input-round" data-input>
                         <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
                             <i class="fas fa-calendar-alt"></i>
                         </a>
@@ -43,11 +41,11 @@
                 </div>
             </div>
 
-            <form method="post">
+            <form method="post" class="auth-form">
                 {% csrf_token %}
 
                 <!-- Articles à sortir -->
-                <div class="auth-card" style="margin-top: 20px;">
+                <div class="auth-card">
                     <h4 class="no-margin-title">
                         <i class="fas fa-boxes"></i> {% trans "Articles à sortir" %}
                     </h4>
@@ -56,11 +54,11 @@
                         <thead>
                         <tr>
                             <th>{% trans "Article" %}</th>
-                            <th style="width: 100px; text-align: center;">{% trans "Réservé" %}</th>
-                            <th style="text-align: center;">{% trans "Disponible" %}</th>
-                            <th style="width: 100px; text-align: center;">{% trans "À sortir" %}</th>
-                            <th style="text-align: right;">{% trans "Don unitaire" %}</th>
-                            <th style="width: 150px; text-align: right;">{% trans "Don total" %}</th>
+                            <th>{% trans "Réservé" %}</th>
+                            <th>{% trans "Disponible" %}</th>
+                            <th>{% trans "À sortir" %}</th>
+                            <th>{% trans "Don unitaire" %}</th>
+                            <th>{% trans "Don total" %}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -68,17 +66,17 @@
                             <tr>
                                 <td>
                                     <strong>{{ item.asset.name }}</strong><br>
-                                    <small style="color: var(--text-secondary);">{{ item.asset.category.name }}</small>
+                                    <small>{{ item.asset.category.name }}</small>
                                 </td>
-                                <td style="text-align: center;">{{ item.quantity_reserved }}</td>
-                                <td style="text-align: center;">
+                                <td>{{ item.quantity_reserved }}</td>
+                                <td>
                                     {% if item.asset.stock_quantity < item.quantity_reserved %}
                                         <span class="quantity-warning">{{ item.asset.stock_quantity }}</span>
                                     {% else %}
                                         {{ item.asset.stock_quantity }}
                                     {% endif %}
                                 </td>
-                                <td style="text-align: center;">
+                                <td>
                                     <input type="number"
                                            name="checkout_{{ item.id }}"
                                            class="quantity-input"
@@ -88,8 +86,8 @@
                                            min="0"
                                            max="{{ item.asset.stock_quantity }}">
                                 </td>
-                                <td style="text-align: right;">{{ item.asset.rental_value }} €</td>
-                                <td style="text-align: right;">
+                                <td>{{ item.asset.rental_value }} €</td>
+                                <td>
                                     <span class="item-total" data-item-id="{{ item.id }}">
                                         {{ item.expected_donation }} €
                                     </span>
@@ -101,7 +99,7 @@
                 </div>
 
                 <!-- Don minimum attendu (en lecture seule) -->
-                <div class="auth-card" style="margin-top: 20px;">
+                <div class="auth-card">
                     <h4 class="no-margin-title">
                         <i class="fas fa-euro-sign"></i> {% trans "Totaux" %}
                     </h4>
@@ -124,7 +122,7 @@
                             </div>
                             <div class="detail-value">
                                 <strong>{{ customer_membership_fee }}</strong> €
-                                <span style="color: var(--accent-red);">({% trans "Non payée" %})</span>
+                                <span class="donation-value bad">({% trans "Non payée" %})</span>
                             </div>
                         </div>
                     {% else %}
@@ -134,7 +132,7 @@
                                 {% trans "Cotisation annuelle" %}
                             </div>
                             <div class="detail-value">
-                                <span style="color: var(--accent-blue);">({% trans "Déjà payée" %})</span>
+                                <span class="donation-value good">({% trans "Déjà payée" %})</span>
                             </div>
                         </div>
                     {% endif %}
@@ -170,7 +168,7 @@
                 </div>
 
                 <!-- Notes -->
-                <div class="auth-card" style="margin-top: 20px;">
+                <div class="auth-card">
                     <label for="notes">
                         <i class="fas fa-sticky-note"></i> {% trans "Notes" %}
                     </label>
@@ -182,14 +180,16 @@
                 </div>
 
                 <!-- Boutons d'action -->
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
-                    <a href="javascript:history.back()" class="auth-button"
-                       style="background-color: var(--bg-element);">
-                        <i class="fas fa-times"></i> {% trans "Annuler" %}
-                    </a>
-                    <button type="submit" class="auth-button">
-                        <i class="fas fa-arrow-right"></i> {% trans "Valider la sortie" %}
-                    </button>
+                <div class="auth-card">
+                    <div class="actions-buttons">
+                        <a href="javascript:history.back()" class="auth-button"
+                           style="background-color: var(--bg-element);">
+                            <i class="fas fa-times"></i> {% trans "Annuler" %}
+                        </a>
+                        <button type="submit" class="auth-button">
+                            <i class="fas fa-arrow-right"></i> {% trans "Valider la sortie" %}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

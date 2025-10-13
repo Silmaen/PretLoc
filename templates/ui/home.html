@@ -3,39 +3,165 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-    {% if user.is_authenticated %}
-    {% if user.profile.user_type == "new" %}
-    <div class="auth-card">
-        <div class="auth-header">
-            <i class="fas fa-user-clock auth-icon"></i>
-            <h2>{% trans "Compte en attente de validation" %}</h2>
-        </div>
-        <p>
-            {% blocktrans %} Votre compte est actuellement en attente de validation par un administrateur.
-            Vous pourrez accéder à toutes les fonctionnalités une fois votre compte validé.{% endblocktrans %}
-        </p>
-    </div>
-    {% else %}
-    <div class="auth-card">
-        <div class="auth-header">
-            <i class="fas fa-tools auth-icon"></i>
-            <h2>{% trans "Site en construction" %}</h2>
-        </div>
-        <p>
-            {% blocktrans %} Notre site est actuellement en cours de développement. Certaines fonctionnalités peuvent ne
-            pas être disponibles ou fonctionner correctement. Merci de votre patience. {% endblocktrans %}
-        </p>
-    </div>
-    {% endif %}
-    {% else %}
-    <h1>{% trans "Bienvenue au Comité des fêtes de Genay" %}</h1>
-    <img src="{% static 'images/cdf.png' %}" alt="Logo du Comité des fêtes de Genay" class="logo">
-    <p>{% trans "Application de gestion du matériel" %}</p>
+    <div class="auth-container">
+        {% if user.is_authenticated %}
+            {% if user.profile.user_type == "new" %}
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <i class="fas fa-user-clock auth-icon"></i>
+                        <h2>{% trans "Compte en attente de validation" %}</h2>
+                    </div>
+                    <p>
+                        {% blocktrans %}Votre compte est actuellement en attente de validation par un administrateur.
+                            Vous pourrez accéder à toutes les fonctionnalités une fois votre compte
+                            validé.{% endblocktrans %}
+                    </p>
+                </div>
+            {% else %}
+                <div class="auth-card">
+                    <h1>{% trans "Tableau de bord" %}</h1>
 
-    <a href="{% url 'accounts:login' %}" class="login-button">
-        <i class="fas fa-sign-in-alt"></i> {% trans "Connexion" %}
-    </a>
-    {% endif %}
-</div>
+                    <!-- Métriques principales -->
+                    <div class="quantity-overview">
+                        {% if capability.can_view_articles %}
+                            <div class="quantity-badge damaged">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div class="quantity-info">
+                                    <span class="quantity-value">{{ articles_endommages }}</span>
+                                    <span class="quantity-label">{% trans "Articles endommagés" %}</span>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if capability.can_view_reservations %}
+                            <div class="quantity-badge available">
+                                <i class="fas fa-check-circle"></i>
+                                <div class="quantity-info">
+                                    <span class="quantity-value">{{ reservations_closes }}</span>
+                                    <span class="quantity-label">{% trans "Réservations closes" %} ({% trans "Cette année" %})</span>
+                                </div>
+                            </div>
+
+                            <div class="quantity-badge checked-out">
+                                <i class="fas fa-calendar-check"></i>
+                                <div class="quantity-info">
+                                    <span class="quantity-value">{{ reservations_en_cours }}</span>
+                                    <span class="quantity-label">{% trans "Réservations en cours" %}</span>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if capability.can_view_donations %}
+                            <div class="quantity-badge reserved">
+                                <i class="fas fa-euro-sign"></i>
+                                <div class="quantity-info">
+                                    <span class="quantity-value">{{ dons_annee|floatformat:2 }} €</span>
+                                    <span class="quantity-label">{% trans "Dons reçus" %} ({% trans "Cette année" %})</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Prochains mouvements -->
+                    {% if capability.can_view_reservations %}
+                        <div class="flex-row">
+                            <div class="auth-card">
+                                <div class="text-center">
+                                    <h5 class="no-margin-title">{% trans "Départs" %}
+                                        - {% trans nom_jour %} {{ prochain_jour|date:"d/m/Y" }}</h5>
+                                    <h2 class="quantity-value" style="color: #fd7e14;">{{ nb_departs }}</h2>
+                                </div>
+                            </div>
+
+                            <div class="auth-card">
+                                <div class="text-center">
+                                    <h5 class="no-margin-title">{% trans "Retours" %}
+                                        - {% trans nom_jour %} {{ prochain_jour|date:"d/m/Y" }}</h5>
+                                    <h2 class="quantity-value" style="color: #28a745;">{{ nb_retours }}</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Détail des départs -->
+                        <div class="auth-card">
+                            <div class="auth-header">
+                                <h4 class="no-margin-title" style="color: #fd7e14;">
+                                    <i class="fas fa-arrow-up"></i>
+                                    {% trans "Détail des départs" %}
+                                    - {% trans nom_jour %} {{ prochain_jour|date:"d/m/Y" }}
+                                </h4>
+                            </div>
+                            {% if departs %}
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>{% trans "Client" %}</th>
+                                        <th>{% trans "Type" %}</th>
+                                        <th>{% trans "Articles" %}</th>
+                                        <th>{% trans "Retour prévu" %}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for reservation in departs %}
+                                        <tr>
+                                            <td>{{ reservation.customer.first_name }} {{ reservation.customer.last_name }}</td>
+                                            <td>{{ reservation.customer.customer_type.name }}</td>
+                                            <td>{{ reservation.items.count }} {% trans "articles" %}</td>
+                                            <td>{{ reservation.return_date|date:"d/m/Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p class="form-help-text text-center">{% trans "Aucun départ prévu" %}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Détail des retours -->
+                        <div class="auth-card">
+                            <div class="auth-header">
+                                <h4 class="no-margin-title" style="color: #28a745;">
+                                    <i class="fas fa-arrow-down"></i>
+                                    {% trans "Détail des retours" %}
+                                    - {% trans nom_jour %} {{ prochain_jour|date:"d/m/Y" }}
+                                </h4>
+                            </div>
+                            {% if retours %}
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>{% trans "Client" %}</th>
+                                        <th>{% trans "Type" %}</th>
+                                        <th>{% trans "Articles" %}</th>
+                                        <th>{% trans "Départ" %}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for reservation in retours %}
+                                        <tr>
+                                            <td>{{ reservation.customer.first_name }} {{ reservation.customer.last_name }}</td>
+                                            <td>{{ reservation.customer.customer_type.name }}</td>
+                                            <td>{{ reservation.items.count }} {% trans "articles" %}</td>
+                                            <td>{{ reservation.checkout_date|date:"d/m/Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p class="form-help-text text-center">{% trans "Aucun retour prévu" %}</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <h1>{% trans "Bienvenue au Comité des fêtes de Genay" %}</h1>
+            <img src="{% static 'images/cdf.png' %}" alt="{% trans 'Logo du Comité des fêtes de Genay' %}" class="logo">
+            <p>{% trans "Application de gestion du matériel" %}</p>
+
+            <a href="{% url 'accounts:login' %}" class="login-button">
+                <i class="fas fa-sign-in-alt"></i> {% trans "Connexion" %}
+            </a>
+        {% endif %}
+    </div>
 {% endblock %}

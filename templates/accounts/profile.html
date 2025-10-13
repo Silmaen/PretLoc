@@ -2,81 +2,82 @@
 {% load i18n %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <i class="fas fa-user-circle auth-icon"></i>
-            <h2>{% trans "Mon profil" %}</h2>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-user-circle auth-icon"></i>
+                <h2>{% trans "Mon profil" %}</h2>
+            </div>
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ user_form.username.id_for_label }}">
+                        <i class="fas fa-user"></i>
+                        {% trans "Nom d'utilisateur" %}
+                    </label>
+                    {{ user_form.username }}
+                    {{ user_form.username.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ user_form.email.id_for_label }}">
+                        <i class="fas fa-envelope"></i>
+                        {% trans "Email" %}
+                    </label>
+                    {{ user_form.email }}
+                    {{ user_form.email.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ user_form.first_name.id_for_label }}">
+                        <i class="fas fa-id-card"></i>
+                        {% trans "Prénom" %}
+                    </label>
+                    {{ user_form.first_name }}
+                    {{ user_form.first_name.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ user_form.last_name.id_for_label }}">
+                        <i class="fas fa-id-card"></i>
+                        {% trans "Nom de famille" %}
+                    </label>
+                    {{ user_form.last_name }}
+                    {{ user_form.last_name.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ profile_form.user_type.id_for_label }}">
+                        <i class="fas fa-user-tag"></i>
+                        {% trans "Type d'utilisateur" %}
+                    </label>
+                    {{ profile_form.user_type }}
+                    {% if is_superuser %}
+                        <p class="form-help-text"><i class="fas fa-lock"></i>
+                            {% trans "En tant que superuser, votre type est fixé comme Administrateur" %}
+                        </p>
+                    {% elif not is_admin %}
+                        <p class="form-help-text"><i class="fas fa-info-circle"></i>
+                            {% trans "Seuls les administrateurs peuvent modifier ce champ" %}
+                        </p>
+                    {% endif %}
+                    {{ profile_form.user_type.errors }}
+                </div>
+
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-save"></i>
+                    {% trans "Enregistrer les modifications" %}
+                </button>
+            </form>
+
+            <div class="auth-card-secondary">
+                <a href="{% url 'accounts:password_change' %}" class="auth-button">
+                    <i class="fas fa-key"></i> {% trans "Modifier mon mot de passe" %}
+                </a>
+            </div>
+
         </div>
-
-        <form method="post" class="auth-form">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="{{ user_form.username.id_for_label }}">
-                    <i class="fas fa-user"></i>
-                    {% trans "Nom d'utilisateur" %}
-                </label>
-                {{ user_form.username }}
-                {{ user_form.username.errors }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ user_form.email.id_for_label }}">
-                    <i class="fas fa-envelope"></i>
-                    {% trans "Email" %}
-                </label>
-                {{ user_form.email }}
-                {{ user_form.email.errors }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ user_form.first_name.id_for_label }}">
-                    <i class="fas fa-id-card"></i>
-                    {% trans "Prénom" %}
-                </label>
-                {{ user_form.first_name }}
-                {{ user_form.first_name.errors }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ user_form.last_name.id_for_label }}">
-                    <i class="fas fa-id-card"></i>
-                    {% trans "Nom de famille" %}
-                </label>
-                {{ user_form.last_name }}
-                {{ user_form.last_name.errors }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ profile_form.user_type.id_for_label }}">
-                    <i class="fas fa-user-tag"></i>
-                    {% trans "Type d'utilisateur" %}
-                </label>
-                {{ profile_form.user_type }}
-                {% if is_superuser %}
-                <p class="form-help-text"><i class="fas fa-lock"></i>
-                    {% trans "En tant que superuser, votre type est fixé comme Administrateur" %}
-                </p>
-                {% elif not is_admin %}
-                <p class="form-help-text"><i class="fas fa-info-circle"></i>
-                    {% trans "Seuls les administrateurs peuvent modifier ce champ" %}
-                </p>
-                {% endif %}
-                {{ profile_form.user_type.errors }}
-            </div>
-
-            <button type="submit" class="auth-button">
-                <i class="fas fa-save"></i>
-                {% trans "Enregistrer les modifications" %}
-            </button>
-        </form>
-        <div style="margin-top: 20px;"></div>
-
-        <a href="{% url 'accounts:password_change' %}" class="auth-button">
-            <i class="fas fa-key"></i> {% trans "Modifier mon mot de passe" %}
-        </a>
-
     </div>
-</div>
 {% endblock %}

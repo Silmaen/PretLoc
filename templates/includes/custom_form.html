@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas {% block form_title_icon %}fa-user-tag{% endblock %} auth-icon"></i>
+                <h2>
+                    {% block form_title %}
+                    {% endblock %}
+                </h2>
+            </div>
+
+            {% block form_content %}
+            {% endblock %}
+        </div>
+        {% block form_actions %}
+            <div class="auth-card">
+                <div class="actions-buttons">
+                    <a href="javascript:history.back()" class="auth-button">
+                        <i class="fas fa-arrow-left"></i> {% trans "Retour" %}
+                    </a>
+                </div>
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}

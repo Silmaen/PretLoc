@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block form_title %}
+    {% trans "Supprimer une catégorie" %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="auth-card-secondary">
+        <p>{% trans "Êtes-vous sûr de vouloir supprimer cette catégorie?" %}</p>
+    </div>
+
+    <div class="auth-card-secondary">
+        <strong>{{ category.name }}</strong>
+        {% if category.description %}
+            <p>{{ category.description }}</p>
+        {% endif %}
+        <p class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            {% trans "Attention: Tous les articles de cette catégorie seront également supprimés!" %}
+        </p>
+    </div>
+
+{% endblock %}

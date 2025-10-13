@@ -14,14 +14,14 @@
             <p><strong>{% trans "Client" %}:</strong> {{ reservation.customer }}</p>
             <p><strong>{% trans "Date prévue" %}:</strong> {{ reservation.checkout_date }}</p>
 
-            <form method="post">
+            <form method="post" class="auth-form">
                 {% csrf_token %}
-                <div class="actions-buttons" style="justify-content: center; margin-top: 20px;">
+                <div class="actions-buttons">
                     <a href="javascript:history.back()" class="auth-button">
                         <i class="fas fa-times"></i> {% trans "Annuler" %}
                     </a>
-                    <button type="submit" class="auth-button" style="background-color: var(--accent-red);">
-                        <i class="fas fa-check"></i> {% trans "Confirmer l'annulation" %}
+                    <button type="submit" class="auth-button danger">
+                        <i class="fas fa-check"></i> {% trans "Confirmer" %}
                     </button>
                 </div>
             </form>

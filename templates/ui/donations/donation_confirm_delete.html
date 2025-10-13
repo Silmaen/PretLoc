@@ -1,0 +1,39 @@
+{% extends 'includes/custom_confirm_delete.html' %}
+{% load i18n %}
+
+{% block form_title %}
+    {% trans "Supprimer un don." %}
+{% endblock %}
+
+{% block form_content %}
+    <div class="auth-card-secondary">
+        <p class="no-margin-title">
+            {% trans "Êtes-vous sûr de vouloir supprimer ce don ?" %}
+        </p>
+    </div>
+
+    <div class="auth-card-secondary">
+        <div class="detail-row">
+            <strong>{% trans "Client" %} :</strong> {{ donation.customer }}
+        </div>
+        <div class="detail-row">
+            <strong>{% trans "Montant" %} :</strong> {{ donation.amount|floatformat:2 }} €
+        </div>
+        <div class="detail-row">
+            <strong>{% trans "Date" %} :</strong> {{ donation.date|date:"d/m/Y" }}
+        </div>
+        {% if donation.includes_membership %}
+            <div class="detail-row">
+                <i class="fas fa-check-circle"></i> {% trans "Inclut l'adhésion" %}
+            </div>
+        {% endif %}
+        {% if donation.reservation %}
+            <div class="detail-row">
+                <strong>{% trans "Réservation" %} :</strong>
+                <a href="{% url 'ui:reservation_detail' donation.reservation.pk %}" class="auth-blue">
+                    #{{ donation.reservation.pk }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

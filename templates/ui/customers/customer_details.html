@@ -9,7 +9,7 @@
                 <h2>{% trans "Détails du Client" %}</h2>
             </div>
 
-            <!-- Informations du client -->
+            <!-- Customer informations -->
             <div class="auth-card-secondary">
                 <h4>{% trans "Informations générales" %}</h4>
                 <div class="detail-row">
@@ -17,8 +17,8 @@
                         <i class="fas fa-users"></i> {% trans "Type de client" %}
                     </div>
                     <div class="detail-value">
-                        <span style="color: {{ customer.customer_type.color }}">
-                            <i class="{% if customer.customer_type.entity_type == 'physical' %}fas fa-user{% else %}fas fa-building{% endif %}"></i>
+                        <span style="color: {{ customer.color }}">
+                            <i class="fas {{ customer.icon }}"></i>
                             {{ customer.customer_type.name }}
                         </span>
                     </div>
@@ -27,19 +27,19 @@
                 {% if customer.customer_type.entity_type == "physical" %}
                     <div class="detail-row">
                         <div class="detail-label">
-                            <i class="fas fa-user"></i> {% trans "Nom" %}
+                            <i class="fas {{ customer.icon }}"></i> {% trans "Nom" %}
                         </div>
                         <div class="detail-value">
-                            {{ customer.last_name }} {{ customer.first_name }}
+                            {{ customer.name }}
                         </div>
                     </div>
                 {% else %}
                     <div class="detail-row">
                         <div class="detail-label">
-                            <i class="fas fa-building"></i> {% trans "Raison sociale" %}
+                            <i class="fas {{ customer.icon }}"></i> {% trans "Raison sociale" %}
                         </div>
                         <div class="detail-value">
-                            {{ customer.company_name }}
+                            {{ customer.name }}
                         </div>
                     </div>
                     <div class="detail-row">
@@ -115,7 +115,7 @@
                 {% endif %}
             </div>
 
-            <!-- Statistiques -->
+            <!-- Statistics -->
             <div class="auth-card-secondary">
                 <h4>{% trans "Statistiques" %}</h4>
                 <div class="detail-row">
@@ -136,11 +136,11 @@
                     </div>
                     <div class="detail-value">
                         {% if is_membership_up_to_date %}
-                            <span style="color: var(--accent-green); font-weight: bold;">
+                            <span class="donation-value good">
                                 <i class="fas fa-check-circle"></i> {% trans "À jour" %}
                             </span>
                         {% else %}
-                            <span style="color: var(--accent-red); font-weight: bold;">
+                            <span class="donation-value bad">
                                 <i class="fas fa-times-circle"></i> {% trans "Non à jour" %}
                             </span>
                         {% endif %}
@@ -148,16 +148,15 @@
                 </div>
             </div>
 
-            <!-- Historique des dons -->
+            <!-- Donation history -->
             {% if capability.can_view_donations %}
                 <div class="auth-card-secondary">
                     <div class="flex-between">
                         <h4>{% trans "Historique des dons" %}</h4>
                         {% if capability.can_add_donations %}
                             <a href="{% url 'ui:donation_create' %}?customer_id={{ customer.pk }}"
-                               class="auth-button"
-                               style="width: auto; padding: 8px 15px;">
-                                <i class="fas fa-plus"></i> {% trans "Ajouter" %}
+                               class="auth-button" title="{% trans "Ajouter" %}">
+                                <i class="fas fa-plus"></i>
                             </a>
                         {% endif %}
                     </div>
@@ -179,11 +178,9 @@
                                         <td>{{ donation.amount|floatformat:2 }} €</td>
                                         <td class="table-cell-center">
                                             {% if donation.includes_membership %}
-                                                <i class="fas fa-check-circle"
-                                                   style="color: var(--accent-green);"></i>
+                                                <i class="fas fa-check-circle donation-value good"></i>
                                             {% else %}
-                                                <i class="fas fa-times-circle"
-                                                   style="color: var(--accent-red);"></i>
+                                                <i class="fas fa-times-circle donation-value bad"></i>
                                             {% endif %}
                                         </td>
                                         <td>
@@ -191,7 +188,7 @@
                                                 {% if capability.can_edit_donations %}
                                                     <a href="{% url 'ui:donation_update' donation.pk %}"
                                                        class="action-button"
-                                                       title="{% trans 'Editer' %}">
+                                                       title="{% trans 'Éditer' %}">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                 {% endif %}
@@ -208,15 +205,14 @@
                 </div>
             {% endif %}
 
-            <!-- Historique des réservations -->
+            <!-- Reservation history -->
             <div class="auth-card-secondary">
                 <div class="flex-between">
                     <h4>{% trans "Historique des réservations" %}</h4>
                     {% if capability.can_add_reservations %}
                         <a href="{% url 'ui:reservation_create' %}?customer_id={{ customer.pk }}"
-                           class="auth-button"
-                           style="width: auto; padding: 8px 15px;">
-                            <i class="fas fa-plus"></i> {% trans "Ajouter" %}
+                           class="auth-button" title="{% trans "Ajouter" %}">
+                            <i class="fas fa-plus"></i>
                         </a>
                     {% endif %}
                 </div>
@@ -262,8 +258,10 @@
                 {% endif %}
             </div>
 
+        </div>
+        <div class="auth-card">
             <!-- Actions -->
-            <div class="reservation-footer-actions">
+            <div class="actions-buttons">
                 <a href="javascript:history.back()" class="auth-button secondary">
                     <i class="fas fa-arrow-left"></i> {% trans "Retour" %}
                 </a>

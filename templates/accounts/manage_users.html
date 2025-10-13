@@ -2,46 +2,60 @@
 {% load i18n %}
 
 {% block content %}
-<div class="container">
-    <h1>{% trans "Gestion des utilisateurs" %}</h1>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-users-cog auth-icon"></i>
+                <h2>{% trans "Gestion des utilisateurs" %}</h2>
+            </div>
 
-    <div style="margin-bottom: 20px;">
-        <a href="{% url 'accounts:create_user' %}" class="auth-button">
-            <i class="fas fa-user-plus"></i> {% trans "Créer un nouvel utilisateur" %}
-        </a>
-    </div>
-
-    <div class="users-table">
-        <table>
-            <thead>
-            <tr>
-                <th>{% trans "Nom d'utilisateur" %}</th>
-                <th>{% trans "Email" %}</th>
-                <th>{% trans "Type d'utilisateur" %}</th>
-                <th>{% trans "Actions" %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for profile in users %}
-            <tr>
-                <td>{{ profile.user.username }}</td>
-                <td>{{ profile.user.email }}</td>
-                <td>{{ profile.get_user_type_display }}</td>
-                <td>
-                    <a href="{% url 'accounts:edit_user' profile.id %}" class="action-button">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    {% if profile.user.id != request.user.id %}
-                    <a href="{% url 'accounts:delete_user' profile.id %}" class="action-button" style="color: var(--accent-red);"
-                       onclick="return confirm('{% trans "Êtes-vous sûr de vouloir supprimer cet utilisateur?" %}')">
-                        <i class="fas fa-trash"></i>
-                    </a>
+            <!-- Search & Action buttons -->
+            <div class="search-action-bar">
+                <div class="actions-buttons">
+                    {% if capability.can_add_users %}
+                        <a href="{% url 'accounts:create_user' %}" class="auth-button"
+                           title="{% trans "Créer un nouvel utilisateur" %}">
+                            <i class="fas fa-user-plus"></i>
+                        </a>
                     {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </div>
+            </div>
+
+            <!-- Users list -->
+            <div class="users-table">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>{% trans "Nom d'utilisateur" %}</th>
+                        <th>{% trans "Email" %}</th>
+                        <th>{% trans "Type d'utilisateur" %}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for profile in users %}
+                        <tr>
+                            <td>{{ profile.user.username }}</td>
+                            <td>{{ profile.user.email }}</td>
+                            <td>{{ profile.get_user_type_display }}</td>
+                            <td>
+                                <a href="{% url 'accounts:edit_user' profile.id %}" class="action-button"
+                                   title="{% trans "Éditer utilisateur" %}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if profile.user.id != request.user.id %}
+                                    <a href="{% url 'accounts:delete_user' profile.id %}" class="action-button danger"
+                                       onclick="return confirm('{% trans "Êtes-vous sûr de vouloir supprimer cet utilisateur?" %}')"
+                                       title="{% trans "Supprimer utilisateur" %}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
 {% endblock %}

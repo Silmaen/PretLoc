@@ -1,0 +1,117 @@
+{% extends 'includes/custom_form.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_css %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/select2.css' %}">
+{% endblock %}
+
+{% block form_title_icon %}fa-hand-holding-heart{% endblock %}
+{% block form_title %}{{ title }}{% endblock %}
+{% block form_content %}
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.customer.id_for_label }}">
+                <i class="fas fa-user"></i> {{ form.customer.label }}
+            </label>
+            {{ form.customer }}
+            {% if form.customer.errors %}
+                <ul class="errorlist">
+                    {{ form.customer.errors }}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.amount.id_for_label }}">
+                <i class="fas fa-euro-sign"></i> {{ form.amount.label }}
+            </label>
+            {{ form.amount }}
+            {% if form.amount.errors %}
+                <ul class="errorlist">
+                    {{ form.amount.errors }}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>
+                {{ form.includes_membership }}
+                <span>
+                    <i class="fas fa-id-card"></i> {{ form.includes_membership.label }}
+                </span>
+            </label>
+            {% if form.includes_membership.errors %}
+                <ul class="errorlist">
+                    {{ form.includes_membership.errors }}
+                </ul>
+            {% endif %}
+            <div class="form-help-text">
+                <i class="fas fa-info-circle"></i>
+                {% trans "Cochez si ce don inclut l'adhésion annuelle" %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.reservation.id_for_label }}">
+                <i class="fas fa-calendar"></i> {{ form.reservation.label }}
+            </label>
+            {{ form.reservation }}
+            {% if form.reservation.errors %}
+                <ul class="errorlist">
+                    {{ form.reservation.errors }}
+                </ul>
+            {% endif %}
+            <div class="form-help-text">
+                <i class="fas fa-info-circle"></i>
+                {% trans "Optionnel : associer ce don à une réservation" %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="auth-button" title="{% trans "Enregistrer" %}">
+                <i class="fas fa-save"></i>
+                {% trans "Enregistrer" %}
+            </button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        {% get_current_language as CURRENT_LANGUAGE %}
+        let currentLang = "{{ CURRENT_LANGUAGE }}";
+        if (currentLang === 'en') {
+            currentLang = "en-GB"
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{% static 'js/select2_customer.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            initCustomerSelect2('#id_customer', {
+                searchUrl: "{% url 'ui:search_customers' %}",
+                placeholder: "{% trans 'Rechercher un client...' %}",
+                language: currentLang,
+                exemptedTitle: "{% trans 'Exonéré de don' %}",
+                {% if donation and donation.customer %}
+                    initialCustomer: {
+                        id: {{ donation.customer.id }},
+                        text: "{{ donation.customer }}",
+                        icon: "{{ donation.customer.customer_type.icon }}",
+                        color: "{{ donation.customer.customer_type.color }}",
+                        exempted: {{ donation.customer.is_exempted_from_donation|yesno:"true,false" }},
+                        type_name: "{{ donation.customer.customer_type.name }}"
+                    }
+                {% endif %}
+            });
+        });
+    </script>
+{% endblock %}
+

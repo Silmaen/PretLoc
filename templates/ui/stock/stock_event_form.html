@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'includes/custom_form.html' %}
 {% load i18n %}
 {% load static %}
 
@@ -9,133 +9,124 @@
     <link rel="stylesheet" href="{% static 'css/select2.css' %}">
 {% endblock %}
 
-{% block content %}
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <i class="fas fa-history auth-icon"></i>
-                <h2>{% trans "Nouvel événement de stock" %}</h2>
-            </div>
+{% block form_title_icon %}fa-history{% endblock %}
+{% block form_title %}{% trans "Nouvel événement de stock" %}{% endblock %}
 
-            <form method="post">
-                {% csrf_token %}
+{% block form_content %}
+    <form method="post" class="auth-form">
+        {% csrf_token %}
 
-                <div class="form-group">
-                    <label for="{{ form.asset.id_for_label }}">
-                        <i class="fas fa-box"></i> {{ form.asset.label }}
-                    </label>
-                    {{ form.asset }}
-                    {% if form.asset.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.asset.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% if form.asset.help_text %}
-                        <div class="form-help-text">
-                            <i class="fas fa-info-circle"></i> {{ form.asset.help_text }}
-                        </div>
-                    {% endif %}
+        <div class="form-group">
+            <label for="{{ form.asset.id_for_label }}">
+                <i class="fas fa-box"></i> {{ form.asset.label }}
+            </label>
+            {{ form.asset }}
+            {% if form.asset.errors %}
+                <ul class="errorlist">
+                    {% for error in form.asset.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if form.asset.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.asset.help_text }}
                 </div>
-
-                <div class="form-group">
-                    <label for="{{ form.event_type.id_for_label }}">
-                        <i class="fas fa-tag"></i> {{ form.event_type.label }}
-                    </label>
-                    {{ form.event_type }}
-                    {% if form.event_type.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.event_type.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% if form.event_type.help_text %}
-                        <div class="form-help-text">
-                            <i class="fas fa-info-circle"></i> {{ form.event_type.help_text }}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.quantity.id_for_label }}">
-                        <i class="fas fa-sort-amount-up"></i> {{ form.quantity.label }}
-                    </label>
-                    {{ form.quantity }}
-                    {% if form.quantity.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.quantity.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% if form.quantity.help_text %}
-                        <div class="form-help-text">
-                            <i class="fas fa-info-circle"></i> {{ form.quantity.help_text }}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.date.id_for_label }}">
-                        <i class="fas fa-calendar-alt"></i> {{ form.date.label }}
-                    </label>
-                    <div class="flatpickr-wrapper">
-                        <input type="text" id="{{ form.date.id_for_label }}"
-                               name="{{ form.date.name }}"
-                               placeholder="{% trans 'Sélectionner une date' %}"
-                               {% if reservation %}value="{{ reservation.checkout_date|date:'Y-m-d H:i' }}" {% endif %}
-                               class="datepicker" data-input required>
-                        <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
-                            <i class="fas fa-calendar-alt"></i>
-                        </a>
-                    </div>
-                    {% if form.date.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.date.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% if form.date.help_text %}
-                        <div class="form-help-text">
-                            <i class="fas fa-info-circle"></i> {{ form.date.help_text }}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.description.id_for_label }}">
-                        <i class="fas fa-sticky-note"></i> {{ form.notes.label }}
-                    </label>
-                    {{ form.description }}
-                    {% if form.description.errors %}
-                        <ul class="errorlist">
-                            {% for error in form.description.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% if form.description.help_text %}
-                        <div class="form-help-text">
-                            <i class="fas fa-info-circle"></i> {{ form.description.help_text }}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
-                    <a href="javascript:history.back()" class="auth-button"
-                       style="background-color: var(--bg-element);">
-                        <i class="fas fa-times"></i> {% trans "Annuler" %}
-                    </a>
-                    <button type="submit" class="auth-button">
-                        <i class="fas fa-save"></i> {% trans "Enregistrer" %}
-                    </button>
-                </div>
-            </form>
+            {% endif %}
         </div>
-    </div>
+
+        <div class="form-group">
+            <label for="{{ form.event_type.id_for_label }}">
+                <i class="fas fa-tag"></i> {{ form.event_type.label }}
+            </label>
+            {{ form.event_type }}
+            {% if form.event_type.errors %}
+                <ul class="errorlist">
+                    {% for error in form.event_type.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if form.event_type.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.event_type.help_text }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.quantity.id_for_label }}">
+                <i class="fas fa-sort-amount-up"></i> {{ form.quantity.label }}
+            </label>
+            {{ form.quantity }}
+            {% if form.quantity.errors %}
+                <ul class="errorlist">
+                    {% for error in form.quantity.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if form.quantity.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.quantity.help_text }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.date.id_for_label }}">
+                <i class="fas fa-calendar-alt"></i> {{ form.date.label }}
+            </label>
+            <div class="flatpickr-wrapper">
+                <input type="text" id="{{ form.date.id_for_label }}"
+                       name="{{ form.date.name }}"
+                       placeholder="{% trans 'Sélectionner une date' %}"
+                       {% if reservation %}value="{{ reservation.checkout_date|date:'Y-m-d H:i' }}" {% endif %}
+                       class="datepicker search-input-round" data-input required>
+                <a class="input-button" data-toggle title="{% trans 'Sélectionner une date' %}">
+                    <i class="fas fa-calendar-alt"></i>
+                </a>
+            </div>
+            {% if form.date.errors %}
+                <ul class="errorlist">
+                    {% for error in form.date.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if form.date.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.date.help_text }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">
+                <i class="fas fa-sticky-note"></i> {{ form.notes.label }}
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <ul class="errorlist">
+                    {% for error in form.description.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if form.description.help_text %}
+                <div class="form-help-text">
+                    <i class="fas fa-info-circle"></i> {{ form.description.help_text }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="auth-button" title="{% trans "Enregistrer" %}">
+                <i class="fas fa-save"></i>
+                {% trans "Enregistrer" %}
+            </button>
+        </div>
+    </form>
 {% endblock %}
 
 {% block extra_js %}
@@ -177,7 +168,7 @@
 
                 return $('<div class="select2-result-asset">' +
                     '<strong>' + asset.text + '</strong>' +
-                    '<div style="display: flex; justify-content: space-between; font-size: 0.8em;">' +
+                    '<div class="search-asset">' +
                     '<span><i class="fas fa-tag"></i> ' + asset.category + '</span>' +
                     '<span><i class="fas fa-boxes"></i>{% trans "Stock:" %} ' + asset.stock + ' / ' + asset.stock_total + '</span>' +
                     '<span><i class="fas fa-euro-sign"></i> ' + asset.rental_value + ' €</span>' +

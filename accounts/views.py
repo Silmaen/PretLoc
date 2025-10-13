@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext_lazy as _
 
-from .decorators import user_type_required, get_capability
+from .decorators import user_capability_required, get_capability
 from .forms import SignUpForm, UserUpdateForm, ProfileUpdateForm
 from .models import UserProfile
 
@@ -80,7 +80,7 @@ def user_profile(request):
 
 
 @login_required
-@user_type_required("admin")
+@user_capability_required("can_view_users")
 def manage_users(request):
     users = UserProfile.objects.all()
     return render(
@@ -94,7 +94,7 @@ def manage_users(request):
 
 
 @login_required
-@user_type_required("admin")
+@user_capability_required("can_edit_users")
 def edit_user(request, user_id):
     user_profile_local = UserProfile.objects.get(id=user_id)
 
@@ -134,7 +134,7 @@ def edit_user(request, user_id):
 
 
 @login_required
-@user_type_required("admin")
+@user_capability_required("can_edit_users")
 def reset_password(request, user_id):
     user_profile_local = UserProfile.objects.get(id=user_id)
     user = user_profile_local.user
@@ -171,7 +171,7 @@ def reset_password(request, user_id):
 
 
 @login_required
-@user_type_required("admin")
+@user_capability_required("can_add_users")
 def create_user(request):
     if request.method == "POST":
         # Récupérer les données du formulaire
@@ -211,7 +211,7 @@ def create_user(request):
 
 
 @login_required
-@user_type_required("admin")
+@user_capability_required("can_delete_users")
 def delete_user(request, user_id):
     user_profile_local = UserProfile.objects.get(id=user_id)
 
